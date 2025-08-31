@@ -19,7 +19,8 @@ app.use(cors({
     'https://programacion-76j8fplcj-tomas0626s-projects.vercel.app',
     'https://programacion-4s5e3pwzy-tomas0626s-projects.vercel.app',
     'https://programacion-ochre-one.vercel.app',
-    'https://programacion-tomas0626s-projects.vercel.app'
+    'https://programacion-tomas0626s-projects.vercel.app',
+    'https://programacion-150p56gws-tomas0626s-projects.vercel.app'
   ],
   credentials: true
 }));
