@@ -29,6 +29,9 @@ import './i18n';
 import HelpIcon from './assets/HelpIcon';
 import { useTranslation } from 'react-i18next';
 
+// URL del backend desde variable de entorno
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+
 function App() {
   // Estado para mostrar el modal de soporte
   const [showSupportModal, setShowSupportModal] = useState(false);
@@ -145,7 +148,7 @@ function App() {
   const handleVerify = async (code) => {
     setVerifyError('');
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/verificar', {
+  const res = await fetch(`${BACKEND_URL}/api/verificar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: pendingEmail, codigo: code })
@@ -171,7 +174,7 @@ function App() {
     const handler = async (e) => {
       const correo = e.detail;
       try {
-  const res = await fetch('https://aura-0244.onrender.com/api/reenviar-verificacion', {
+  const res = await fetch(`${BACKEND_URL}/api/reenviar-verificacion`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ correo })
@@ -195,7 +198,7 @@ function App() {
     const handler = async (e) => {
       const correo = e.detail;
       try {
-  const res = await fetch('https://aura-0244.onrender.com/api/reenviar-codigo', {
+  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ correo })
@@ -219,7 +222,7 @@ function App() {
     setRecoveryError('');
     setRecoveryEmail(email);
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/recovery', {
+  const res = await fetch(`${BACKEND_URL}/api/recovery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -245,7 +248,7 @@ function App() {
     setRecoveryError('');
     setRecoveryCode(code);
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/recovery/verify', {
+  const res = await fetch(`${BACKEND_URL}/api/recovery/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail, code })
@@ -281,7 +284,7 @@ function App() {
       return;
     }
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/recovery/reset', {
+  const res = await fetch(`${BACKEND_URL}/api/recovery/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail, code: recoveryCode, password })
@@ -307,7 +310,7 @@ function App() {
   const handleLogin = async (form) => {
     setLoginError('');
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/login', {
+  const res = await fetch(`${BACKEND_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario: form.usuario, contrasena: form.contrasena })
@@ -327,12 +330,12 @@ function App() {
       }
       // Obtener datos reales del usuario tras login exitoso
       // data.usuario puede ser username o correo, según backend
-  const resUser = await fetch(`https://aura-0244.onrender.com/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`);
+  const resUser = await fetch(`${BACKEND_URL}/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`);
       let userData = await resUser.json();
       setUser(userData);
       // Esperar un poco y volver a pedir los datos para asegurar que ultima_conexion esté actualizada
       setTimeout(async () => {
-  const resUser2 = await fetch(`https://aura-0244.onrender.com/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`);
+  const resUser2 = await fetch(`${BACKEND_URL}/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`);
         const userData2 = await resUser2.json();
         setUser(userData2);
       }, 500);
@@ -350,7 +353,7 @@ function App() {
   const handleRegister = async (data) => {
     setRegisterError('');
     try {
-  const res = await fetch('https://aura-0244.onrender.com/api/registro', {
+  const res = await fetch(`${BACKEND_URL}/api/registro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1215,7 +1218,7 @@ function App() {
               onSubmit={async email => {
                 setPendingEmail(email);
                 try {
-                  const res = await fetch('https://aura-0244.onrender.com/api/reenviar-verificacion', {
+                  const res = await fetch(`${BACKEND_URL}/api/reenviar-verificacion`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ correo: email })
