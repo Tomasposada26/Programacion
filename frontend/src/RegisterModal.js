@@ -107,7 +107,7 @@ const RegisterModal = ({ isOpen, onClose, onRegister, errorMsg }) => {
   // Lógica para Google OAuth
   const handleGoogleRegister = () => {
     const clientId = '130837705730-qotegc29noaned5m19qapvvr2ene29q5.apps.googleusercontent.com';
-    const redirectUri = 'http://localhost:3000/google-callback.html';
+  const redirectUri = 'https://tu-frontend-en-vercel.com/google-callback.html'; // Cambia esto por la URL real de tu frontend
     const scope = 'profile email';
     const responseType = 'code';
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=select_account`;

@@ -25,7 +25,7 @@ const RespuestasPanel = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   // Cargar reglas al montar
   useEffect(() => {
-    fetch('http://localhost:4000/api/reglas')
+  fetch('https://aura-0244.onrender.com/api/reglas')
       .then(res => res.json())
       .then(data => setReglas(Array.isArray(data) ? data : []));
   }, []);
@@ -57,7 +57,7 @@ const RespuestasPanel = () => {
       estado: form.state ? 'activa' : 'inactiva'
     };
     try {
-      const res = await fetch('http://localhost:4000/api/reglas', {
+  const res = await fetch('https://aura-0244.onrender.com/api/reglas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nueva)
@@ -229,7 +229,7 @@ const RespuestasPanel = () => {
                       title={regla.estado === 'activa' ? t('autoResponses.active','Activo') : t('autoResponses.inactive','Inactiva')}
                       onClick={async () => {
                         const nuevoEstado = regla.estado === 'activa' ? 'inactiva' : 'activa';
-                        const res = await fetch(`http://localhost:4000/api/reglas/${regla._id}/estado`, {
+                        const res = await fetch(`https://aura-0244.onrender.com/api/reglas/${regla._id}/estado`, {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ estado: nuevoEstado })
@@ -258,7 +258,7 @@ const RespuestasPanel = () => {
                     <button
                       style={{background: darkMode ? '#232a3b' : '#e0e7ef',color: darkMode ? '#fff' : '#232a3b',fontWeight:600,padding:'6px 12px',border:'none',borderRadius:6,cursor:'pointer',marginRight:6}}
                       onClick={async () => {
-                        const res = await fetch(`http://localhost:4000/api/reglas/${regla._id}/duplicar`, { method: 'POST' });
+                        const res = await fetch(`https://aura-0244.onrender.com/api/reglas/${regla._id}/duplicar`, { method: 'POST' });
                         if (res.ok) {
                           const nueva = await res.json();
                           setReglas(rs => [nueva, ...rs]);
@@ -284,7 +284,7 @@ const RespuestasPanel = () => {
                       style={{background:'#e53e3e',color:'#fff',fontWeight:600,padding:'6px 12px',border:'none',borderRadius:6,cursor:'pointer'}}
                       onClick={async () => {
                         if (window.confirm(t('autoResponses.confirmDelete','¿Seguro que quieres eliminar esta regla?'))) {
-                          const res = await fetch(`http://localhost:4000/api/reglas/${regla._id}`, { method: 'DELETE' });
+                          const res = await fetch(`https://aura-0244.onrender.com/api/reglas/${regla._id}`, { method: 'DELETE' });
                           if (res.ok) {
                             setReglas(rs => rs.filter(r => r._id !== regla._id));
                             // Notificación: regla eliminada
@@ -325,7 +325,7 @@ const RespuestasPanel = () => {
                   <button
                     style={{background:'#188fd9',color:'#fff',fontWeight:700,padding:'8px 18px',border:'none',borderRadius:8,cursor:'pointer'}}
                     onClick={async () => {
-                      const res = await fetch(`http://localhost:4000/api/reglas/${editId}`, {
+                      const res = await fetch(`https://aura-0244.onrender.com/api/reglas/${editId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ respuestaAutomatica: editValue })
