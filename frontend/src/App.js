@@ -222,7 +222,7 @@ function App() {
     setRecoveryError('');
     setRecoveryEmail(email);
     try {
-  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
+    const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -233,9 +233,9 @@ function App() {
         toast.error(errorData.error || 'No se pudo enviar el correo');
         return;
       }
-      setShowRecovery(false);
-      setShowReset(true);
-      setRecoveryStep('code');
+  setShowRecovery(false);
+  setShowReset(true);
+  setRecoveryStep('code');
       toast.success('¡Código de recuperación enviado!');
     } catch (err) {
       setRecoveryError('Error al enviar el correo de recuperación');
