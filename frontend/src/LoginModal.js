@@ -4,9 +4,8 @@ import Spinner from './assets/Spinner';
 import googleIcon from './assets/google-icon.svg';
 import EyeIcon from './assets/EyeIcon';
 
-const BACKEND_URL = process.env.NODE_ENV === 'production'
-  ? 'https://aura-0244.onrender.com'
-  : '';
+// URL del backend desde variable de entorno
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpenVerifyEmail }) => {
   const [form, setForm] = useState(() => {
