@@ -272,30 +272,42 @@ app.post('/api/recovery/request', async (req, res) => {
     await transporter.sendMail({
       from: 'Aura <aurainstacms@gmail.com>',
       to: correo,
-      subject: 'Código de recuperación de contraseña',
-      html: `<div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:40px auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #0001;overflow:hidden;">
-          <tr>
-            <td style="background:#188fd9;padding:32px 0;text-align:center;">
-              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Recupera tu acceso</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 32px 16px 32px;">
-              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Tu código de recuperación es:</p>
-              <div style="background:#f4f6fb;border-radius:12px;padding:24px 0;margin:0 0 18px 0;text-align:center;">
-                <span style="display:inline-block;font-size:2.2em;letter-spacing:12px;font-weight:900;color:#6366f1;font-family:monospace;background:#fff;padding:12px 32px;border-radius:8px;border:2px solid #6366f1;box-shadow:0 2px 8px #6366f133;">${codigo}</span>
-              </div>
-              <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Si no solicitaste este código, puedes ignorar este correo.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:#f4f6fb;padding:18px 32px;text-align:center;color:#888;font-size:0.98em;border-top:1px solid #eee;">
-              Saludos,<br>El equipo de Aura
-            </td>
-          </tr>
-        </table>
-      </div>`
+      subject: 'Recupera tu acceso a Aura: Código de recuperación',
+      html: `
+        <div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:40px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #0002;overflow:hidden;">
+            <tr>
+              <td style="background:#188fd9;padding:36px 0;text-align:center;">
+                <img src="https://aura-frontend-tomasposada26.vercel.app/logo192.png" alt="Aura" width="64" height="64" style="margin-bottom:12px;border-radius:12px;" />
+                <h1 style="color:#fff;font-size:2.2em;margin:0;font-weight:900;letter-spacing:2px;">Recupera tu acceso a Aura</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:36px 36px 18px 36px;">
+                <p style="font-size:1.15em;color:#222;margin:0 0 16px 0;">Hola,</p>
+                <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Recibimos una solicitud para restablecer la contraseña de tu cuenta en <b>Aura</b>. Si fuiste tú, utiliza el siguiente código para continuar con el proceso:</p>
+                <div style="background:#f4f6fb;border-radius:14px;padding:24px 0;margin:0 0 18px 0;text-align:center;">
+                  <span style="display:inline-block;font-size:2.3em;letter-spacing:12px;font-weight:900;color:#6366f1;font-family:monospace;background:#fff;padding:14px 36px;border-radius:10px;border:2px solid #6366f1;box-shadow:0 2px 8px #6366f133;">${codigo}</span>
+                </div>
+                <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Este código es válido por los próximos <b>10 minutos</b>. Si no solicitaste este cambio, puedes ignorar este correo y tu contraseña seguirá siendo la misma.</p>
+                <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+                <p style="font-size:1.05em;color:#222;margin:0 0 10px 0;"><b>¿Necesitas ayuda?</b></p>
+                <p style="font-size:1em;color:#444;margin:0 0 18px 0;">Nuestro equipo está disponible para ayudarte en cualquier momento. Responde a este correo o escríbenos a <a href="mailto:soporte@aura.com" style="color:#188fd9;">soporte@aura.com</a>.</p>
+                <p style="font-size:1em;color:#6366f1;margin:0 0 12px 0;font-weight:600;">¡Gracias por confiar en Aura!</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="background:#f4f6fb;padding:20px 36px;text-align:center;color:#888;font-size:1em;border-top:1px solid #eee;">
+                <div style="margin-bottom:6px;">El equipo de Aura</div>
+                <div style="font-size:0.98em;">Automatización y gestión inteligente de redes sociales</div>
+                <div style="margin-top:8px;">
+                  <a href="https://aura-frontend-tomasposada26.vercel.app" style="color:#188fd9;text-decoration:none;font-weight:600;">Visita nuestra web</a>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `
     });
     res.json({ ok: true });
   } catch (err) {

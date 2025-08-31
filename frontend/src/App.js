@@ -212,6 +212,7 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
+
   const [showVerify, setShowVerify] = useState(false);
   const [showEmailVerify, setShowEmailVerify] = useState(false);
 
@@ -1110,7 +1111,32 @@ function App() {
                         style={{fontWeight:600, fontSize:15, background:'linear-gradient(90deg,#10b981 0%,#188fd9 100%)', color:'#fff', border:'none', borderRadius:6, padding:'8px 18px', marginLeft:8, cursor:'pointer'}}
                         id="newsletter-suscribirse-btn"
                         type="button"
-                        disabled={false}
+                        onClick={async () => {
+                          const input = document.getElementById('newsletter-email');
+                          const correo = input.value.trim();
+                          input.value = '';
+                          if (!correo) {
+                            toast.error('Por favor ingresa un correo válido.');
+                            return;
+                          }
+                          try {
+                            const res = await fetch(`${BACKEND_URL}/api/interesados`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ correo })
+                            });
+                            const data = await res.json();
+                            if (res.ok && data.ok) {
+                              toast.success('¡Suscripción exitosa! Revisa tu correo.');
+                            } else if (data.message && data.message.includes('suscripción activa')) {
+                              toast.info('El usuario ya está suscrito.');
+                            } else {
+                              toast.error(data.error || 'No se pudo registrar tu interés.');
+                            }
+                          } catch (err) {
+                            toast.error('No se pudo registrar tu interés.');
+                          }
+                        }}
                       >Suscribirse</button>
                     </div>
                   </div>
