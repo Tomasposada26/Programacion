@@ -97,10 +97,10 @@ const RespuestasPanel = () => {
     position: 'fixed',
     top: 100, // altura de la barra superior
     left: 320, // ancho de la barra lateral
-    right: 0,
-    bottom: 0,
-    width: 'auto',
-    height: 'auto',
+    width: 400,
+    height: 'calc(100vh - 120px)', // más alto, pero sin agrandar el card
+    maxHeight: 'calc(100vh - 120px)',
+    minHeight: 600,
     boxShadow: darkMode ? '0 4px 24px #10b98144' : '0 4px 24px #10b98122',
     fontWeight: 400,
     fontSize: 16,
@@ -119,6 +119,7 @@ const RespuestasPanel = () => {
   return (
     <div className="respuestas-panel aura-main-panel-bg">
       <div style={cardStyles}>
+        <div style={{height: 32}} /> {/* Espacio entre la parte superior y el primer mensaje */}
         <h2 style={{fontWeight:800, fontSize: '1.6rem', marginBottom: 18}}>{t('autoResponses.title', 'Respuestas Automáticas')}</h2>
         {/* Formulario para añadir nueva regla */}
   <form style={{
