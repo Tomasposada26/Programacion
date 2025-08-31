@@ -1,0 +1,5 @@
+CREATE TABLE interesado (
+    id SERIAL PRIMARY KEY,
+    correo VARCHAR(255) UNIQUE NOT NULL,
+    fecha_suscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
