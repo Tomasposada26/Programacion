@@ -359,6 +359,7 @@ app.post('/api/reenviar-codigo', async (req, res) => {
 // --- ENDPOINTS DE LOGIN/REGISTRO ---
 // Login
 app.post('/api/login', async (req, res) => {
+  console.log('POST /api/login body:', req.body);
   const { usuario, contrasena } = req.body;
   if (!usuario || !contrasena) {
     return res.status(400).json({ error: 'Faltan datos' });
