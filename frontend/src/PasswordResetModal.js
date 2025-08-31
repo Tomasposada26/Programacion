@@ -56,7 +56,7 @@ const PasswordResetModal = ({ isOpen, onClose, onReset, email, errorMsg, step })
     }
     setLoading(true);
     try {
-      const res = await fetch('/api/recovery/reset', {
+  const res = await fetch('/api/reenviar-codigo/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, repeat })

@@ -248,7 +248,7 @@ function App() {
     setRecoveryError('');
     setRecoveryCode(code);
     try {
-  const res = await fetch(`${BACKEND_URL}/api/recovery/verify`, {
+  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail, code })
@@ -284,7 +284,7 @@ function App() {
       return;
     }
     try {
-  const res = await fetch(`${BACKEND_URL}/api/recovery/reset`, {
+  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail, code: recoveryCode, password })
