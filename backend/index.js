@@ -464,6 +464,27 @@ app.post('/api/recovery/verify', async (req, res) => {
   }
 });
 
+// Verificar código de registro y activar cuenta
+app.post('/api/verificar', async (req, res) => {
+  const { correo, codigo } = req.body;
+  if (!correo || !codigo) return res.status(400).json({ error: 'Faltan datos' });
+  try {
+    const user = await Usuario.findOne({ correo });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    if (user.verificado) return res.status(400).json({ error: 'La cuenta ya está verificada' });
+    if (user.codigo_verificacion !== codigo) return res.status(400).json({ error: 'Código incorrecto' });
+    // Verificar cuenta
+    user.verificado = true;
+    user.codigo_verificacion = null;
+    user.codigo_verificacion_enviado = null;
+    await user.save();
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error al verificar la cuenta:', err);
+    res.status(500).json({ error: 'Error al verificar la cuenta' });
+  }
+});
+
 // --- DEMO/UTILIDADES ---
 app.get('/api/hola', (req, res) => {
   res.json({ mensaje: '¡Hola desde el backend de Aura!' });
