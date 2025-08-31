@@ -243,7 +243,7 @@ pool.connect()
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/aura');
 
 mongoose.connection.on('connected', () => {
-  console.log('Conectado a MongoDB');
+  console.log('Conectado a MongoDB Atlas');
 });
 mongoose.connection.on('error', (err) => {
   console.error('Error de conexión a MongoDB:', err);
