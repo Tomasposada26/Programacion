@@ -23,7 +23,7 @@ const EmailVerifyModal = ({ isOpen, onClose, onSubmit }) => {
           onClick={() => onSubmit(email)}
           style={{ width: '100%', background: '#188FD9', color: '#fff', border: 'none', borderRadius: 6, padding: 12, fontWeight: 700, fontSize: 16, cursor: 'pointer', marginBottom: 8 }}
         >
-          Continuar
+          Confirmar
         </button>
         <button
           onClick={onClose}

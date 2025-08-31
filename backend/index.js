@@ -374,23 +374,23 @@ app.post('/api/reenviar-verificacion', async (req, res) => {
     await transporter.sendMail({
       from: 'Aura <aurainstacms@gmail.com>',
       to: correo,
-      subject: 'Verifica tu cuenta en Aura',
+      subject: 'Tu nuevo código de verificación para Aura',
       html: `<div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:40px auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #0001;overflow:hidden;">
           <tr>
-            <td style="background:#188fd9;padding:32px 0;text-align:center;">
-              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Bienvenido a Aura</h1>
+            <td style="background:#6366f1;padding:32px 0;text-align:center;">
+              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Reenvío de código</h1>
             </td>
           </tr>
           <tr>
             <td style="padding:32px 32px 16px 32px;">
               <p style="font-size:1.1em;color:#222;margin:0 0 12px 0;">Hola <b>${user.nombre}</b>,</p>
-              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">¡Gracias por unirte a <b>Aura</b>! Para confirmar tu cuenta y mantenerla segura, utiliza el siguiente código de verificación:</p>
+              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Has solicitado un nuevo código de verificación para tu cuenta en <b>Aura</b>. Utiliza el siguiente código para continuar con la verificación:</p>
               <div style="background:#f4f6fb;border-radius:12px;padding:24px 0;margin:0 0 18px 0;text-align:center;">
                 <span style="display:inline-block;font-size:2.2em;letter-spacing:12px;font-weight:900;color:#6366f1;font-family:monospace;background:#fff;padding:12px 32px;border-radius:8px;border:2px solid #6366f1;box-shadow:0 2px 8px #6366f133;">${codigo}</span>
               </div>
-              <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Este código es válido por los próximos <b>10 minutos</b>.<br>Si no solicitaste esta verificación, puedes ignorar este correo.</p>
-              <p style="font-size:1em;color:#6366f1;font-weight:600;margin:0 0 12px 0;">Bienvenido a la comunidad Aura ✨</p>
+              <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Este código es válido por los próximos <b>10 minutos</b>.<br>Si no solicitaste este reenvío, puedes ignorar este correo.</p>
+              <p style="font-size:1em;color:#6366f1;font-weight:600;margin:0 0 12px 0;">¡Gracias por confiar en Aura!</p>
             </td>
           </tr>
           <tr>

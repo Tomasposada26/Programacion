@@ -1209,7 +1209,6 @@ function App() {
               isOpen={showEmailVerify}
               onClose={() => setShowEmailVerify(false)}
               onSubmit={async email => {
-                setPendingEmail(email);
                 try {
                   const res = await fetch(`${BACKEND_URL}/api/reenviar-verificacion`, {
                     method: 'POST',
@@ -1222,6 +1221,7 @@ function App() {
                     return;
                   }
                   toast.success('¡Código de verificación enviado! Revisa tu correo.');
+                  setPendingEmail(email);
                   setShowEmailVerify(false);
                   setShowVerify(true);
                 } catch (err) {

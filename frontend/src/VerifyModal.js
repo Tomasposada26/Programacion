@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spinner from './assets/Spinner';
 
 
@@ -7,25 +7,40 @@ const VerifyModal = ({ isOpen, onClose, onVerify, correo, errorMsg }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
+  const [resending, setResending] = useState(false);
+  const timerRef = useRef();
   // Usar useRef para mantener la referencia estable
   // Contador regresivo
   useEffect(() => {
     if (!isOpen) return;
-    if (timer > 0) {
-      const interval = setInterval(() => setTimer(t => t - 1), 1000);
-      return () => clearInterval(interval);
-    } else {
-      setCanResend(true);
-    }
-  }, [timer, isOpen]);
+    setTimer(60);
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [isOpen]);
 
   // Reenviar código
-  const handleResendCode = () => {
-    setCanResend(false);
-    setTimer(60);
-    window.dispatchEvent(new CustomEvent('reenviar-codigo-verificacion', {detail:correo}));
-    setInputs(['', '', '', '', '', '']);
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+  const handleResendCode = async () => {
+    setResending(true);
+    try {
+      await fetch(`${BACKEND_URL}/api/reenviar-verificacion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo })
+      });
+      setTimer(60);
+      setInputs(['', '', '', '', '', '']);
+    } catch {}
+    setResending(false);
   };
   const inputRefs = React.useRef(Array.from({ length: 6 }, () => React.createRef()));
   const modalRef = React.useRef(null);
@@ -163,12 +178,12 @@ const VerifyModal = ({ isOpen, onClose, onVerify, correo, errorMsg }) => {
           {error && <div style={{ color: 'red', marginBottom: 10, textAlign: 'center' }} role="alert">{error}</div>}
           {errorMsg && <div style={{ color: 'red', marginBottom: 10, textAlign: 'center' }} role="alert">{errorMsg}</div>}
           <div style={{textAlign:'center', marginBottom:10, color:'#888', fontSize:15}}>
-            {canResend ? (
-              <button type="button" style={{background:'none', border:'none', color:'#6366f1', textDecoration:'underline', cursor:'pointer', fontSize:15, fontWeight:600, padding:0}} onClick={handleResendCode}>
+            {timer > 0 ? (
+              <>Puedes reenviar el código en <span style={{ color: '#6366f1', fontWeight: 600 }}>{timer}s</span></>
+            ) : (
+              <button type="button" style={{background:'none', border:'none', color:'#6366f1', textDecoration:'underline', cursor:'pointer', fontSize:15, fontWeight:600, padding:0}} onClick={handleResendCode} disabled={resending}>
                 Enviar nuevo código
               </button>
-            ) : (
-              <>Puedes reenviar código en {timer}s</>
             )}
           </div>
           <button
