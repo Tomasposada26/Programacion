@@ -1109,6 +1109,8 @@ function App() {
                       <button
                         style={{fontWeight:600, fontSize:15, background:'linear-gradient(90deg,#10b981 0%,#188fd9 100%)', color:'#fff', border:'none', borderRadius:6, padding:'8px 18px', marginLeft:8, cursor:'pointer'}}
                         id="newsletter-suscribirse-btn"
+                        type="button"
+                        disabled={false}
                       >Suscribirse</button>
                     </div>
                   </div>
