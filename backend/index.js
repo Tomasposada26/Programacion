@@ -229,6 +229,7 @@ const pool = new Pool({
   database: process.env.PG_DATABASE || 'aura',
   password: process.env.PG_PASSWORD || '0626',
   port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : 5432,
+  ssl: { rejectUnauthorized: false }
 });
 
 pool.connect()
