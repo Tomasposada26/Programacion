@@ -1,3 +1,20 @@
+// --- DEPENDENCIAS Y MODELOS ---
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Regla = require('./models/Regla');
+const Usuario = require('./models/Usuario');
+const Interesado = require('./models/Interesado');
+
+// --- CONFIGURACIÓN APP ---
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 // --- ENDPOINT INTERESADOS ---
 // POST /api/interesados
 app.post('/api/interesados', async (req, res) => {
@@ -67,22 +84,6 @@ app.post('/api/interesados', async (req, res) => {
     res.status(500).json({ error: 'No se pudo registrar el interesado' });
   }
 });
-// --- DEPENDENCIAS Y MODELOS ---
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Regla = require('./models/Regla');
-const Usuario = require('./models/Usuario');
-const Interesado = require('./models/Interesado');
-
-// --- CONFIGURACIÓN APP ---
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 // --- CONEXIÓN MONGODB ---
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/aura');
