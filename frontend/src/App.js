@@ -1,3 +1,4 @@
+// Cambio menor para forzar deploy en Vercel - 31/08/2025
 import React, { useState, useEffect } from 'react';
 import PasswordResetModal from './PasswordResetModal';
 import PasswordRecoveryModal from './PasswordRecoveryModal';
