@@ -4,6 +4,10 @@ import Spinner from './assets/Spinner';
 import googleIcon from './assets/google-icon.svg';
 import EyeIcon from './assets/EyeIcon';
 
+const BACKEND_URL = process.env.NODE_ENV === 'production'
+  ? 'https://aura-0244.onrender.com'
+  : '';
+
 const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpenVerifyEmail }) => {
   const [form, setForm] = useState(() => {
     let usuario = '';
@@ -81,7 +85,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpen
     setLoading(true);
     // Llamada al backend para login
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(`${BACKEND_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario: form.usuario, contrasena: form.contrasena })
