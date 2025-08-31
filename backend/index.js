@@ -50,26 +50,6 @@ function authMiddleware(req, res, next) {
 
 // --- ENDPOINTS USUARIO ---
 // Cambiar contraseña (MongoDB)
-app.post('/api/recovery/reset', async (req, res) => {
-  const { email, password, repeat } = req.body;
-  if (!email || !password || !repeat) return res.status(400).json({ error: 'Faltan datos' });
-  const isSecure = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
-  if (!isSecure) return res.status(400).json({ error: 'La contraseña no cumple con los requisitos de seguridad.' });
-  if (password !== repeat) return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
-  try {
-    const user = await Usuario.findOne({ correo: email });
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-    const hash = await bcrypt.hash(password, 10);
-    user.contrasena = hash;
-    user.codigo_recuperacion = null;
-    user.codigo_recuperacion_enviado = null;
-    await user.save();
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Error al cambiar la contraseña:', err);
-    res.status(500).json({ error: 'Error al cambiar la contraseña' });
-  }
-});
 
 // Obtener datos de usuario (MongoDB)
 app.get('/api/usuario/info', async (req, res) => {
@@ -477,20 +457,6 @@ app.post('/api/registro', async (req, res) => {
 });
 
 // Verificar código de recuperación
-app.post('/api/recovery/verify', async (req, res) => {
-  const { email, code } = req.body;
-  if (!email || !code) return res.status(400).json({ error: 'Faltan datos' });
-  try {
-    const user = await Usuario.findOne({ correo: email });
-    if (!user || user.codigo_recuperacion !== code) {
-      return res.status(400).json({ error: 'Código incorrecto o usuario no encontrado' });
-    }
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Error en recovery verify:', err);
-    res.status(500).json({ error: 'Error al verificar el código' });
-  }
-});
 
 // Verificar código de registro y activar cuenta
 app.post('/api/verificar', async (req, res) => {
