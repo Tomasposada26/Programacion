@@ -1,5 +1,6 @@
 // Importar el modelo de reglas automáticas
 const Regla = require('./models/Regla');
+const Usuario = require('./models/Usuario');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,19 +14,21 @@ const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
-// Endpoint para cambiar la contraseña después de verificar el código
+// Endpoint para cambiar la contraseña después de verificar el código (MongoDB)
 app.post('/api/recovery/reset', async (req, res) => {
   const { email, password, repeat } = req.body;
   if (!email || !password || !repeat) return res.status(400).json({ error: 'Faltan datos' });
-  // Validación de seguridad
   const isSecure = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
   if (!isSecure) return res.status(400).json({ error: 'La contraseña no cumple con los requisitos de seguridad.' });
   if (password !== repeat) return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
   try {
-    const user = await pool.query('SELECT id FROM usuario WHERE correo=$1', [email]);
-    if (user.rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const user = await Usuario.findOne({ correo: email });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
     const hash = await bcrypt.hash(password, 10);
-    await pool.query('UPDATE usuario SET contrasena=$1, codigo_recuperacion=NULL, codigo_recuperacion_enviado=NULL WHERE correo=$2', [hash, email]);
+    user.contrasena = hash;
+    user.codigo_recuperacion = null;
+    user.codigo_recuperacion_enviado = null;
+    await user.save();
     res.json({ ok: true });
   } catch (err) {
     console.error('Error al cambiar la contraseña:', err);
@@ -33,15 +36,13 @@ app.post('/api/recovery/reset', async (req, res) => {
   }
 });
 
-// Endpoint para obtener datos reales del usuario por username o correo
+// Endpoint para obtener datos reales del usuario por username o correo (MongoDB)
 app.get('/api/usuario/info', async (req, res) => {
   const { usuario } = req.query;
   if (!usuario) return res.status(400).json({ error: 'Falta el parámetro usuario' });
   try {
-    const result = await pool.query('SELECT nombre, apellidos, usuario, correo, ultima_conexion FROM usuario WHERE usuario=$1 OR correo=$1', [usuario]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
-    // Renombrar campos para frontend
-    const user = result.rows[0];
+    const user = await Usuario.findOne({ $or: [{ usuario }, { correo: usuario }] });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json({
       nombre: user.nombre,
       apellidos: user.apellidos,
@@ -54,14 +55,18 @@ app.get('/api/usuario/info', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener usuario' });
   }
 });
-// Endpoint para actualizar nombre y apellidos del usuario
+// Endpoint para actualizar nombre y apellidos del usuario (MongoDB)
 app.post('/api/usuario/update', async (req, res) => {
   const { nombre, apellidos, correo } = req.body;
   if (!nombre || !apellidos || !correo) {
     return res.status(400).json({ error: 'Faltan datos' });
   }
   try {
-    await pool.query('UPDATE usuario SET nombre=$1, apellidos=$2 WHERE correo=$3', [nombre, apellidos, correo]);
+    const user = await Usuario.findOne({ correo });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    user.nombre = nombre;
+    user.apellidos = apellidos;
+    await user.save();
     res.json({ ok: true });
   } catch (err) {
     console.error('Error al actualizar usuario:', err);
