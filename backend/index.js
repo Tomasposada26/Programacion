@@ -223,13 +223,14 @@ app.post('/api/interesados', async (req, res) => {
   }
 });
 
+const isProduction = process.env.PG_HOST && !['localhost', '127.0.0.1'].includes(process.env.PG_HOST);
 const pool = new Pool({
   user: process.env.PG_USER || 'postgres',
   host: process.env.PG_HOST || 'localhost',
   database: process.env.PG_DATABASE || 'aura',
   password: process.env.PG_PASSWORD || '0626',
   port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : 5432,
-  ssl: { rejectUnauthorized: false }
+  ...(isProduction ? { ssl: { rejectUnauthorized: false } } : {})
 });
 
 pool.connect()
