@@ -11,7 +11,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://aura-0244.onrender.com',
+    'https://programacion-401rmydo3-tomas0626s-projects.vercel.app',
+    'https://programacion-76j8fplcj-tomas0626s-projects.vercel.app'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Endpoint para cambiar la contraseña después de verificar el código (MongoDB)
