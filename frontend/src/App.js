@@ -212,7 +212,7 @@ function App() {
   }, [darkMode]);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [showRecovery, setShowRecovery] = useState(false);
+  // const [showRecovery, setShowRecovery] = useState(false); // Eliminada duplicada
 
   const [showVerify, setShowVerify] = useState(false);
   const [showEmailVerify, setShowEmailVerify] = useState(false);
