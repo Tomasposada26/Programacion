@@ -4,7 +4,7 @@ const Usuario = require('./models/Usuario');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
+// PostgreSQL eliminado
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -180,7 +180,6 @@ app.patch('/api/reglas/:id/estado', async (req, res) => {
 
 // Endpoint para registrar interesados en la newsletter
 app.post('/api/interesados', async (req, res) => {
-  // ...existing code...
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return res.status(400).json({ error: 'Correo inválido' });
   }
@@ -228,23 +227,7 @@ app.post('/api/interesados', async (req, res) => {
   }
 });
 
-const isProduction = process.env.PG_HOST && !['localhost', '127.0.0.1'].includes(process.env.PG_HOST);
-const pool = new Pool({
-  user: process.env.PG_USER || 'postgres',
-  host: process.env.PG_HOST || 'localhost',
-  database: process.env.PG_DATABASE || 'aura',
-  password: process.env.PG_PASSWORD || '0626',
-  port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : 5432,
-  ...(isProduction ? { ssl: { rejectUnauthorized: false } } : {})
-});
-
-pool.connect()
-  .then(() => {
-    console.log('Conectado a PostgreSQL');
-  })
-  .catch(err => {
-    console.error('Error de conexión a PostgreSQL:', err);
-  });
+// Configuración PostgreSQL eliminada
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/aura');
@@ -609,16 +592,7 @@ app.get('/api/hola', (req, res) => {
   res.json({ mensaje: '¡Hola desde el backend de Aura!' });
 });
 
-// Prueba conexión PostgreSQL
-app.get('/api/postgres', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ postgres: result.rows[0] });
-  } catch (err) {
-    console.error('Error de conexión a PostgreSQL:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// Endpoint de prueba PostgreSQL eliminado
 
 // Prueba conexión MongoDB
 app.get('/api/mongo', async (req, res) => {
