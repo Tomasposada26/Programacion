@@ -1109,9 +1109,10 @@ function App() {
                       <button
                         onClick={async () => {
                           const input = document.getElementById('newsletter-email');
-                          const correo = input.value;
+                          const correo = input.value.trim();
                           if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
                             toast.error('Ingresa un correo válido');
+                            input.value = '';
                             return;
                           }
                           try {
@@ -1121,22 +1122,27 @@ function App() {
                               body: JSON.stringify({ correo })
                             });
                             const data = await res.json();
-                            if (data && data.message) {
+                            if (res.status === 400 && data && data.error === 'Correo requerido') {
+                              toast.error('Ingresa un correo válido');
+                            } else if (res.status === 200 && data && data.message) {
                               if (data.ok) {
                                 toast.success(data.message);
                               } else {
                                 toast.info(data.message);
                               }
+                            } else if (res.status === 409 && data && data.error) {
+                              toast.info('Ya estás suscrito a las novedades de Aura.');
                             } else {
                               toast.success('¡Gracias por suscribirte! Revisa tu correo para más información.');
                             }
                             input.value = '';
                           } catch (err) {
                             toast.error('No se pudo registrar tu interés. Intenta de nuevo.');
+                            input.value = '';
                           }
                         }}
                         style={{fontWeight:600, fontSize:15, background:'linear-gradient(90deg,#10b981 0%,#188fd9 100%)', color:'#fff', border:'none', borderRadius:6, padding:'8px 18px', marginLeft:8, cursor:'pointer'}}
-                      id="newsletter-suscribirse-btn"
+                        id="newsletter-suscribirse-btn"
                       >Suscribirse</button>
                     </div>
                   </div>
