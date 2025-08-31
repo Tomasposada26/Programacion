@@ -8,6 +8,7 @@ import EyeIcon from './assets/EyeIcon';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpenVerifyEmail }) => {
+  console.log('BACKEND_URL:', BACKEND_URL);
   const [form, setForm] = useState(() => {
     let usuario = '';
     let contrasena = '';
