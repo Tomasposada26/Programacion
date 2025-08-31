@@ -1,0 +1,100 @@
+.profile-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  width: 600px;
+  max-width: 95vw;
+  padding: 32px 28px 22px 28px;
+  position: relative;
+}
+.profile-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+.profile-modal-header h2 {
+  margin: 0;
+  font-size: 1.7rem;
+  color: #1a3365;
+  font-weight: 700;
+}
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+}
+.profile-modal-message {
+  background: #e3f6ff;
+  color: #188fd9;
+  font-size: 0.98rem;
+  padding: 6px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(24,143,217,0.08);
+  width: fit-content;
+  display: block;
+  position: static;
+}
+.profile-modal-message-inline {
+  margin: 0 0 0 auto;
+  align-self: center;
+}
+.profile-modal-content {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  margin-bottom: 18px;
+}
+.profile-modal-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.profile-modal-col label {
+  font-weight: 600;
+  color: #1a3365;
+  margin-bottom: 2px;
+}
+.profile-modal-col input,
+.profile-modal-col select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c3d0e6;
+  font-size: 1rem;
+  background: #f7fafd;
+  color: #1a3365;
+  margin-bottom: 6px;
+}
+.profile-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+.edit-btn, .save-btn {
+  background: linear-gradient(90deg, #0fd2b2 0%, #1a8fd7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(24,143,217,0.08);
+  transition: background 0.2s;
+}
+.edit-btn:hover, .save-btn:hover {
+  background: linear-gradient(90deg, #1a8fd7 0%, #0fd2b2 100%);
+}

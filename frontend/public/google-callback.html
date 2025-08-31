@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Google Callback</title>
+  <script>
+    // Extrae el fragmento de la URL (access_token, id_token, etc)
+    function parseQueryString(query) {
+      const params = {};
+      query.replace(/([^&=]+)=([^&]*)/g, function(m, key, value) {
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+      });
+      return params;
+    }
+    window.onload = function() {
+      // Google responde con el código en la query string
+      const params = parseQueryString(window.location.search.substring(1));
+      // Envía el código al opener (ventana principal)
+      if (window.opener && params.code) {
+        window.opener.postMessage({ type: 'google_oauth_code', code: params.code }, '*');
+      }
+      // Cierra la ventana después de unos segundos
+      setTimeout(() => window.close(), 1000);
+    };
+  </script>
+</head>
+<body>
+  <h2>Procesando autenticación con Google...</h2>
+</body>
+</html>

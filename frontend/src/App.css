@@ -1,0 +1,583 @@
+/* VerifyModal input and button for light/dark mode */
+:root {
+  --aura-verify-input-bg: #fafbfc;
+  --aura-verify-input-color: #222;
+  --aura-verify-input-border: #6366f1;
+  --aura-verify-btn-bg: #6366f1;
+  --aura-verify-btn-color: #fff;
+}
+
+body.aura-dark {
+  --aura-verify-input-bg: #232a3b;
+  --aura-verify-input-color: #f3f3f3;
+  --aura-verify-input-border: #1EE6D9;
+  --aura-verify-btn-bg: #1EE6D9;
+  --aura-verify-btn-color: #232a3b;
+}
+/* Notification badge and icons for light/dark mode */
+:root {
+  --aura-profile-bg: #fff;
+  --aura-profile-fg: #1a3365;
+  --aura-notif-x-bg: #fff;
+  --aura-notif-x-fg: #888;
+  --aura-notif-badge-bg: #e53e3e;
+  --aura-notif-badge-bg-empty: #fff;
+  --aura-notif-badge-fg: #fff;
+  --aura-notif-badge-fg-empty: #888;
+  --aura-notif-badge-border: #fff;
+  --aura-notif-badge-shadow: #e53e3e55;
+  --aura-soluciones: #188fd9;
+}
+
+body.aura-dark {
+  --aura-profile-bg: #232a3b;
+  --aura-profile-fg: #f3f3f3;
+  --aura-notif-x-bg: #232a3b;
+  --aura-notif-x-fg: #bbb;
+  --aura-notif-badge-bg: #e53e3e;
+  --aura-notif-badge-bg-empty: #232a3b;
+  --aura-notif-badge-fg: #fff;
+  --aura-notif-badge-fg-empty: #bbb;
+  --aura-notif-badge-border: #232a3b;
+  --aura-notif-badge-shadow: #e53e3e99;
+  --aura-soluciones: #1EE6D9;
+}
+/* Main panel background for light/dark mode */
+.aura-main-panel-bg {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 110px);
+  background: var(--aura-main-bg, #fff);
+  color: var(--aura-main-color, #222);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Modal background for light/dark mode */
+:root {
+  --aura-main-bg: #fff;
+  --aura-main-color: #222;
+  --aura-modal-bg: #fff;
+  --aura-modal-color: #222;
+}
+
+body.aura-dark {
+  --aura-main-bg: #36393f;
+  --aura-main-color: #f3f3f3;
+  --aura-modal-bg: #232a3b;
+  --aura-modal-color: #f3f3f3;
+}
+body.aura-dark {
+  background: #000000 !important;
+  color: #e0e6f0 !important;
+}
+
+.aura-dark .settings-panel {
+  background: #1a2235;
+  color: #e0e6f0;
+  box-shadow: 0 8px 32px rgba(30,230,217,0.10), 0 1.5px 8px rgba(36,198,240,0.08);
+}
+.aura-dark .settings-panel-content h4 {
+  color: #1EE6D9;
+}
+.aura-dark .settings-panel-content li {
+  color: #e0e6f0;
+}
+.aura-dark .settings-close {
+  background: linear-gradient(90deg, #232a3b 0%, #1EE6D9 100%);
+  color: #fff;
+}
+/* Footer social stats */
+.aura-footer-socialstats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+.aura-footer-social-icons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.aura-footer-socialstats-text {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+}
+/* Mega panel para Recursos y Únete a nosotros */
+.aura-menu-recursos .aura-dropdown-panel,
+.aura-menu-join .aura-dropdown-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #232a3b;
+  min-width: 650px;
+  max-width: 750px;
+  box-shadow: 0 8px 32px rgba(24,143,217,0.13);
+  border-radius: 18px;
+  z-index: 1001;
+  padding: 32px 24px 24px 24px;
+  gap: 28px;
+  margin-top: 0;
+}
+.aura-menu-recursos:hover > .aura-dropdown-panel,
+.aura-menu-recursos:focus-within > .aura-dropdown-panel,
+.aura-menu-recursos > .aura-dropdown-panel:hover,
+.aura-menu-join:hover > .aura-dropdown-panel,
+.aura-menu-join:focus-within > .aura-dropdown-panel,
+.aura-menu-join > .aura-dropdown-panel:hover {
+  display: flex;
+}
+.aura-menu-join .aura-dropdown-panel {
+  min-width: 340px;
+  max-width: 380px;
+  left: 0;
+  transform: none;
+  gap: 0;
+}
+/* Menú desplegable superior */
+/* Centrado y visual mejorada del menú */
+.aura-navbar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.aura-navbar-centered {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.aura-menu {
+  list-style: none;
+  display: flex;
+  gap: 38px;
+  margin: 0 auto;
+  padding: 0;
+  align-items: center;
+}
+.aura-menu-item {
+  position: relative;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px 18px;
+  transition: background 0.2s;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.aura-menu-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+/* Dropdown tipo mega para Our Product */
+.aura-menu-product .aura-dropdown-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #232a3b;
+  min-width: 650px;
+  max-width: 750px;
+  box-shadow: 0 8px 32px rgba(24,143,217,0.13);
+  border-radius: 18px;
+  z-index: 1001;
+  padding: 32px 24px 24px 24px;
+  gap: 28px;
+  margin-top: 0;
+}
+.aura-menu-product:hover > .aura-dropdown-panel,
+.aura-menu-product:focus-within > .aura-dropdown-panel,
+.aura-menu-product > .aura-dropdown-panel:hover {
+  display: flex;
+}
+.aura-dropdown-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  max-width: 320px;
+  gap: 18px;
+}
+.aura-dropdown-title {
+  color: #111;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.aura-dropdown-desc {
+  color: #232a3b;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.aura-dropdown-link {
+  margin-bottom: 2px;
+}
+.aura-dropdown-link span {
+  font-weight: 700;
+  color: #232a3b;
+  font-size: 15px;
+}
+.aura-dropdown-link p {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: #4b4b4b;
+  font-weight: 400;
+}
+.aura-dropdown-link-simple {
+  font-size: 15px;
+  color: #232a3b;
+  font-weight: 600;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+.aura-dropdown-link-simple:hover {
+  color: #188fd9;
+}
+.aura-dropdown-img-block {
+  margin-top: 18px;
+}
+.aura-dropdown-img {
+  background: #f5f6fa;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #232a3b;
+  box-shadow: 0 2px 8px rgba(24,143,217,0.07);
+}
+/* Dropdown simple para los otros menús */
+.aura-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  color: #232a3b;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(24,143,217,0.10);
+  border-radius: 0 0 12px 12px;
+  z-index: 1001;
+  padding: 10px 0;
+}
+.aura-menu-item:hover > .aura-dropdown {
+  display: block;
+}
+.aura-dropdown li {
+  padding: 10px 24px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.18s;
+}
+.aura-dropdown li:hover {
+  background: #f5f6fa;
+  color: #188fd9;
+}
+/* Barra superior azul oscuro fija */
+.aura-header {
+  width: 100vw;
+  height: 120px;
+  background: #0a2342;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+}
+.aura-header-content {
+  width: 100vw;
+  max-width: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  padding: 0;
+}
+.aura-logo {
+  width: 240px;
+  height: auto;
+  object-fit: contain;
+  margin-left: 32px !important;
+  margin-right: 0;
+  justify-self: start;
+}
+.aura-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-self: end;
+}
+.aura-login-btn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 0;
+}
+.aura-register-block {
+  color: #fff;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.aura-register-link {
+  color: #fff;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  margin-top: 2px;
+}
+
+/* Body blanco con banner */
+.aura-body {
+  margin-top: 80px;
+  margin-bottom: 80px;
+  min-height: calc(100vh - 80px - 220px);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 1;
+}
+.aura-banner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  display: flex;
+  background: linear-gradient(120deg, #f5f6fa 60%, #eaf6ff 100%);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 48px 40px 40px 60px;
+  gap: 40px;
+  min-height: 340px;
+}
+.aura-banner-left {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.aura-banner-left h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.aura-banner-desc {
+  font-size: 1.1rem;
+  color: #232a3b;
+  margin-bottom: 18px;
+}
+.aura-banner-list {
+  color: #4b4b4b;
+  margin-bottom: 22px;
+  font-size: 1rem;
+  padding-left: 18px;
+}
+.aura-banner-list li {
+  margin-bottom: 6px;
+}
+.aura-banner-cta {
+  background: linear-gradient(90deg, #10b981 60%, #188fd9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 38px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+}
+.aura-banner-register {
+  color: #232a3b;
+  font-size: 0.98rem;
+  margin-top: 8px;
+}
+.aura-banner-link {
+  color: #188fd9;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.aura-banner-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aura-bot-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(24,143,217,0.10);
+  padding: 32px 24px 18px 24px;
+  min-width: 320px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.aura-bot-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #10b981 60%, #188fd9 100%);
+  margin-bottom: 18px;
+}
+.aura-bot-message {
+  background: linear-gradient(90deg, #10b981 60%, #188fd9 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 1.22rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.aura-bot-desc {
+  color: #232a3b;
+  font-size: 1rem;
+  text-align: left;
+}
+
+/* Footer fijo */
+.aura-footer {
+  width: 100vw;
+  background: #0a2342;
+  color: #fff;
+  position: static;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  padding-top: 32px;
+  padding-bottom: 12px;
+}
+.aura-footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.aura-footer-cols {
+  display: flex;
+  gap: 60px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.aura-footer-cols > div {
+  min-width: 180px;
+}
+.aura-footer-cols ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #dbeafe;
+  font-size: 0.98rem;
+}
+.aura-footer-cols b {
+  color: #fff;
+  font-size: 1.08rem;
+}
+.aura-footer-newsletter {
+  min-width: 260px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.aura-footer-newsletter-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.aura-footer-newsletter-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+}
+.aura-footer-newsletter-form button {
+  background: linear-gradient(90deg, #e53e3e 60%, #d946ef 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.aura-footer-bottom {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  font-size: 0.98rem;
+    margin-top: 20px; /* Increased margin for better spacing */
+  color: #dbeafe;
+}
+.aura-footer-love {
+  margin-left: auto;
+  color: #10b981;
+  font-weight: 600;
+}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

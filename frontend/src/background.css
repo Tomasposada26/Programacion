@@ -1,0 +1,14 @@
+/* Fondo azul con textura geométrica y degradado para toda la app */
+.background-azul-textura {
+  min-height: 100vh;
+  width: 100vw;
+  background: 
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 40px),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 4px, transparent 4px 40px),
+    linear-gradient(120deg, #0a2342 0%, #188fd9 100%);
+  background-blend-mode: overlay, overlay, normal;
+  background-attachment: fixed;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: -1;
+}
