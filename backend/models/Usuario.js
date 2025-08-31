@@ -6,6 +6,7 @@ const usuarioSchema = new mongoose.Schema({
   usuario: { type: String, required: true, unique: true },
   correo: { type: String, required: true, unique: true },
   contrasena: { type: String, required: true },
+  verificado: { type: Boolean, default: false },
   codigo_recuperacion: { type: String },
   codigo_recuperacion_enviado: { type: Date },
   codigo_verificacion: { type: String },
