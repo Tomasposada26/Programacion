@@ -222,7 +222,7 @@ function App() {
     setRecoveryError('');
     setRecoveryEmail(email);
     try {
-  const res = await fetch(`${BACKEND_URL}/api/recovery`, {
+  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
