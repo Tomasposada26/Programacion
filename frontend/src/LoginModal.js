@@ -5,7 +5,7 @@ import googleIcon from './assets/google-icon.svg';
 import EyeIcon from './assets/EyeIcon';
 
 // URL del backend desde variable de entorno
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+const BACKEND_URL = process.env.REACT_APP_API_URL || '';
 
 const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpenVerifyEmail }) => {
   console.log('BACKEND_URL:', BACKEND_URL);

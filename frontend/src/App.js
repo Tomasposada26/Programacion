@@ -30,7 +30,7 @@ import HelpIcon from './assets/HelpIcon';
 import { useTranslation } from 'react-i18next';
 
 // URL del backend desde variable de entorno
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
 function App() {
   // Estados para recuperación de contraseña

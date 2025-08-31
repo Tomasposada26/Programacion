@@ -28,7 +28,7 @@ const VerifyModal = ({ isOpen, onClose, onVerify, correo, errorMsg }) => {
   }, [isOpen]);
 
   // Reenviar código
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+  const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
   const handleResendCode = async () => {
     setResending(true);
     try {

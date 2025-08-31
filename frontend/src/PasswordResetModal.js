@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import EyeIcon from './assets/EyeIcon';
 
 // Modal funcional para el flujo de recuperación
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 function PasswordResetModal({ isOpen, onClose, onReset, email, errorMsg, step }) {
 	const [code, setCode] = useState(['', '', '', '', '', '']);
 	const [password, setPassword] = useState('');
