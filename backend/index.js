@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Regla = require('./models/Regla');
 const Usuario = require('./models/Usuario');
+const Interesado = require('./models/Interesado');
 
 // --- CONFIGURACIÓN APP ---
 const app = express();
@@ -47,6 +48,50 @@ function authMiddleware(req, res, next) {
     next();
   });
 }
+
+// --- ENDPOINT INTERESADOS ---
+// POST /api/interesados
+app.post('/api/interesados', async (req, res) => {
+  const { correo } = req.body;
+  if (!correo) return res.status(400).json({ error: 'Correo requerido' });
+  try {
+    const existente = await Interesado.findOne({ correo });
+    if (existente) return res.status(409).json({ error: 'Ya registrado' });
+    const nuevo = new Interesado({ correo });
+    await nuevo.save();
+    // Enviar correo de agradecimiento
+    await transporter.sendMail({
+      from: 'Aura <aurainstacms@gmail.com>',
+      to: correo,
+      subject: '¡Gracias por tu interés en Aura!',
+      html: `<div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:40px auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #0001;overflow:hidden;">
+          <tr>
+            <td style="background:#188fd9;padding:32px 0;text-align:center;">
+              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Aura</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 32px 16px 32px;">
+              <p style="font-size:1.1em;color:#222;margin:0 0 12px 0;">¡Gracias por suscribirte!</p>
+              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Pronto recibirás novedades y recursos exclusivos sobre automatización y Aura.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f4f6fb;padding:18px 32px;text-align:center;color:#888;font-size:0.98em;border-top:1px solid #eee;">
+              Saludos,<br>El equipo de Aura
+            </td>
+          </tr>
+        </table>
+      </div>`
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error al registrar interesado:', err);
+    res.status(500).json({ error: 'No se pudo registrar el interesado' });
+  }
+});
+
 
 // --- ENDPOINTS USUARIO ---
 // Cambiar contraseña (MongoDB)
@@ -183,6 +228,92 @@ app.patch('/api/reglas/:id/estado', async (req, res) => {
   }
 });
 
+// --- RECUPERACIÓN DE CONTRASEÑA ---
+// Solicitar recuperación: genera y envía código
+app.post('/api/recovery/request', async (req, res) => {
+  const { correo } = req.body;
+  if (!correo) return res.status(400).json({ error: 'Correo requerido' });
+  try {
+    const user = await Usuario.findOne({ correo });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const codigo = generarCodigo();
+    user.codigo_recuperacion = codigo;
+    user.codigo_recuperacion_enviado = new Date();
+    await user.save();
+    await transporter.sendMail({
+      from: 'Aura <aurainstacms@gmail.com>',
+      to: correo,
+      subject: 'Código de recuperación de contraseña',
+      html: `<div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:40px auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #0001;overflow:hidden;">
+          <tr>
+            <td style="background:#188fd9;padding:32px 0;text-align:center;">
+              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Recupera tu acceso</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 32px 16px 32px;">
+              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Tu código de recuperación es:</p>
+              <div style="background:#f4f6fb;border-radius:12px;padding:24px 0;margin:0 0 18px 0;text-align:center;">
+                <span style="display:inline-block;font-size:2.2em;letter-spacing:12px;font-weight:900;color:#6366f1;font-family:monospace;background:#fff;padding:12px 32px;border-radius:8px;border:2px solid #6366f1;box-shadow:0 2px 8px #6366f133;">${codigo}</span>
+              </div>
+              <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Si no solicitaste este código, puedes ignorar este correo.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f4f6fb;padding:18px 32px;text-align:center;color:#888;font-size:0.98em;border-top:1px solid #eee;">
+              Saludos,<br>El equipo de Aura
+            </td>
+          </tr>
+        </table>
+      </div>`
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error al solicitar recuperación:', err);
+    res.status(500).json({ error: 'Error al solicitar recuperación' });
+  }
+});
+
+// Verificar código de recuperación
+app.post('/api/recovery/verify', async (req, res) => {
+  const { correo, codigo } = req.body;
+  if (!correo || !codigo) return res.status(400).json({ error: 'Faltan datos' });
+  try {
+    const user = await Usuario.findOne({ correo });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    if (user.codigo_recuperacion !== codigo) return res.status(400).json({ error: 'Código incorrecto' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error al verificar código de recuperación:', err);
+    res.status(500).json({ error: 'Error al verificar código' });
+  }
+});
+
+// Cambiar contraseña con código válido
+app.post('/api/recovery/reset', async (req, res) => {
+  const { correo, codigo, password, repeat } = req.body;
+  if (!correo || !codigo || !password || !repeat) return res.status(400).json({ error: 'Faltan datos' });
+  if (password !== repeat) return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
+  const isSecure = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+  if (!isSecure) return res.status(400).json({ error: 'La contraseña no cumple con los requisitos de seguridad.' });
+  try {
+    const user = await Usuario.findOne({ correo });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    if (user.codigo_recuperacion !== codigo) return res.status(400).json({ error: 'Código incorrecto' });
+    const hash = await bcrypt.hash(password, 10);
+    user.contrasena = hash;
+    user.codigo_recuperacion = null;
+    user.codigo_recuperacion_enviado = null;
+    await user.save();
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error al cambiar la contraseña:', err);
+    res.status(500).json({ error: 'Error al cambiar la contraseña' });
+  }
+});
+
+
 // --- ENDPOINTS INTERESADOS (Newsletter) ---
 app.post('/api/interesados', async (req, res) => {
   const { email } = req.body;
@@ -277,91 +408,6 @@ app.post('/api/reenviar-verificacion', async (req, res) => {
   }
 });
 
-// Reenviar código de recuperación de contraseña
-// Verificar código de recuperación (nuevo endpoint)
-app.post('/api/reenviar-codigo/verify', async (req, res) => {
-  const { email, code } = req.body;
-  if (!email || !code) return res.status(400).json({ error: 'Faltan datos' });
-  try {
-    const user = await Usuario.findOne({ correo: email });
-    if (!user || user.codigo_recuperacion !== code) {
-      return res.status(400).json({ error: 'Código incorrecto o usuario no encontrado' });
-    }
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Error en recovery verify:', err);
-    res.status(500).json({ error: 'Error al verificar el código' });
-  }
-});
-
-// Cambiar contraseña (nuevo endpoint)
-app.post('/api/reenviar-codigo/reset', async (req, res) => {
-  const { email, password, repeat, code } = req.body;
-  if (!email || !password || !repeat || !code) return res.status(400).json({ error: 'Faltan datos' });
-  const isSecure = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
-  if (!isSecure) return res.status(400).json({ error: 'La contraseña no cumple con los requisitos de seguridad.' });
-  if (password !== repeat) return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
-  try {
-    const user = await Usuario.findOne({ correo: email });
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-    if (user.codigo_recuperacion !== code) return res.status(400).json({ error: 'Código de recuperación incorrecto' });
-    const hash = await bcrypt.hash(password, 10);
-    user.contrasena = hash;
-    user.codigo_recuperacion = null;
-    user.codigo_recuperacion_enviado = null;
-    await user.save();
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Error al cambiar la contraseña:', err);
-    res.status(500).json({ error: 'Error al cambiar la contraseña' });
-  }
-});
-app.post('/api/reenviar-codigo', async (req, res) => {
-  const { correo } = req.body;
-  if (!correo) {
-    return res.status(400).json({ error: 'Correo requerido' });
-  }
-  try {
-    const user = await Usuario.findOne({ correo });
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-    const codigo = generarCodigo();
-    user.codigo_recuperacion = codigo;
-    user.codigo_recuperacion_enviado = new Date();
-    await user.save();
-    await transporter.sendMail({
-      from: 'Aura <aurainstacms@gmail.com>',
-      to: correo,
-      subject: 'Nuevo código de recuperación',
-      html: `<div style="background:#f4f6fb;padding:0;margin:0;font-family:sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:40px auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #0001;overflow:hidden;">
-          <tr>
-            <td style="background:#188fd9;padding:32px 0;text-align:center;">
-              <h1 style="color:#fff;font-size:2.1em;margin:0;font-weight:800;letter-spacing:2px;">Recupera tu acceso</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 32px 16px 32px;">
-              <p style="font-size:1.1em;color:#222;margin:0 0 18px 0;">Tu nuevo código de recuperación es:</p>
-              <div style="background:#f4f6fb;border-radius:12px;padding:24px 0;margin:0 0 18px 0;text-align:center;">
-                <span style="display:inline-block;font-size:2.2em;letter-spacing:12px;font-weight:900;color:#6366f1;font-family:monospace;background:#fff;padding:12px 32px;border-radius:8px;border:2px solid #6366f1;box-shadow:0 2px 8px #6366f133;">${codigo}</span>
-              </div>
-              <p style="font-size:1em;color:#444;margin:0 0 12px 0;">Si no solicitaste este código, puedes ignorar este correo.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:#f4f6fb;padding:18px 32px;text-align:center;color:#888;font-size:0.98em;border-top:1px solid #eee;">
-              Saludos,<br>El equipo de Aura
-            </td>
-          </tr>
-        </table>
-      </div>`
-    });
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Error al reenviar código de recuperación:', err);
-    res.status(500).json({ error: 'Error al reenviar el código de recuperación' });
-  }
-});
 
 // --- ENDPOINTS DE LOGIN/REGISTRO ---
 // Login

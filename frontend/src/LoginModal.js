@@ -191,7 +191,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpen
               value={form.usuario}
               onChange={handleChange}
               onBlur={handleBlur}
-              style={{ width: '100%', padding: 8, border: touched.usuario && !isValidUsuario ? '2px solid #e53e3e' : undefined }}
+              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 38px 8px 8px', border: touched.usuario && !isValidUsuario ? '2px solid #e53e3e' : '1px solid #222', fontSize: 16, borderRadius: 6, transition: 'border 0.2s' }}
               ref={firstInputRef}
               aria-label="Usuario o correo"
               autoComplete="username"
@@ -204,32 +204,34 @@ const LoginModal = ({ isOpen, onClose, onLogin, errorMsg, onOpenRecovery, onOpen
           </div>
           <div style={{ width: '100%', position: 'relative', marginBottom: 10 }}>
             <label htmlFor="login-contrasena" style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Contraseña</label>
-            <input
-              id="login-contrasena"
-              name="contrasena"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Ingresa contraseña"
-              value={form.contrasena}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 38px 8px 8px', border: touched.contrasena && !isValidContrasena ? '2px solid #e53e3e' : undefined }}
-              aria-label="Contraseña"
-              autoComplete="current-password"
-              required
-              aria-invalid={touched.contrasena && !isValidContrasena}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                id="login-contrasena"
+                name="contrasena"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Ingresa contraseña"
+                value={form.contrasena}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '8px 38px 8px 8px', border: touched.contrasena && !isValidContrasena ? '2px solid #e53e3e' : undefined, fontSize: 16, borderRadius: 6, transition: 'border 0.2s' }}
+                aria-label="Contraseña"
+                autoComplete="current-password"
+                required
+                aria-invalid={touched.contrasena && !isValidContrasena}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', height: 28, width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                tabIndex={0}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+            </div>
             {touched.contrasena && !isValidContrasena && (
               <div style={{ color: '#e53e3e', fontSize: 13, marginBottom: 4 }} role="alert">La contraseña debe tener al menos 6 caracteres.</div>
             )}
-            <button
-              type="button"
-              onClick={() => setShowPassword(v => !v)}
-              style={{ position: 'absolute', right: 12, top: 34, background: 'none', border: 'none', padding: 0, cursor: 'pointer', height: 24, display: 'flex', alignItems: 'center' }}
-              tabIndex={0}
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            >
-              <EyeIcon open={showPassword} />
-            </button>
           </div>
           <div style={{ width: '100%', display: 'flex', alignItems: 'center', marginBottom: 10 }}>
             <input

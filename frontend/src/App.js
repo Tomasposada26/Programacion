@@ -1,6 +1,8 @@
+import React, { useState, useEffect } from 'react';
+import PasswordResetModal from './PasswordResetModal';
+import PasswordRecoveryModal from './PasswordRecoveryModal';
 import AnimatedRobot from './assets/AnimatedRobot';
 import Modal from 'react-modal';
-import React, { useState, useEffect } from 'react';
 import NotificationsModal from './NotificationsModal';
 import ProfileModal from './ProfileModal';
 import DashboardPanel from './DashboardPanel';
@@ -19,8 +21,6 @@ import UserActionsBar from './UserActionsBar';
 import RegisterModal from './RegisterModal';
 import VerifyModal from './VerifyModal';
 import LoginModal from './LoginModal';
-import PasswordRecoveryModal from './PasswordRecoveryModal';
-import PasswordResetModal from './PasswordResetModal';
 import EmailVerifyModal from './EmailVerifyModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,6 +33,91 @@ import { useTranslation } from 'react-i18next';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
 
 function App() {
+  // Estados para recuperación de contraseña
+  // ...dejar solo una declaración de showRecovery, setShowRecovery dentro de App...
+  const [recoveryStep, setRecoveryStep] = useState('email'); // 'email', 'code', 'newpass'
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoveryError, setRecoveryError] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  // Handler para enviar correo de recuperación
+  const handleSendRecovery = async (email) => {
+    setRecoveryError('');
+    setRecoveryEmail(email);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/recovery/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email })
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setRecoveryError(errorData.error || 'No se pudo enviar el correo');
+        return;
+      }
+      setShowRecovery(false);
+      setShowResetModal(true);
+      setRecoveryStep('code');
+    } catch (err) {
+      setRecoveryError('Error al enviar el correo de recuperación');
+    }
+  };
+
+  // Handler para verificar código
+  const handleVerifyRecoveryCode = async (code) => {
+    setRecoveryError('');
+    setRecoveryCode(code);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/recovery/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: recoveryEmail, codigo: code })
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setRecoveryError(errorData.error || 'Código inválido');
+        return;
+      }
+      setRecoveryStep('newpass');
+    } catch (err) {
+      setRecoveryError('Código inválido o expirado');
+    }
+  };
+
+  // Handler para cambiar la contraseña
+  const handleResetPassword = async (password, repeat) => {
+    setRecoveryError('');
+    if (password !== repeat) {
+      setRecoveryError('Las contraseñas no coinciden');
+      return;
+    }
+    const isPasswordSecure = pw =>
+      pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
+    if (!isPasswordSecure(password)) {
+      setRecoveryError('La contraseña debe tener al menos 8 caracteres, mayúscula, minúscula, número y símbolo.');
+      return;
+    }
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/recovery/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: recoveryEmail, codigo: recoveryCode, password, repeat })
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setRecoveryError(errorData.error || 'No se pudo cambiar la contraseña');
+        return;
+      }
+      setShowResetModal(false);
+      setRecoveryStep('email');
+      setRecoveryCode('');
+      setRecoveryEmail('');
+      alert('¡Contraseña restablecida! Ahora puedes iniciar sesión.');
+    } catch (err) {
+      setRecoveryError('Error al cambiar la contraseña');
+    }
+  };
   // Estado para mostrar el modal de soporte
   const [showSupportModal, setShowSupportModal] = useState(false);
   // Estado para el panel de ajustes
@@ -127,7 +212,6 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
-  const [showReset, setShowReset] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [showEmailVerify, setShowEmailVerify] = useState(false);
 
@@ -137,12 +221,6 @@ function App() {
   const [verifyError, setVerifyError] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [recoveryEmail, setRecoveryEmail] = useState('');
-
-  // Recuperación de contraseña
-  const [recoveryStep, setRecoveryStep] = useState('email'); // 'email', 'code', 'newpass'
-  const [recoveryError, setRecoveryError] = useState('');
-  const [recoveryCode, setRecoveryCode] = useState('');
 
   // Handler para verificar código de verificación (debe estar dentro de App)
   const handleVerify = async (code) => {
@@ -193,118 +271,6 @@ function App() {
     return () => window.removeEventListener('reenviar-codigo-verificacion', handler);
   }, []);
 
-  // Reenviar código de recuperación
-  React.useEffect(() => {
-    const handler = async (e) => {
-      const correo = e.detail;
-      try {
-  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ correo })
-        });
-        if (!res.ok) {
-          const errorData = await res.json();
-          toast.error(errorData.error || 'No se pudo reenviar el código');
-        } else {
-          toast.success('¡Nuevo código enviado! Revisa tu correo.');
-        }
-      } catch (err) {
-        toast.error('Error al reenviar el código');
-      }
-    };
-    window.addEventListener('reenviar-codigo-recovery', handler);
-    return () => window.removeEventListener('reenviar-codigo-recovery', handler);
-  }, []);
-
-  // Handler para enviar código de recuperación
-  const handleSendRecovery = async (email) => {
-    setRecoveryError('');
-    setRecoveryEmail(email);
-    try {
-    const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setRecoveryError(errorData.error || 'No se pudo enviar el correo');
-        toast.error(errorData.error || 'No se pudo enviar el correo');
-        return;
-      }
-  setShowRecovery(false);
-  setShowReset(true);
-  setRecoveryStep('code');
-      toast.success('¡Código de recuperación enviado!');
-    } catch (err) {
-      setRecoveryError('Error al enviar el correo de recuperación');
-      toast.error('Error al enviar el correo de recuperación');
-    }
-  };
-
-  // Handler para verificar el código recibido
-  const handleVerifyRecoveryCode = async (code) => {
-    setRecoveryError('');
-    setRecoveryCode(code);
-    try {
-  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: recoveryEmail, code })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setRecoveryError(errorData.error || 'Código inválido');
-        toast.error(errorData.error || 'Código inválido');
-        return;
-      }
-      setRecoveryStep('newpass');
-      toast.success('¡Código verificado! Ahora restablece tu contraseña.');
-    } catch (err) {
-      setRecoveryError('Código inválido o expirado');
-      toast.error('Código inválido o expirado');
-    }
-  };
-
-  // Handler para cambiar la contraseña
-  const handleResetPassword = async (password, repeat) => {
-    setRecoveryError('');
-    if (password !== repeat) {
-      setRecoveryError('Las contraseñas no coinciden');
-      toast.error('Las contraseñas no coinciden');
-      return;
-    }
-    // Seguridad de contraseña
-    const isPasswordSecure = pw =>
-      pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
-    if (!isPasswordSecure(password)) {
-      setRecoveryError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.');
-      toast.error('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.');
-      return;
-    }
-    try {
-  const res = await fetch(`${BACKEND_URL}/api/reenviar-codigo/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: recoveryEmail, code: recoveryCode, password })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setRecoveryError(errorData.error || 'No se pudo cambiar la contraseña');
-        toast.error(errorData.error || 'No se pudo cambiar la contraseña');
-        return;
-      }
-      setShowReset(false);
-      setRecoveryStep('email');
-      setRecoveryCode('');
-      setRecoveryEmail('');
-      toast.success('¡Contraseña restablecida! Ahora puedes iniciar sesión.');
-    } catch (err) {
-      setRecoveryError('Error al cambiar la contraseña');
-      toast.error('Error al cambiar la contraseña');
-    }
-  };
 
   // Handler de login
   const handleLogin = async (form) => {
@@ -1212,6 +1178,33 @@ function App() {
                 setShowEmailVerify(true);
               }}
             />
+            <PasswordRecoveryModal
+              isOpen={showRecovery}
+              onClose={() => setShowRecovery(false)}
+              onSendRecovery={handleSendRecovery}
+              errorMsg={recoveryError}
+            />
+            {showResetModal && recoveryStep === 'code' && (
+              <PasswordResetModal
+                isOpen={showResetModal}
+                onClose={() => setShowResetModal(false)}
+                onReset={handleVerifyRecoveryCode}
+                email={recoveryEmail}
+                errorMsg={recoveryError}
+                step="code"
+              />
+            )}
+            {showResetModal && recoveryStep === 'newpass' && (
+              <PasswordResetModal
+                isOpen={showResetModal}
+                onClose={() => setShowResetModal(false)}
+                onReset={handleResetPassword}
+                email={recoveryEmail}
+                errorMsg={recoveryError}
+                step="newpass"
+              />
+            )}
+  const [showRecovery, setShowRecovery] = useState(false);
             <EmailVerifyModal
               isOpen={showEmailVerify}
               onClose={() => setShowEmailVerify(false)}
@@ -1236,33 +1229,7 @@ function App() {
                 }
               }}
             />
-            <PasswordRecoveryModal
-              isOpen={showRecovery}
-              onClose={() => setShowRecovery(false)}
-              onSendRecovery={handleSendRecovery}
-              errorMsg={recoveryError}
-            />
-            {/* Modal para ingresar código y luego nueva contraseña */}
-            {showReset && recoveryStep === 'code' && (
-              <PasswordResetModal
-                isOpen={showReset}
-                onClose={() => setShowReset(false)}
-                onReset={handleVerifyRecoveryCode}
-                email={recoveryEmail}
-                errorMsg={recoveryError}
-                step="code"
-              />
-            )}
-            {showReset && recoveryStep === 'newpass' && (
-              <PasswordResetModal
-                isOpen={showReset}
-                onClose={() => setShowReset(false)}
-                onReset={handleResetPassword}
-                email={recoveryEmail}
-                errorMsg={recoveryError}
-                step="newpass"
-              />
-            )}
+            {/* ¿Olvidaste tu contraseña? Solo texto, sin acción ni modal. */}
             <RegisterModal
               isOpen={showRegister}
               onClose={() => setShowRegister(false)}
