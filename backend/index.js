@@ -56,7 +56,9 @@ app.post('/api/interesados', async (req, res) => {
   if (!correo) return res.status(400).json({ error: 'Correo requerido' });
   try {
     const existente = await Interesado.findOne({ correo });
-    if (existente) return res.status(409).json({ error: 'Ya registrado' });
+    if (existente) {
+      return res.status(200).json({ ok: false, message: 'Ya estás suscrito a las novedades de Aura.' });
+    }
     const nuevo = new Interesado({ correo });
     await nuevo.save();
     // Enviar correo de agradecimiento
@@ -85,7 +87,7 @@ app.post('/api/interesados', async (req, res) => {
         </table>
       </div>`
     });
-    res.json({ ok: true });
+    res.json({ ok: true, message: '¡Suscripción exitosa! Revisa tu correo para más información.' });
   } catch (err) {
     console.error('Error al registrar interesado:', err);
     res.status(500).json({ error: 'No se pudo registrar el interesado' });

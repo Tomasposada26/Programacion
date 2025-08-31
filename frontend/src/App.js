@@ -1109,8 +1109,8 @@ function App() {
                       <button
                         onClick={async () => {
                           const input = document.getElementById('newsletter-email');
-                          const email = input.value;
-                          if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+                          const correo = input.value;
+                          if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
                             toast.error('Ingresa un correo válido');
                             return;
                           }
@@ -1118,13 +1118,20 @@ function App() {
                             const res = await fetch('https://aura-0244.onrender.com/api/interesados', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ email })
+                              body: JSON.stringify({ correo })
                             });
-                            if (!res.ok) throw new Error();
-                            toast.success('¡Gracias por suscribirte! Revisa tu correo para más información.');
+                            const data = await res.json();
+                            if (data && data.message) {
+                              if (data.ok) {
+                                toast.success(data.message);
+                              } else {
+                                toast.info(data.message);
+                              }
+                            } else {
+                              toast.success('¡Gracias por suscribirte! Revisa tu correo para más información.');
+                            }
                             input.value = '';
                           } catch (err) {
-                            // Puedes revisar err para más detalles si el backend falla
                             toast.error('No se pudo registrar tu interés. Intenta de nuevo.');
                           }
                         }}
