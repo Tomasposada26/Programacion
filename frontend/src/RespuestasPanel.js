@@ -119,7 +119,7 @@ const RespuestasPanel = () => {
   return (
     <div className="respuestas-panel aura-main-panel-bg">
       <div style={cardStyles}>
-        <div style={{height: 32}} /> {/* Espacio entre la parte superior y el primer mensaje */}
+  <div style={{height: 16}} /> {/* Espacio entre la parte superior y el primer mensaje */}
         <h2 style={{fontWeight:800, fontSize: '1.6rem', marginBottom: 18}}>{t('autoResponses.title', 'Respuestas Automáticas')}</h2>
         {/* Formulario para añadir nueva regla */}
   <form style={{
