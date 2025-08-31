@@ -35,7 +35,7 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
 function App() {
   // Estados para recuperación de contraseña
-  // ...dejar solo una declaración de showRecovery, setShowRecovery dentro de App...
+  const [showRecovery, setShowRecovery] = useState(false);
   const [recoveryStep, setRecoveryStep] = useState('email'); // 'email', 'code', 'newpass'
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoveryError, setRecoveryError] = useState('');
@@ -1212,7 +1212,6 @@ function App() {
                 step="newpass"
               />
             )}
-  const [showRecovery, setShowRecovery] = useState(false);
             <EmailVerifyModal
               isOpen={showEmailVerify}
               onClose={() => setShowEmailVerify(false)}
