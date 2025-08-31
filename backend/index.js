@@ -16,7 +16,10 @@ app.use(cors({
     'http://localhost:3000',
     'https://aura-0244.onrender.com',
     'https://programacion-401rmydo3-tomas0626s-projects.vercel.app',
-    'https://programacion-76j8fplcj-tomas0626s-projects.vercel.app'
+    'https://programacion-76j8fplcj-tomas0626s-projects.vercel.app',
+    'https://programacion-4s5e3pwzy-tomas0626s-projects.vercel.app',
+    'https://programacion-ochre-one.vercel.app',
+    'https://programacion-tomas0626s-projects.vercel.app'
   ],
   credentials: true
 }));
