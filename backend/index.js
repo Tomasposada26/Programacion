@@ -1,3 +1,4 @@
+// Cambio mínimo para limpiar historial
 // --- DEPENDENCIAS Y MODELOS ---
 require('dotenv').config();
 const express = require('express');
