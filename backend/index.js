@@ -13,7 +13,10 @@ const Interesado = require('./models/Interesado');
 
 // --- CONFIGURACIÓN APP ---
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://aura-qivl.onrender.com',
+  credentials: true
+}));
 app.use(express.json());
 
 // --- ENDPOINT INTERESADOS ---
