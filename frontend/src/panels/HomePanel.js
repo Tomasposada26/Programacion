@@ -49,7 +49,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
   // REGISTRO
   const handleRegister = async (form) => {
     try {
-      const res = await fetch('http://localhost:4000/api/auth/registro', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -72,7 +72,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
   // VERIFICAR CUENTA
   const handleVerify = async (code) => {
     try {
-      const res = await fetch('http://localhost:4000/api/auth/verificar', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/auth/verificar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: pendingEmail, codigo: code })
@@ -96,7 +96,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
   // REENVIAR VERIFICACIÓN
   const handleEmailVerify = async (email) => {
     try {
-      const res = await fetch('http://localhost:4000/api/auth/reenviar-verificacion', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/auth/reenviar-verificacion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: email })
@@ -121,7 +121,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
   // RECUPERAR CONTRASEÑA
   const handleSendRecovery = async (email) => {
     try {
-  const res = await fetch('http://localhost:4000/api/auth/recovery/request', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/auth/recovery/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: email })
@@ -153,7 +153,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
         setResetStep('newpass');
       } else {
         // Enviar nueva contraseña y repetir al backend
-        const res = await fetch('http://localhost:4000/api/auth/recovery/reset', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/auth/recovery/reset', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ correo: resetEmail, contrasena: password, repetir: repeat })
@@ -183,7 +183,7 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
       return;
     }
     try {
-      const res = await fetch('http://localhost:4000/api/interesados/subscribe', {
+  const res = await fetch((process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com') + '/api/interesados/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: email })

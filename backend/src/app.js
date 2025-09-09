@@ -30,8 +30,11 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/reglas', reglaRoutes);
 app.use('/api/util', utilRoutes);
 app.use('/api/auth', authRoutes);
+
 app.use('/api/notificaciones', notificacionRoutes);
 
-// Aquí irán las rutas y middlewares (se irán moviendo desde index.js)
+// Webhook público para Instagram
+const webhookRoutes = require('./routes/webhookRoutes');
+app.use('/webhook', webhookRoutes);
 
 module.exports = app;

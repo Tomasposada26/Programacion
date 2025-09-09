@@ -11,7 +11,7 @@ import PoliticasEliminacion from './legal/PoliticasEliminacion';
 import SoportePanel from './panels/SoportePanel';
 
 // URL del backend desde variable de entorno (escuchando en el puerto local)
-// const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+// const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
 
 function App() {
@@ -41,7 +41,7 @@ function App() {
 
   // Handlers principales
   // URL del backend (ajusta si tienes variable de entorno)
-  const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+  const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
   const handleLogin = async (data) => {
     setSesionIniciada(true);

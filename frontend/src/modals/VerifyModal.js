@@ -24,7 +24,7 @@ const VerifyModal = ({ isOpen, onClose, onVerify, correo, errorMsg }) => {
     return () => clearInterval(timerRef.current);
   }, [isOpen]);
 
-  const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+  const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
   const handleResendCode = async () => {
     setResending(true);
     try {
