@@ -1,7 +1,4 @@
-const instagramTokenRoutes = require('./routes/instagramTokenRoutes');
-app.use('/api/instagram-token', instagramTokenRoutes);
-const instagramRoutes = require('./routes/instagramRoutes');
-app.use('/api/instagram', instagramRoutes);
+
 // src/app.js
 // Configuración central de la app Express
 require('dotenv').config();
@@ -19,6 +16,11 @@ const app = express();
 app.use(express.json());
 const corsOptions = require('./config/cors');
 app.use(cors(corsOptions));
+
+const instagramTokenRoutes = require('./routes/instagramTokenRoutes');
+app.use('/api/instagram-token', instagramTokenRoutes);
+const instagramRoutes = require('./routes/instagramRoutes');
+app.use('/api/instagram', instagramRoutes);
 
 const interesadoRoutes = require('./routes/interesadoRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
