@@ -1,0 +1,13 @@
+.tendencias-panel {
+  min-height: 200px;
+  padding: 32px;
+  background: var(--panel-bg, #f8faff);
+  color: var(--panel-color, #232a3b);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+  font-size: 18px;
+}
+
+.aura-main-panel-bg {
+  background: var(--main-bg, #f8faff);
+}

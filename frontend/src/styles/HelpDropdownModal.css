@@ -1,0 +1,55 @@
+.help-dropdown-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1999;
+  background: transparent;
+}
+.help-dropdown-modal {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0003;
+  padding: 24px 18px 18px 18px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  animation: fadeInHelp 0.18s;
+}
+@keyframes fadeInHelp {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.help-dropdown-close {
+  position: absolute;
+  top: 12px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #232a3b;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 10;
+  transition: color 0.2s;
+}
+.help-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 12px 18px;
+  margin: 0;
+  text-decoration: none;
+  box-shadow: 0 2px 8px #0001;
+  transition: background 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+}
+.help-dropdown-btn:hover {
+  filter: brightness(0.95);
+  box-shadow: 0 4px 16px #0002;
+}

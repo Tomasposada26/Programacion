@@ -1,0 +1,325 @@
+.footer-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.footer-link:hover {
+  color: #10b981;
+  text-decoration: none;
+}
+/* Footer links debajo de copyright y redes */
+.aura-footer-links {
+  margin-top: 12px;
+  text-align: center;
+  color: #dbeafe;
+  font-size: 0.97rem;
+  font-weight: 500;
+}
+.aura-footer-link {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.aura-footer-link:hover {
+  color: #10b981;
+}
+/* Panel principal antes de iniciar sesión */
+.home-panel {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+  color: #222;
+  transition: background 0.3s, color 0.3s;
+  display: flex;
+  flex-direction: column;
+
+/* 5 espacios = 80px (5*16px) */
+.aura-body {
+  margin-top: -10px; /* 5 espacios de 16px */
+}
+
+/* HEADER AURA */
+.aura-header {
+  width: 100vw;
+  background: #0a2342;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 120px; /* antes 90px */
+  box-sizing: border-box;
+}
+.aura-logo {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* más separación */
+}
+.aura-logo img {
+  height: 100px; /* antes 90px */
+}
+.aura-navbar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.aura-menu {
+  display: flex;
+  gap: 48px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.aura-menu-item {
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.18rem;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.aura-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.aura-login-btn {
+  background: #10b981;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 38px;
+  font-size: 1.13rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.13);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aura-login-btn:hover {
+  background: #0e9e6e;
+}
+.aura-register-block {
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  margin: 0;
+}
+.aura-register-link {
+  background: none;
+  border: none;
+  color: #188fd9;
+  font-weight: 700;
+  font-size: 1.13rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-top: 2px;
+  transition: color 0.2s;
+  text-align: left;
+  display: block;
+}
+.aura-register-link:hover {
+  color: #0e9e6e;
+}
+
+.aura-banner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 50px auto 0 auto;
+  display: flex;
+  background: linear-gradient(120deg, #f5f6fa 60%, #eaf6ff 100%);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 48px 40px 40px 60px;
+  gap: 40px;
+  min-height: 340px;
+  margin-bottom: 45px; /* 3 espacios de 16px, 2 menos que antes */
+}
+}
+.aura-banner-left {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.aura-banner-left h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.aura-banner-desc {
+  font-size: 1.1rem;
+  color: #232a3b;
+  margin-bottom: 18px;
+}
+.aura-banner-list {
+  color: #4b4b4b;
+  margin-bottom: 22px;
+  font-size: 1rem;
+  padding-left: 18px;
+}
+.aura-banner-list li {
+  margin-bottom: 6px;
+}
+.aura-banner-cta {
+  background: linear-gradient(90deg, #10b981 60%, #188fd9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 38px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+}
+.aura-banner-register {
+  color: #232a3b;
+  font-size: 0.98rem;
+  margin-top: 8px;
+}
+.aura-banner-link {
+  color: #188fd9;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.aura-banner-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aura-bot-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(24,143,217,0.10);
+  padding: 32px 24px 18px 24px;
+  min-width: 320px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.aura-bot-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #10b981 60%, #188fd9 100%);
+  margin-bottom: 18px;
+}
+.aura-bot-message {
+  background: linear-gradient(90deg, #10b981 60%, #188fd9 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 1.22rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.aura-bot-desc {
+  color: #232a3b;
+  font-size: 1rem;
+  text-align: left;
+}
+
+/* Footer solo antes de iniciar sesión */
+.aura-footer {
+  width: 100vw;
+  background: #0a2342;
+  color: #fff;
+  position: static;
+  left: unset;
+  bottom: unset;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  padding-top: 32px;
+  padding-bottom: 12px;
+  z-index: 100;
+}
+.aura-footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.aura-footer-cols {
+  display: flex;
+  gap: 60px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.aura-footer-cols > div {
+  min-width: 180px;
+}
+.aura-footer-cols ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #dbeafe;
+  font-size: 0.98rem;
+}
+.aura-footer-cols b {
+  color: #fff;
+  font-size: 1.08rem;
+}
+.aura-footer-newsletter {
+  min-width: 260px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.aura-footer-newsletter-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.aura-footer-newsletter-form input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+}
+.aura-footer-newsletter-form button {
+  background: linear-gradient(90deg, #e53e3e 60%, #d946ef 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.aura-footer-bottom {
+  margin-top: 20px;
+  color: #dbeafe;
+}
+.aura-footer-bottom-content {
+  display: flex;
+  align-items: center;
+  font-size: 0.98rem;
+}
+.aura-footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 848px;
+}
+
+/* Botones, inputs, modales compartidos */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+}

@@ -1,5 +1,0 @@
-# Ignorar archivos de variables de entorno
-.env
-backend/.env
-frontend/.env
-.env.local

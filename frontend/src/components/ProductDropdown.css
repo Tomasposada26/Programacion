@@ -1,0 +1,21 @@
+.product-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.product-dropdown-trigger {
+  transition: color 0.2s;
+}
+
+.product-dropdown-trigger:hover {
+  color: #1da1f2;
+}
+
+.product-dropdown-modal {
+  animation: fadeInDropdown 0.18s ease;
+}
+
+@keyframes fadeInDropdown {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

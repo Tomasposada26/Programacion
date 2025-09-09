@@ -1,0 +1,113 @@
+html, body, #root {
+  height: 100%;
+}
+
+.aura-panel-main-scroll {
+  overflow-y: auto;
+  height: 100%;
+}
+/* Botón de cerrar sesión rojo estilo HomePanel */
+.aura-logout-btn {
+  background: linear-gradient(90deg, #e53e3e 60%, #d946ef 100%);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 38px;
+  font-size: 1.13rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(229,62,62,0.13);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aura-logout-btn:hover {
+  background: linear-gradient(90deg, #c53030 60%, #a21caf 100%);
+}
+
+/* Variables y modo oscuro solo para el panel Aura */
+:root {
+  --aura-verify-input-bg: #fafbfc;
+  --aura-verify-input-color: #222;
+  --aura-verify-input-border: #6366f1;
+  --aura-verify-btn-bg: #6366f1;
+  --aura-verify-btn-color: #fff;
+  --aura-profile-bg: #fff;
+  --aura-profile-fg: #1a3365;
+  --aura-notif-x-bg: #fff;
+  --aura-notif-x-fg: #888;
+  --aura-notif-badge-bg: #e53e3e;
+  --aura-notif-badge-bg-empty: #fff;
+  --aura-notif-badge-fg: #fff;
+  --aura-notif-badge-fg-empty: #888;
+  --aura-notif-badge-border: #fff;
+  --aura-notif-badge-shadow: #e53e3e55;
+  --aura-soluciones: #188fd9;
+  --aura-main-bg: #fff;
+  --aura-main-color: #222;
+  --aura-modal-bg: #fff;
+  --aura-modal-color: #222;
+}
+
+body.aura-dark {
+  --aura-verify-input-bg: #232a3b;
+  --aura-verify-input-color: #f3f3f3;
+  --aura-verify-input-border: #1EE6D9;
+  --aura-verify-btn-bg: #1EE6D9;
+  --aura-verify-btn-color: #232a3b;
+  --aura-profile-bg: #232a3b;
+  --aura-profile-fg: #f3f3f3;
+  --aura-notif-x-bg: #232a3b;
+  --aura-notif-x-fg: #bbb;
+  --aura-notif-badge-bg: #e53e3e;
+  --aura-notif-badge-bg-empty: #232a3b;
+  --aura-notif-badge-fg: #fff;
+  --aura-notif-badge-fg-empty: #bbb;
+  --aura-notif-badge-border: #232a3b;
+  --aura-notif-badge-shadow: #e53e3e99;
+  --aura-soluciones: #1EE6D9;
+  --aura-main-bg: #36393f;
+  --aura-main-color: #f3f3f3;
+  --aura-modal-bg: #232a3b;
+  --aura-modal-color: #f3f3f3;
+  background: #000000 !important;
+  color: #e0e6f0 !important;
+}
+
+/* Panel principal */
+.aura-panel {
+  width: 100%;
+  min-height: 100vh;
+  /* background removed to avoid double banner */
+  color: var(--aura-main-color);
+  transition: background 0.3s, color 0.3s;
+}
+
+.aura-main-panel-bg {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 110px);
+  /* background removed to avoid double banner */
+  color: var(--aura-main-color, #222);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Paneles y cards */
+.settings-panel {
+  background: #1a2235;
+  color: #e0e6f0;
+  box-shadow: 0 8px 32px rgba(30,230,217,0.10), 0 1.5px 8px rgba(36,198,240,0.08);
+}
+.settings-panel-content h4 {
+  color: #1EE6D9;
+}
+.settings-panel-content li {
+  color: #e0e6f0;
+}
+.settings-close {
+  background: linear-gradient(90deg, #232a3b 0%, #1EE6D9 100%);
+  color: #fff;
+}
+

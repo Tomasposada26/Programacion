@@ -1,0 +1,43 @@
+.respuestas-panel {
+  min-height: calc(100vh - 100px);
+  background: #fff;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.respuestas-panel h2 {
+  font-weight: 800;
+  font-size: 1.6rem;
+  margin-bottom: 18px;
+}
+
+.respuestas-panel .card {
+  background: #f8faff;
+  color: #232a3b;
+  border-radius: 0;
+  width: calc(100vw - 340px - 20px);
+  max-width: none;
+  margin-right: 20px;
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
+  min-height: 600px;
+  box-shadow: 0 4px 24px #10b98122;
+  font-weight: 400;
+  font-size: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 5px 30px 32px 38px;
+  gap: 32px;
+  transition: background 0.3s, color 0.3s;
+  overflow-y: scroll;
+  overflow-x: auto;
+  z-index: 1;
+}

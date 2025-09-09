@@ -1,0 +1,20 @@
+.cuentas-panel {
+  min-height: calc(100vh - 100px); /* debajo de la barra superior */
+  margin-left: 0; /* ya que el main tiene marginLeft: 320px */
+  background: #fff;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.cuentas-panel-content {
+  padding: 40px 48px;
+  max-width: 800px;
+  font-size: 1.13rem;
+  color: #232a3b;
+  line-height: 1.7;
+}

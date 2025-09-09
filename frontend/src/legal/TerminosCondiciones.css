@@ -1,0 +1,147 @@
+.terminos-content {
+  animation: fadeInLegal 0.7s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeInLegal {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: none; }
+}
+.terminos-back-btn {
+  transition: background 0.2s, color 0.2s, border 0.2s, transform 0.18s cubic-bezier(.4,0,.2,1);
+}
+.terminos-back-btn:hover {
+  transform: scale(1.07);
+}
+.legal-breadcrumbs {
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.legal-breadcrumbs a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.legal-breadcrumbs a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+.breadcrumb-sep {
+  color: #9ca3af;
+  font-size: 1.1em;
+}
+.terminos-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* TerminosCondiciones.css - Estilos exclusivos para la página de Términos y Condiciones de Aura */
+
+.terminos-container {
+  max-width: 900px;
+  min-height: 80vh;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid #e0e7ef;
+  box-shadow: 0 6px 32px rgba(10,35,66,0.13);
+  padding: 32px 28px 40px 28px;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  transition: box-shadow 0.2s;
+}
+.terminos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.terminos-logo {
+  height: 62px;
+  max-width: 160px;
+}
+.terminos-back-btn {
+  background: linear-gradient(90deg, #e53e3e 60%, #d946ef 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px 8px 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.terminos-back-btn:hover {
+  background: linear-gradient(90deg, #d946ef 60%, #e53e3e 100%);
+}
+.terminos-back-btn .back-icon {
+  font-size: 1.2em;
+  margin-right: 2px;
+}
+.terminos-content h1 {
+  font-size: 2.1rem;
+  margin-bottom: 18px;
+  color: #10b981;
+  border-bottom: 2px solid #e0e7ef;
+  padding-bottom: 8px;
+}
+.terminos-content h2 {
+  font-size: 1.25rem;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: #0a2342;
+  border-bottom: 1px solid #e0e7ef;
+  padding-bottom: 4px;
+}
+.terminos-content ul {
+  margin-left: 24px;
+  margin-bottom: 18px;
+}
+.terminos-content li {
+  margin-bottom: 8px;
+  font-size: 1.08rem;
+}
+.terminos-content p, .terminos-content a {
+  color: #232a3b;
+  font-size: 1.09rem;
+  line-height: 1.7;
+}
+.terminos-content a {
+  text-decoration: underline;
+}
+.terminos-content hr {
+  border: none;
+  border-top: 1.5px solid #e0e7ef;
+  margin: 32px 0 24px 0;
+}
+@media (max-width: 700px) {
+  .terminos-container {
+    max-width: 98vw;
+    padding: 18px 4vw 24px 4vw;
+    min-height: 90vh;
+  }
+  .terminos-header {
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .terminos-content h1 {
+    font-size: 1.3rem;
+  }
+  .terminos-content h2 {
+    font-size: 1.08rem;
+  }
+  .terminos-content p, .terminos-content li {
+    font-size: 0.98rem;
+  }
+}
+body {
+  background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%);
+}
