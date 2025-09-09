@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import fetchWithAuth from './utils/fetchWithAuth';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -47,7 +48,11 @@ function App() {
   let userData = null;
     try {
       // Obtener datos completos del usuario tras login
-      const res = await fetch(`${BACKEND_URL}/api/usuarios/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`);
+      const res = await fetchWithAuth(
+        `${BACKEND_URL}/api/usuarios/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`,
+        {},
+        handleLogout
+      );
       if (!res.ok) throw new Error('No se pudo obtener datos de usuario');
       userData = await res.json();
       setUser({
@@ -73,7 +78,11 @@ function App() {
     }
     // Obtener notificaciones persistentes del backend
     try {
-      const notifRes = await fetch(`${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userData._id)}`);
+      const notifRes = await fetchWithAuth(
+        `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userData._id)}`,
+        {},
+        handleLogout
+      );
       if (notifRes.ok) {
         const notifs = await notifRes.json();
         setNotifications(Array.isArray(notifs) ? notifs : []);
@@ -96,8 +105,10 @@ function App() {
   };
 
 
+
+
   // Guardar notificaciones en backend
-  const persistNotifications = React.useCallback(() => {
+  const persistNotifications = React.useCallback((logoutFn) => {
     if (!user || !user._id || !Array.isArray(notifications)) return;
     const payload = {
       userId: user._id,
@@ -113,21 +124,25 @@ function App() {
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
       navigator.sendBeacon(url, blob);
     } else {
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      fetchWithAuth(
+        url,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        },
+        logoutFn
+      );
     }
   }, [user, notifications, BACKEND_URL]);
 
   // Guardar al cerrar sesión
-  const handleLogout = () => {
-    persistNotifications();
+  const handleLogout = React.useCallback(() => {
+    persistNotifications(handleLogout);
     setSesionIniciada(false);
     setUser(null);
     setDarkMode(false);
-  };
+  }, [persistNotifications]);
 
   // Guardar al cerrar la pestaña
   React.useEffect(() => {
