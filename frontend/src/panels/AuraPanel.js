@@ -1,4 +1,5 @@
 import React from 'react';
+import CuentasPanel from './CuentasPanel';
 
 import '../styles/AuraPanel.css';
 import logoAura from '../assets/logo-aura.png';
