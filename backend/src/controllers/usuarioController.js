@@ -1,4 +1,5 @@
 const Usuario = require('../models/Usuario');
+const Instagram = require('../routes/instagramTokenRoutes').Instagram || require('mongoose').model('Instagram');
 
 const usuarioController = {
   async delete(req, res) {
@@ -12,6 +13,8 @@ const usuarioController = {
       const Regla = require('../models/Regla');
   await Notificacion.deleteMany({ userId: user._id.toString() });
   await Regla.deleteMany({ userId: user._id.toString() });
+  // Eliminar datos de Instagram asociados a este usuario
+  await Instagram.deleteMany({ app_user_id: user._id });
       await Usuario.deleteOne({ correo });
       res.json({ ok: true });
     } catch (err) {
