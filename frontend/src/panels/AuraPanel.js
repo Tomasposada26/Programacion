@@ -267,25 +267,7 @@ const AuraPanel = ({
       case 'prueba-neto':
         return <PruebaNetoPanel />;
       case 'cuentas':
-        return (
-          <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-            <div style={{
-              width: 320,
-              height: 320,
-              background: '#f5faff',
-              borderRadius: 18,
-              boxShadow: '0 2px 12px #2196f311',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.3rem',
-              color: '#183b54',
-              fontWeight: 700
-            }}>
-              Card de cuentas
-            </div>
-          </div>
-        );
+        return <CuentasPanel />;
       case 'ajustes':
         return <SettingsPanel />;
       default:
