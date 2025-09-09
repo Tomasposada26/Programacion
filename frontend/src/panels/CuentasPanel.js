@@ -146,12 +146,14 @@ const CuentasPanel = () => {
         onConfirm={() => handleUnlink(confirm.id)}
         message="¿Estás seguro que deseas desvincular esta cuenta?"
       />
-      <Toast
-        open={toast.open}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, open: false })}
-      />
+      {toast.open && toast.message && (
+        <Toast
+          open={toast.open}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, open: false })}
+        />
+      )}
     </div>
   );
 };
