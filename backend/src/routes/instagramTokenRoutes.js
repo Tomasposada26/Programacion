@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
+const authMiddleware = require('../middlewares/authMiddleware');
 const mongoose = require('mongoose');
 
 // Modelo para guardar datos de Instagram asociados a un usuario de la app
@@ -14,7 +15,7 @@ const InstagramSchema = new mongoose.Schema({
 const Instagram = mongoose.model('Instagram', InstagramSchema);
 
 // Endpoint para guardar el access_token recibido tras el login
-router.post('/save-token', async (req, res) => {
+router.post('/save-token', authMiddleware, async (req, res) => {
   const { app_user_id, instagram_user_id, access_token, expires_in } = req.body;
   if (!app_user_id || !instagram_user_id || !access_token) return res.status(400).json({ error: 'Faltan datos' });
   try {
@@ -32,7 +33,7 @@ router.post('/save-token', async (req, res) => {
 });
 
 // Endpoint para obtener el access_token (y refrescarlo si está por expirar)
-router.get('/get-token/:app_user_id', async (req, res) => {
+router.get('/get-token/:app_user_id', authMiddleware, async (req, res) => {
   const { app_user_id } = req.params;
   try {
     const doc = await Instagram.findOne({ app_user_id });
@@ -56,7 +57,7 @@ router.get('/get-token/:app_user_id', async (req, res) => {
 });
 
 // Endpoint para eliminar todos los datos de Instagram asociados a un usuario de la app
-router.delete('/delete-by-user/:app_user_id', async (req, res) => {
+router.delete('/delete-by-user/:app_user_id', authMiddleware, async (req, res) => {
   const { app_user_id } = req.params;
   try {
     await Instagram.deleteMany({ app_user_id });
