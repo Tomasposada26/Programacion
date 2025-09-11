@@ -92,7 +92,7 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setToast({ open: true, message: 'Cuenta desvinculada', type: 'success' });
-      fetchAccounts();
+  // fetchAccounts eliminado: ahora el fetch es global
     } catch (e) {
       setToast({ open: true, message: 'Error al desvincular', type: 'error' });
     }
