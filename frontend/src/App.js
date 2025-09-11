@@ -21,7 +21,7 @@ function App() {
   // Estado de autenticación y usuario
   const [sesionIniciada, setSesionIniciada] = useState(false);
   const [user, setUser] = useState(null);
-
+  //prueba
   // Estados globales para notificaciones
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);

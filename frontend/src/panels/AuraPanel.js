@@ -278,6 +278,7 @@ const AuraPanel = ({
           </div>
         );
     }
+    //prueba
   };
 
   // Ref para la campana

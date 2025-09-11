@@ -1,4 +1,5 @@
 // Rutas para login, registro, verificación, recuperación
+//prueba
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
