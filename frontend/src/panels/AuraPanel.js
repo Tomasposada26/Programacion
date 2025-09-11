@@ -32,7 +32,6 @@ const AuraPanel = ({
   user,
 // ...existing code...
   // Elimina cualquier prop duplicada aquí
-  user,
   onLogout,
   darkMode,
   setDarkMode,
