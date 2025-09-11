@@ -121,7 +121,8 @@ const CuentasPanel = () => {
   const handleUnlink = async (id) => {
     setLoading(true);
     try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/delete-by-user/${user._id}`, {
+      // Eliminar solo la cuenta específica por su _id en la BD
+      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${user.token}` }
       });

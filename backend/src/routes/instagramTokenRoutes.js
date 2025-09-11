@@ -1,3 +1,5 @@
+// Eliminar una cuenta IG simulada por su _id
+router.delete('/simulate-link/:id', authMiddleware, instagramTokenSimController.deleteSimulatedAccount);
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
