@@ -202,6 +202,7 @@ const CuentasPanel = () => {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast({ ...toast, open: false })}
+          duration={3000}
         />
       )}
     </div>
