@@ -21,16 +21,19 @@ function App() {
   // Estado de autenticación y usuario
   const [sesionIniciada, setSesionIniciada] = useState(false);
   const [user, setUser] = useState(null);
-  // Estado global de cuentas IG simuladas
-  const [accounts, setAccounts] = useState([]);
+  //prueba
   // Estados globales para notificaciones
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+
   // Estado global de modo oscuro (solo para AuraPanel)
   const [darkMode, setDarkMode] = useState(false);
+
   // Estado para mostrar/ocultar el modal de notificaciones
   const [showNotifications, setShowNotifications] = useState(false);
+
   // Estados para errores y datos temporales
   const [loginError, setLoginError] = useState('');
   const [registerError, setRegisterError] = useState('');
@@ -42,7 +45,7 @@ function App() {
 
   const handleLogin = async (data) => {
     setSesionIniciada(true);
-    let userData = null;
+  let userData = null;
     try {
       // Obtener datos completos del usuario tras login
       const res = await fetchWithAuth(
@@ -65,22 +68,6 @@ function App() {
         fecha_nacimiento: userData.fecha_nacimiento,
         edad: userData.edad
       });
-      // Obtener cuentas IG simuladas del backend
-      try {
-        const accRes = await fetchWithAuth(
-          `${BACKEND_URL}/api/instagram-token/user-accounts`,
-          {},
-          handleLogout
-        );
-        if (accRes.ok) {
-          const accs = await accRes.json();
-          setAccounts(Array.isArray(accs) ? accs : []);
-        } else {
-          setAccounts([]);
-        }
-      } catch (e) {
-        setAccounts([]);
-      }
     } catch (err) {
       setUser({
         usuario: data.usuario,
@@ -88,12 +75,11 @@ function App() {
         token: data.token,
         ultimaConexion: data.ultimaConexion
       });
-      setAccounts([]);
     }
     // Obtener notificaciones persistentes del backend
     try {
       const notifRes = await fetchWithAuth(
-        `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userData?._id || '')}`,
+        `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userData._id)}`,
         {},
         handleLogout
       );
@@ -152,23 +138,11 @@ function App() {
 
   // Guardar al cerrar sesión
   const handleLogout = React.useCallback(() => {
-    // Guardar cuentas IG simuladas en backend
-    if (user && user.token && Array.isArray(accounts)) {
-      fetch(`${BACKEND_URL}/api/instagram-token/save-accounts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`
-        },
-        body: JSON.stringify({ accounts })
-      });
-    }
     persistNotifications(handleLogout);
     setSesionIniciada(false);
     setUser(null);
-    setAccounts([]);
     setDarkMode(false);
-  }, [persistNotifications, user, accounts]);
+  }, [persistNotifications]);
 
   // Guardar al cerrar la pestaña
   React.useEffect(() => {
@@ -213,8 +187,6 @@ function App() {
                 setShowHelpDropdown={setShowHelpDropdown}
                 helpBtnRef={helpBtnRef}
                 onUserUpdate={handleUserUpdate}
-                accounts={accounts}
-                setAccounts={setAccounts}
               />
             ) : (
               <HomePanel

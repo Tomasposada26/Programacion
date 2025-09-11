@@ -27,11 +27,7 @@ import UsersIcon from '../assets/UsersIcon';
 
 
 const AuraPanel = ({
-  accounts,
-  setAccounts,
   user,
-// ...existing code...
-  // Elimina cualquier prop duplicada aquí
   onLogout,
   darkMode,
   setDarkMode,
@@ -272,7 +268,7 @@ const AuraPanel = ({
       case 'prueba-neto':
         return <PruebaNetoPanel />;
       case 'cuentas':
-        return <CuentasPanel accounts={accounts} setAccounts={setAccounts} user={user} />;
+        return <CuentasPanel />;
       case 'ajustes':
         return <SettingsPanel />;
       default:

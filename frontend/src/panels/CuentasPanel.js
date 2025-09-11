@@ -8,18 +8,65 @@ import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
-const CuentasPanel = ({ accounts, setAccounts, user }) => {
+const CuentasPanel = () => {
+  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
-  // user viene por props
+  const [user, setUser] = useState(null); // Aquí deberías obtener el usuario logueado (JWT)
 
   // Simulación: obtener usuario logueado (reemplaza por tu lógica real)
-  // user viene por props
+  useEffect(() => {
+    // Obtener el usuario logueado y su JWT real
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+  const decoded = jwtDecode(token);
+        // El backend espera req.user.id como userId
+        setUser({ _id: decoded.id, username: decoded.username || decoded.usuario || '', token });
+      } catch (e) {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }, []);
 
-  // El fetch de cuentas ahora se hace en App/AuraPanel y se pasa por props
+  // Obtener cuentas vinculadas
+  const fetchAccounts = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      // Obtener cuentas IG simuladas persistentes del usuario
+      const res = await fetch(`${BACKEND_URL}/api/instagram-token/user-accounts`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAccounts(data.map(acc => ({
+          ...acc,
+          _id: acc._id,
+          username: acc.username,
+          profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+          timeToExpire: '59d 23h',
+          isExpiringSoon: false,
+          active: acc.active,
+          linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
+          autoRefresh: true,
+          refreshing: false
+        })));
+      } else {
+        setAccounts([]);
+      }
+    } catch (e) {
+      setAccounts([]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchAccounts(); }, [user]);
 
   // Formatear tiempo para expirar
   function formatTimeToExpire(expires_in, last_refresh) {
@@ -92,7 +139,7 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setToast({ open: true, message: 'Cuenta desvinculada', type: 'success' });
-  // fetchAccounts eliminado: ahora el fetch es global
+      fetchAccounts();
     } catch (e) {
       setToast({ open: true, message: 'Error al desvincular', type: 'error' });
     }

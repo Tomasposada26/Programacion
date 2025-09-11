@@ -3,8 +3,6 @@ const axios = require('axios');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const instagramTokenSimController = require('../controllers/instagramTokenSimController');
-// Guardar todas las cuentas IG simuladas del usuario (bulk)
-router.post('/save-accounts', authMiddleware, instagramTokenSimController.saveUserAccounts);
 // Eliminar una cuenta IG simulada por su _id
 router.delete('/simulate-link/:id', authMiddleware, instagramTokenSimController.deleteSimulatedAccount);
 // Endpoint para simular vinculación de cuenta IG (mock)

@@ -1,26 +1,3 @@
-// POST /api/instagram-token/save-accounts
-exports.saveUserAccounts = async (req, res) => {
-  try {
-    const userId = req.user && req.user.id;
-    if (!userId) return res.status(401).json({ error: 'No autorizado' });
-    const { accounts } = req.body;
-    if (!Array.isArray(accounts)) return res.status(400).json({ error: 'Faltan cuentas' });
-    // Eliminar todas las cuentas previas del usuario
-    await InstagramAccount.deleteMany({ userId });
-    // Insertar las nuevas
-    const docs = await InstagramAccount.insertMany(
-      accounts.map(acc => ({
-        userId,
-        username: acc.username,
-        linkedAt: acc.linkedAt || new Date(),
-        active: acc.active !== undefined ? acc.active : true
-      }))
-    );
-    res.status(201).json({ success: true, accounts: docs });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al guardar cuentas' });
-  }
-};
 // DELETE /api/instagram-token/simulate-link/:id
 exports.deleteSimulatedAccount = async (req, res) => {
   try {
