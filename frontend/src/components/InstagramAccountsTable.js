@@ -13,7 +13,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
         aria-label="Buscar por nombre de perfil"
       />
     </div>
-    <div className="instagram-accounts-table-wrapper" style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'visible', borderRadius: 12, boxShadow: '0 2px 8px #cfd8dc22' }}>
+  <div className="instagram-accounts-table-wrapper" style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', borderRadius: 12, boxShadow: '0 2px 8px #cfd8dc22' }}>
       <table className="instagram-accounts-table" style={{ minWidth: 1100 }}>
         <thead>
           <tr>
