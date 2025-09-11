@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instagram Callback</title>
+  <script>
+    // Extrae el fragmento de la URL (code, state, etc)
+    function parseQueryString(query) {
+      const params = {};
+      query.replace(/([^&=]+)=([^&]*)/g, function(m, key, value) {
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+      });
+      return params;
+    }
+    window.onload = function() {
+      // Instagram responde con el código en la query string
+      const params = parseQueryString(window.location.search.substring(1));
+      // Envía el código al opener (ventana principal)
+      if (window.opener && params.code) {
+        window.opener.postMessage({ type: 'instagram_oauth_code', code: params.code }, '*');
+        window.close();
+      }
+    };
+  </script>
+</head>
+<body>
+  <div style="text-align:center;margin-top:40px;">
+    <h2>Procesando autenticación de Instagram...</h2>
+  </div>
+</body>
+</html>

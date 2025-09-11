@@ -48,7 +48,12 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
                 </span>
               </td>
               <td>
-                <span className={acc.active ? 'badge badge-ok' : 'badge badge-off'}>
+                <span
+                  className={acc.active ? 'badge badge-ok' : 'badge badge-off'}
+                  style={{ cursor: 'pointer' }}
+                  title="Haz clic para activar/desactivar"
+                  onClick={() => acc.onToggleActive && acc.onToggleActive(acc._id, !acc.active)}
+                >
                   {acc.active ? 'Activa' : 'Desactivada'}
                 </span>
               </td>
