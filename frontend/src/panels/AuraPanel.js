@@ -30,6 +30,8 @@ const AuraPanel = ({
   accounts,
   setAccounts,
   user,
+// ...existing code...
+  // Elimina cualquier prop duplicada aquí
   user,
   onLogout,
   darkMode,
