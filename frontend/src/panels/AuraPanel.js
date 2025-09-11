@@ -27,6 +27,9 @@ import UsersIcon from '../assets/UsersIcon';
 
 
 const AuraPanel = ({
+  accounts,
+  setAccounts,
+  user,
   user,
   onLogout,
   darkMode,

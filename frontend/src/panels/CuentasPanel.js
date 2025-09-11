@@ -14,24 +14,10 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
-  const [user, setUser] = useState(null); // Aquí deberías obtener el usuario logueado (JWT)
+  // user viene por props
 
   // Simulación: obtener usuario logueado (reemplaza por tu lógica real)
-  useEffect(() => {
-    // Obtener el usuario logueado y su JWT real
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-  const decoded = jwtDecode(token);
-        // El backend espera req.user.id como userId
-        setUser({ _id: decoded.id, username: decoded.username || decoded.usuario || '', token });
-      } catch (e) {
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-  }, []);
+  // user viene por props
 
   // El fetch de cuentas ahora se hace en App/AuraPanel y se pasa por props
 
