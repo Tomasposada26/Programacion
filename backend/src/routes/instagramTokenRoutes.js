@@ -2,17 +2,13 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
-const mongoose = require('mongoose');
 
-// Modelo para guardar datos de Instagram asociados a un usuario de la app
-const InstagramSchema = new mongoose.Schema({
-  app_user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
-  instagram_user_id: String,
-  access_token: String,
-  expires_in: Number,
-  last_refresh: { type: Date, default: Date.now }
-}, { collection: 'instagram' });
-const Instagram = mongoose.model('Instagram', InstagramSchema);
+const instagramTokenSimController = require('../controllers/instagramTokenSimController');
+// Endpoint para simular vinculación de cuenta IG (mock)
+router.post('/simulate-link', authMiddleware, instagramTokenSimController.simulateLink);
+
+// Endpoint para obtener cuentas IG simuladas del usuario
+router.get('/user-accounts', authMiddleware, instagramTokenSimController.getUserAccounts);
 
 // Endpoint para guardar el access_token recibido tras el login
 router.post('/save-token', authMiddleware, async (req, res) => {

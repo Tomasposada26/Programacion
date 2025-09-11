@@ -27,23 +27,22 @@ const CuentasPanel = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/instagram-token/get-token/${user._id}`, {
+      // Obtener cuentas IG simuladas persistentes del usuario
+      const res = await fetch(`${BACKEND_URL}/api/instagram-token/user-accounts`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        // Si el backend soporta múltiples cuentas, data debe ser array. Si no, adaptamos:
-        const arr = Array.isArray(data) ? data : data && data.access_token ? [data] : [];
-        setAccounts(arr.map(acc => ({
+        setAccounts(data.map(acc => ({
           ...acc,
-          _id: acc._id || user._id,
-          username: acc.instagram_user_id || 'Desconocido',
-          profile_picture_url: acc.profile_picture_url || 'https://ui-avatars.com/api/?name=IG',
-          timeToExpire: acc.expires_in ? formatTimeToExpire(acc.expires_in, acc.last_refresh) : 'N/A',
-          isExpiringSoon: acc.expires_in && acc.expires_in < 3 * 24 * 3600, // menos de 3 días
-          active: !!acc.access_token,
-          linkedAt: acc.last_refresh ? new Date(acc.last_refresh).toLocaleString() : 'N/A',
-          autoRefresh: acc.autoRefresh !== false,
+          _id: acc._id,
+          username: acc.username,
+          profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+          timeToExpire: '59d 23h',
+          isExpiringSoon: false,
+          active: acc.active,
+          linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
+          autoRefresh: true,
           refreshing: false
         })));
       } else {
@@ -71,31 +70,47 @@ const CuentasPanel = () => {
   const handleLink = async () => {
     setLinking(true);
     // Simulación: generar un nombre de usuario aleatorio con @ delante
+    const now = new Date();
+    const randomName = () => {
+      const realNames = [
+        'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
+        'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
+        'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
+        'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
+      ];
+      const suffix = Math.random() < 0.5 ? '' : Math.floor(Math.random() * 1000);
+      return `@${realNames[Math.floor(Math.random() * realNames.length)]}${suffix}`;
+    };
+    const username = randomName();
+    const fakeAccount = {
+      _id: Math.random().toString(36).slice(2),
+      username,
+      profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+      timeToExpire: '59d 23h',
+      isExpiringSoon: false,
+      active: true,
+      linkedAt: now.toLocaleString(),
+      autoRefresh: true,
+      refreshing: false
+    };
+    // Enviar al backend para almacenar en MongoDB (nombre, fecha, estado)
+    try {
+      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify({
+          username,
+          linkedAt: now.toISOString(),
+          active: true
+        })
+      });
+    } catch (e) {
+      // Si falla, solo simula en frontend
+    }
     setTimeout(() => {
-      const now = new Date();
-      const randomName = () => {
-        // Listado de nombres de usuario más realistas
-        const realNames = [
-          'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
-          'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
-          'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
-          'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
-        ];
-        // Sufijo aleatorio para simular unicidad
-        const suffix = Math.random() < 0.5 ? '' : Math.floor(Math.random() * 1000);
-        return `@${realNames[Math.floor(Math.random() * realNames.length)]}${suffix}`;
-      };
-      const fakeAccount = {
-        _id: Math.random().toString(36).slice(2),
-        username: randomName(),
-        profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
-        timeToExpire: '59d 23h',
-        isExpiringSoon: false,
-        active: true,
-        linkedAt: now.toLocaleString(),
-        autoRefresh: true,
-        refreshing: false
-      };
       setAccounts(accs => [fakeAccount, ...accs]);
       setLinking(false);
       setToast({ open: true, message: 'Cuenta vinculada exitosamente (simulada)', type: 'success' });
