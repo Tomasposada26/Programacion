@@ -14,7 +14,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
       />
     </div>
   <div className="instagram-accounts-table-wrapper" style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', borderRadius: 12, boxShadow: '0 2px 8px #cfd8dc22' }}>
-      <table className="instagram-accounts-table" style={{ minWidth: 1100 }}>
+      <table className="instagram-accounts-table" style={{ minWidth: 1700 }}>
         <thead>
           <tr>
             <th>Nombre de perfil</th>
