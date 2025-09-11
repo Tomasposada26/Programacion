@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
@@ -23,7 +23,7 @@ const CuentasPanel = () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-  const decoded = jwt_decode(token);
+  const decoded = jwtDecode(token);
         // El backend espera req.user.id como userId
         setUser({ _id: decoded.id, username: decoded.username || decoded.usuario || '', token });
       } catch (e) {
