@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import jwt_decode from 'jwt-decode';
 import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
@@ -18,8 +19,19 @@ const CuentasPanel = () => {
 
   // Simulación: obtener usuario logueado (reemplaza por tu lógica real)
   useEffect(() => {
-    // Aquí deberías obtener el usuario logueado y su JWT
-    setUser({ _id: '68ba567c7d8776eaa6286717', username: 'Tomas0626', token: localStorage.getItem('token') });
+    // Obtener el usuario logueado y su JWT real
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        // El backend espera req.user.id como userId
+        setUser({ _id: decoded.id, username: decoded.username || decoded.usuario || '', token });
+      } catch (e) {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
   }, []);
 
   // Obtener cuentas vinculadas
