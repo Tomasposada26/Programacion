@@ -19,7 +19,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
           <tr>
             <th>Nombre de perfil</th>
             <th>Tiempo para expirar</th>
-            <th>Estado</th>
+            <th style={{ width: 120 }}>Estado</th>
             <th>Fecha de vinculación</th>
             <th>Auto-refresh</th>
             <th>Acciones</th>
@@ -47,10 +47,10 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
                   {acc.timeToExpire}
                 </span>
               </td>
-              <td>
+              <td style={{ width: 120, textAlign: 'center' }}>
                 <span
                   className={acc.active ? 'badge badge-ok' : 'badge badge-off'}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', minWidth: 70, display: 'inline-block' }}
                   title="Haz clic para activar/desactivar"
                   onClick={() => acc.onToggleActive && acc.onToggleActive(acc._id, !acc.active)}
                 >
