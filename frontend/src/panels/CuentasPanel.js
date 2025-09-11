@@ -70,12 +70,24 @@ const CuentasPanel = () => {
   // Vincular cuenta (simulación: abre popup de Instagram OAuth)
   const handleLink = async () => {
     setLinking(true);
-    // Simulación: agregar una cuenta falsa a la tabla
+    // Simulación: generar un nombre de usuario aleatorio con @ delante
     setTimeout(() => {
       const now = new Date();
+      const randomName = () => {
+        // Listado de nombres de usuario más realistas
+        const realNames = [
+          'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
+          'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
+          'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
+          'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
+        ];
+        // Sufijo aleatorio para simular unicidad
+        const suffix = Math.random() < 0.5 ? '' : Math.floor(Math.random() * 1000);
+        return `@${realNames[Math.floor(Math.random() * realNames.length)]}${suffix}`;
+      };
       const fakeAccount = {
         _id: Math.random().toString(36).slice(2),
-        username: `@${user?.username || 'usuario'}`,
+        username: randomName(),
         profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
         timeToExpire: '59d 23h',
         isExpiringSoon: false,
@@ -107,20 +119,28 @@ const CuentasPanel = () => {
     setConfirm({ open: false, id: null });
   };
 
-  // Refrescar token
+  // Refrescar token (simulado: solo restablece el contador de tiempo para expirar)
   const handleRefresh = async (id) => {
-    setAccounts(accs => accs.map(a => a._id === id ? { ...a, refreshing: true } : a));
-    try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/refresh-token/${user._id}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setToast({ open: true, message: 'Token renovado', type: 'success' });
-      fetchAccounts();
-    } catch (e) {
-      setToast({ open: true, message: 'Error al renovar token', type: 'error' });
-    }
-    setAccounts(accs => accs.map(a => a._id === id ? { ...a, refreshing: false } : a));
+    setAccounts(accs => accs.map(a =>
+      a._id === id
+        ? {
+            ...a,
+            refreshing: true,
+            timeToExpire: '59d 23h',
+            isExpiringSoon: false
+          }
+        : a
+    ));
+    setTimeout(() => {
+      setAccounts(accs => accs.map(a => a._id === id ? { ...a, refreshing: false } : a));
+      setToast({ open: true, message: 'Token renovado (simulado)', type: 'success' });
+    }, 1000);
+  };
+
+  // Alternar estado activa/desactivada
+  const handleToggleActive = (id, value) => {
+    setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
+    setToast({ open: true, message: value ? 'Cuenta activada' : 'Cuenta desactivada', type: value ? 'success' : 'warning' });
   };
 
   // Cambiar auto-refresh
@@ -137,15 +157,18 @@ const CuentasPanel = () => {
     <div style={{ width: '100%', maxWidth: 900, margin: '0 auto', padding: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <InstagramLinkCard
-          isLinked={accounts.length > 0}
+          isLinked={false} // Siempre mostrar el botón de vincular
           onLink={handleLink}
-          onUnlink={() => setConfirm({ open: true, id: user._id })}
+          onUnlink={() => setConfirm({ open: true, id: user?._id })}
           instagramUser={accounts[0]}
           loading={linking || loading}
         />
       </div>
       <InstagramAccountsTable
-        accounts={filteredAccounts}
+        accounts={filteredAccounts.map(acc => ({
+          ...acc,
+          onToggleActive: handleToggleActive
+        }))}
         onUnlink={id => setConfirm({ open: true, id })}
         onRefresh={handleRefresh}
         onToggleAutoRefresh={handleToggleAutoRefresh}
