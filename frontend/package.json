@@ -11,6 +11,7 @@
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.2",
+    "jwt-decode": "^4.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
@@ -45,7 +46,6 @@
       "last 1 safari version"
     ]
   },
-
   "devDependencies": {
     "typescript": "^4.9.5"
   }
