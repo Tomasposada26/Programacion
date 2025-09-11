@@ -2,7 +2,7 @@ import React from 'react';
 import './InstagramAccountsTable.css';
 
 const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRefresh, search, setSearch }) => (
-  <div style={{ width: '100%', marginTop: 32 }}>
+  <div style={{ width: '100%', marginTop: 32, maxWidth: 1800, marginLeft: 'auto', marginRight: 'auto' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
       <input
         type="text"
@@ -13,7 +13,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
         aria-label="Buscar por nombre de perfil"
       />
     </div>
-  <div className="instagram-accounts-table-wrapper" style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', borderRadius: 12, boxShadow: '0 2px 8px #cfd8dc22' }}>
+  <div className="instagram-accounts-table-wrapper" style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', borderRadius: 12, boxShadow: '0 2px 8px #cfd8dc22', width: '100%' }}>
       <table className="instagram-accounts-table" style={{ minWidth: 1700 }}>
         <thead>
           <tr>
