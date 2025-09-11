@@ -170,7 +170,7 @@ const CuentasPanel = () => {
   const filteredAccounts = accounts.filter(acc => acc.username.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div style={{ width: '100%', maxWidth: 900, margin: '0 auto', padding: 24 }}>
+  <div style={{ width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: '0 auto', padding: 24, overflow: 'visible' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <InstagramLinkCard
           isLinked={false} // Siempre mostrar el botón de vincular
