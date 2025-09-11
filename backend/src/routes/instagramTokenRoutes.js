@@ -1,12 +1,10 @@
-
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
+const instagramTokenSimController = require('../controllers/instagramTokenSimController');
 // Eliminar una cuenta IG simulada por su _id
 router.delete('/simulate-link/:id', authMiddleware, instagramTokenSimController.deleteSimulatedAccount);
-
-const instagramTokenSimController = require('../controllers/instagramTokenSimController');
 // Endpoint para simular vinculación de cuenta IG (mock)
 router.post('/simulate-link', authMiddleware, instagramTokenSimController.simulateLink);
 
