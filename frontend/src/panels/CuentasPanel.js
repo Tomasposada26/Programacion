@@ -70,12 +70,24 @@ const CuentasPanel = () => {
   // Vincular cuenta (simulación: abre popup de Instagram OAuth)
   const handleLink = async () => {
     setLinking(true);
-    // Aquí deberías abrir el flujo real de Instagram OAuth en un modal
+    // Simulación: agregar una cuenta falsa a la tabla
     setTimeout(() => {
+      const now = new Date();
+      const fakeAccount = {
+        _id: Math.random().toString(36).slice(2),
+        username: `@${user?.username || 'usuario'}`,
+        profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+        timeToExpire: '59d 23h',
+        isExpiringSoon: false,
+        active: true,
+        linkedAt: now.toLocaleString(),
+        autoRefresh: true,
+        refreshing: false
+      };
+      setAccounts(accs => [fakeAccount, ...accs]);
       setLinking(false);
-      setToast({ open: true, message: 'Cuenta vinculada exitosamente', type: 'success' });
-      fetchAccounts();
-    }, 2000);
+      setToast({ open: true, message: 'Cuenta vinculada exitosamente (simulada)', type: 'success' });
+    }, 1000);
   };
 
   // Desvincular cuenta
