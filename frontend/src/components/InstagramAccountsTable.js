@@ -19,12 +19,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
           <tr>
             <th>Nombre de perfil</th>
             <th>Tiempo para expirar</th>
-            <th style={{ width: 130 }}>Nombre de perfil</th>
-            <th style={{ width: 110 }}>Tiempo para expirar</th>
-            <th style={{ width: 90 }}>Estado</th>
-            <th style={{ width: 180 }}>Fecha de vinculación</th>
-            <th style={{ width: 110 }}>Auto-refresh</th>
-            <th style={{ width: 140 }}>Acciones</th>
+            <th style={{ width: 120 }}>Estado</th>
             <th>Fecha de vinculación</th>
             <th>Auto-refresh</th>
             <th>Acciones</th>
@@ -35,7 +30,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
             <tr><td colSpan={6} style={{ textAlign: 'center', color: '#888' }}>No hay cuentas vinculadas</td></tr>
           ) : accounts.map(acc => (
             <tr key={acc._id} className={acc.isExpiringSoon ? 'expiring' : ''}>
-              <td style={{ width: 130 }}>
+              <td>
                 <span
                   tabIndex={0}
                   className="profile-tooltip-trigger"
@@ -47,12 +42,12 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
                   </span>
                 </span>
               </td>
-              <td style={{ width: 110 }}>
+              <td>
                 <span className={acc.isExpiringSoon ? 'badge badge-warning' : 'badge badge-ok'}>
                   {acc.timeToExpire}
                 </span>
               </td>
-              <td style={{ width: 90, textAlign: 'center' }}>
+              <td style={{ width: 120, textAlign: 'center' }}>
                 <span
                   className={acc.active ? 'badge badge-ok' : 'badge badge-off'}
                   style={{ cursor: 'pointer', minWidth: 70, display: 'inline-block' }}
@@ -62,8 +57,8 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
                   {acc.active ? 'Activa' : 'Desactivada'}
                 </span>
               </td>
-              <td style={{ width: 180 }}>{acc.linkedAt}</td>
-              <td style={{ width: 110 }}>
+              <td>{acc.linkedAt}</td>
+              <td>
                 <label className="switch">
                   <input
                     type="checkbox"
@@ -78,7 +73,7 @@ const InstagramAccountsTable = ({ accounts, onUnlink, onRefresh, onToggleAutoRef
                   <div className="warning-text">Si el token expira, el sistema puede fallar.</div>
                 )}
               </td>
-              <td style={{ width: 140, display: 'flex', gap: 8 }}>
+              <td style={{ display: 'flex', gap: 8 }}>
                 <button className="btn-refresh" onClick={() => onRefresh(acc._id)} disabled={acc.refreshing}>
                   {acc.refreshing ? 'Renovando...' : 'Renovar token'}
                 </button>
