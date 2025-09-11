@@ -8,8 +8,7 @@ import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
-const CuentasPanel = () => {
-  const [accounts, setAccounts] = useState([]);
+const CuentasPanel = ({ accounts, setAccounts, user }) => {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
   const [confirm, setConfirm] = useState({ open: false, id: null });
@@ -34,39 +33,7 @@ const CuentasPanel = () => {
     }
   }, []);
 
-  // Obtener cuentas vinculadas
-  const fetchAccounts = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      // Obtener cuentas IG simuladas persistentes del usuario
-      const res = await fetch(`${BACKEND_URL}/api/instagram-token/user-accounts`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setAccounts(data.map(acc => ({
-          ...acc,
-          _id: acc._id,
-          username: acc.username,
-          profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
-          timeToExpire: '59d 23h',
-          isExpiringSoon: false,
-          active: acc.active,
-          linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
-          autoRefresh: true,
-          refreshing: false
-        })));
-      } else {
-        setAccounts([]);
-      }
-    } catch (e) {
-      setAccounts([]);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchAccounts(); }, [user]);
+  // El fetch de cuentas ahora se hace en App/AuraPanel y se pasa por props
 
   // Formatear tiempo para expirar
   function formatTimeToExpire(expires_in, last_refresh) {

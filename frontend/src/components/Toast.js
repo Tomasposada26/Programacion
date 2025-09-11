@@ -14,7 +14,7 @@ const Toast = ({ message, type, onClose, duration = 3000 }) => {
     }
     const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
-  }, [onClose, duration, message]);
+  }, [onClose, duration]);
   return (
     <div className={`toast toast-${type}`}> 
       <span>{message}</span>

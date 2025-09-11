@@ -1,3 +1,5 @@
+// Guardar todas las cuentas IG simuladas del usuario (bulk)
+router.post('/save-accounts', authMiddleware, instagramTokenSimController.saveUserAccounts);
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
