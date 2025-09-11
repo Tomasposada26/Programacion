@@ -1,5 +1,5 @@
 const Usuario = require('../models/Usuario');
-const Instagram = require('../routes/instagramTokenRoutes').Instagram || require('mongoose').model('Instagram');
+const Instagram = require('../models/InstagramAccount');
 
 const usuarioController = {
   async delete(req, res) {
