@@ -67,17 +67,34 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
       });
       if (res.ok) {
         const data = await res.json();
-        setAccounts(data.map(acc => ({
-          ...acc,
-          _id: acc._id,
-          username: acc.username,
-          profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
-          isExpiringSoon: false,
-          active: acc.active,
-          linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
-          autoRefresh: true,
-          refreshing: false
-        })));
+        setAccounts(data.map(acc => {
+          // Si no tiene expiresAt, asígnale uno y persiste en backend
+          let expiresAt = acc.expiresAt;
+          if (!expiresAt) {
+            expiresAt = Date.now() + 60 * 60 * 1000;
+            // Persistir en backend
+            fetch(`${BACKEND_URL}/api/instagram-token/update-expiry/${acc._id}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${user.token}`
+              },
+              body: JSON.stringify({ expiresAt })
+            });
+          }
+          return {
+            ...acc,
+            _id: acc._id,
+            username: acc.username,
+            profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+            isExpiringSoon: false,
+            active: acc.active,
+            linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
+            autoRefresh: acc.autoRefresh !== undefined ? acc.autoRefresh : true,
+            refreshing: false,
+            expiresAt
+          };
+        }));
       } else {
         // No borres el estado global si falla el fetch
         // Opcional: muestra un error si quieres
@@ -121,6 +138,7 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
       return `@${realNames[Math.floor(Math.random() * realNames.length)]}${suffix}`;
     };
     const username = randomName();
+    const expiresAt = Date.now() + 60 * 60 * 1000;
     const fakeAccount = {
       _id: Math.random().toString(36).slice(2),
       username,
@@ -129,8 +147,25 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
       active: true,
       linkedAt: now.toLocaleString(),
       autoRefresh: true,
-      refreshing: false
+      refreshing: false,
+      expiresAt
     };
+    // Guardar expiresAt en backend al vincular
+    try {
+      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user?.token}`
+        },
+        body: JSON.stringify({
+          username,
+          linkedAt: now.toISOString(),
+          active: true,
+          expiresAt
+        })
+      });
+    } catch (e) {}
     try {
       await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
         method: 'POST',
