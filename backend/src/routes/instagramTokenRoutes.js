@@ -5,7 +5,7 @@ const router = express.Router();
 
 const authMiddleware = require('../middlewares/authMiddleware');
 const instagramTokenSimController = require('../controllers/instagramTokenSimController');
-const Instagram = require('../models/Instagram'); // Asegúrate de que este modelo existe
+const Instagram = require('../models/InstagramAccount'); // Corregido: modelo correcto
 
 // ---------------------------------------------------------------------------
 // RUTAS PARA CUENTAS SIMULADAS (mock)
