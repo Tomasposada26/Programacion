@@ -123,7 +123,7 @@ const CuentasPanel = () => {
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
       setLinking(false);
-      setToast({ open: true, message: 'Cuenta vinculada exitosamente (simulada)', type: 'success' });
+  // setToast({ open: true, message: 'Cuenta vinculada exitosamente (simulada)', type: 'success' });
     }, 1000);
   };
 
@@ -136,10 +136,10 @@ const CuentasPanel = () => {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      setToast({ open: true, message: 'Cuenta desvinculada', type: 'success' });
+    // setToast({ open: true, message: 'Cuenta desvinculada', type: 'success' });
       fetchAccounts();
     } catch (e) {
-      setToast({ open: true, message: 'Error al desvincular', type: 'error' });
+    // setToast({ open: true, message: 'Error al desvincular', type: 'error' });
     }
     setLoading(false);
     setConfirm({ open: false, id: null });
@@ -159,21 +159,21 @@ const CuentasPanel = () => {
     ));
     setTimeout(() => {
       setAccounts(accs => accs.map(a => a._id === id ? { ...a, refreshing: false } : a));
-      setToast({ open: true, message: 'Token renovado (simulado)', type: 'success' });
+    // setToast({ open: true, message: 'Token renovado (simulado)', type: 'success' });
     }, 1000);
   };
 
   // Alternar estado activa/desactivada
   const handleToggleActive = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
-    setToast({ open: true, message: value ? 'Cuenta activada' : 'Cuenta desactivada', type: value ? 'success' : 'warning' });
+    // setToast({ open: true, message: value ? 'Cuenta activada' : 'Cuenta desactivada', type: value ? 'success' : 'warning' });
   };
 
   // Cambiar auto-refresh
   const handleToggleAutoRefresh = async (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, autoRefresh: value } : a));
     // Aquí deberías guardar el valor en el backend si lo soporta
-    setToast({ open: true, message: value ? 'Auto-refresh activado' : 'Auto-refresh desactivado', type: value ? 'success' : 'warning' });
+    // setToast({ open: true, message: value ? 'Auto-refresh activado' : 'Auto-refresh desactivado', type: value ? 'success' : 'warning' });
   };
 
   // Filtrar cuentas por nombre
