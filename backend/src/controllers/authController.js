@@ -31,9 +31,19 @@ const login = async (req, res) => {
     try {
       const InstagramAccount = require('../models/InstagramAccount');
       accounts = await InstagramAccount.find({ userId: user._id });
+      console.log('[LOGIN BACKEND] Cuentas IG encontradas:', accounts);
     } catch (e) {
+      console.error('[LOGIN BACKEND] Error buscando cuentas IG:', e);
       accounts = [];
     }
+    console.log('[LOGIN BACKEND] Respuesta login:', {
+      ok: true,
+      token,
+      usuario: user.usuario,
+      correo: user.correo,
+      ultimaConexion: user.ultima_conexion,
+      accounts
+    });
     res.json({
       ok: true,
       token,
