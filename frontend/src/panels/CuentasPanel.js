@@ -1,9 +1,30 @@
+// Envía todas las cuentas vinculadas al backend al cerrar sesión
+export async function persistInstagramAccountsOnLogout(accounts, user) {
+  if (!user || !user.token || !Array.isArray(accounts) || accounts.length === 0) return;
+  for (const acc of accounts) {
+    try {
+      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify({
+          username: acc.username,
+          linkedAt: acc.linkedAt || new Date().toISOString(),
+          active: acc.active !== undefined ? acc.active : true
+        })
+      });
+    } catch (e) {
+      // Silenciar error para no bloquear logout
+    }
+  }
+}
 import React, { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
-import Toast from '../components/Toast';
 import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
@@ -11,7 +32,6 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.
 const CuentasPanel = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
@@ -209,14 +229,6 @@ const CuentasPanel = () => {
         onConfirm={() => handleUnlink(confirm.id)}
         message="¿Estás seguro que deseas desvincular esta cuenta?"
       />
-      {toast.open && toast.message && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ ...toast, open: false })}
-          duration={3000}
-        />
-      )}
     </div>
   );
 };
