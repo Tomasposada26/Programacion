@@ -4,11 +4,11 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 // Actualizar expiresAt de una cuenta IG simulada
-router.patch('/update-expiry/:id', authMiddleware, instagramTokenSimController.updateExpiry);
-
 const authMiddleware = require('../middlewares/authMiddleware');
 const instagramTokenSimController = require('../controllers/instagramTokenSimController');
 const Instagram = require('../models/InstagramAccount'); // Corregido: modelo correcto
+
+router.patch('/update-expiry/:id', authMiddleware, instagramTokenSimController.updateExpiry);
 
 // ---------------------------------------------------------------------------
 // RUTAS PARA CUENTAS SIMULADAS (mock)
