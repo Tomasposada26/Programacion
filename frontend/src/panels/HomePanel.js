@@ -33,7 +33,19 @@ const HomePanel = ({ onLogin, onRegister, loginError, registerError, registerSuc
   // LOGIN
   const handleLogin = (user) => {
     setShowLogin(false);
-    onLogin(user);
+    // Si el backend retorna el token, pásalo como user.token
+    if (user && user.token) {
+      onLogin(user);
+    } else if (user && user.ok && user.token) {
+      // Si la respuesta es {ok:true, token:...}
+      onLogin({ ...user, token: user.token });
+    } else {
+      // Si el backend retorna { token, usuario, correo, ... }
+      onLogin({
+        ...user,
+        token: user.token || user.accessToken || ''
+      });
+    }
   };
   const handleOpenRecovery = () => {
     setShowLogin(false);
