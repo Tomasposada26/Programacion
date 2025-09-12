@@ -47,7 +47,7 @@ const AuraPanel = ({
   setShowSettings,
   showHelpDropdown,
   setShowHelpDropdown,
-  settingsPanelRef, // (no se usa)
+  settingsPanelRef,     // no usado localmente
   helpBtnRef,
   loginError,
   registerError,
@@ -59,14 +59,30 @@ const AuraPanel = ({
   handleVerify,
   onUserUpdate
 }) => {
+
+  // Estado interno para panel (si no viene controlado por props)
   const [panelActivoState, setPanelActivoState] = React.useState('home');
   const panelActivo = panelActivoProp !== undefined ? panelActivoProp : panelActivoState;
   const setPanelActivo = setPanelActivoProp !== undefined ? setPanelActivoProp : setPanelActivoState;
 
+  // Estado modal perfil & ajustes
   const [showProfileModal, setShowProfileModal] = React.useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = React.useState(false);
   const ajustesBtnRef = React.useRef(null);
 
+  // Botón "hero" base
+  const btnHero = {
+    background: '#1ee6d9',
+    color: '#183b54',
+    fontWeight: 700,
+    border: 'none',
+    borderRadius: 8,
+    padding: '8px 18px',
+    fontSize: '1rem',
+    cursor: 'pointer'
+  };
+
+  // Feature cards
   const featureItems = React.useMemo(() => ([
     {
       icon: '⚡',
@@ -105,18 +121,22 @@ const AuraPanel = ({
     return () => clearInterval(intervalRef.current);
   }, [hovered, featureItems.length]);
 
+  // Render dinámico de paneles
   const renderPanel = () => {
     switch (panelActivo) {
       case 'home':
         return (
           <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 120px)', minHeight: 600 }}>
+            {/* Fondo gradiente */}
             <div style={{
               position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
               zIndex: 0,
               background: 'linear-gradient(120deg, #18425d 0%, #2196f3 60%, #e3f2fd 100%)'
             }} />
+            {/* Contenido */}
             <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
+                {/* Columna izquierda */}
                 <div style={{ flex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 32px 32px 48px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
                     <span style={{
@@ -130,20 +150,28 @@ const AuraPanel = ({
                       👋 Hola {user?.nombre || user?.usuario || 'Usuario'}
                     </span>
                   </div>
+
                   <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#fff', marginBottom: 8 }}>
                     ¡Bienvenido a tu panel en Aura 🚀
                   </div>
                   <div style={{ color: '#e3f2fd', fontWeight: 500, fontSize: '1.1rem', marginBottom: 8 }}>
                     <em>Nos alegra tenerte aquí.</em>
                   </div>
-                  <div style={{ color: '#fff', fontSize: '1.05rem', marginBottom: 18, maxWidth: 1100 }}>
-                    En Aura podrás gestionar y automatizar la interacción de tus cuentas de Instagram...
+                  <div style={{ color: '#fff', fontSize: '1.05rem', marginBottom: 18, maxWidth: 1100, lineHeight: 1.45 }}>
+                    En Aura podrás gestionar y automatizar la interacción de tus cuentas de Instagram, descubrir tendencias clave en vacantes,
+                    eventos y reuniones, responder automáticamente a tus clientes con Neto nuestro chatbot y obtener una visión clara de tu impacto digital.
+                    Además, podrás programar publicaciones, analizar el crecimiento de tus seguidores, recibir alertas inteligentes y mucho más.
+                    Todo desde un solo lugar: simple, ágil y seguro. ¡Empieza a explorar y lleva tu presencia digital al siguiente nivel!
                   </div>
+
+                  {/* Botones hero (los tres que mencionaste) */}
                   <div style={{ display: 'flex', gap: 12, marginBottom: 18, flexWrap: 'wrap' }}>
                     <button style={btnHero}>Deja que Neto trabaje por ti 🤖</button>
                     <button style={btnHero}>Tendencias claras, decisiones inteligentes 🧠</button>
                     <button style={btnHero}>Un panel, todas tus cuentas 🗝️</button>
                   </div>
+
+                  {/* Feature cards */}
                   <div style={{ display: 'flex', gap: 24, marginTop: 32, flexWrap: 'nowrap', justifyContent: 'center' }}>
                     {featureItems.map((item, idx) => {
                       const isActive = (hovered === null && activeIdx === idx) || hovered === idx;
@@ -176,7 +204,58 @@ const AuraPanel = ({
                       );
                     })}
                   </div>
+
+                  {/* Botones de navegación rápidos (los que dijiste que faltaban) */}
+                  <div style={{ display: 'flex', gap: 18, marginTop: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button
+                      style={{ background: '#fff', color: '#183b54', fontWeight: 700, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                      onClick={() => setPanelActivo('dashboard')}
+                    >
+                      <DashboardIcon size={22} color="#2196f3" /> Dashboard
+                    </button>
+                    <button
+                      style={{ background: '#fff', color: '#183b54', fontWeight: 700, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                      onClick={() => setPanelActivo('tendencias')}
+                    >
+                      <TrendsIcon size={22} color="#1ee6d9" /> Tendencias
+                    </button>
+                    <button
+                      style={{ background: '#fff', color: '#183b54', fontWeight: 700, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                      onClick={() => setPanelActivo('respuestas')}
+                    >
+                      ⚙️ Configurar Neto
+                    </button>
+                    <button
+                      style={{ background: '#fff', color: '#183b54', fontWeight: 700, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                      onClick={() => setPanelActivo('cuentas')}
+                    >
+                      ➕ Vincular nueva cuenta
+                    </button>
+                    <button
+                      style={{ background: '#fff', color: '#183b54', fontWeight: 700, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                      onClick={() => setShowNotifications(true)}
+                    >
+                      🔔 Revisar notificaciones
+                    </button>
+                  </div>
+
+                  {/* Franja inferior (banner) */}
+                  <div style={{
+                    marginTop: 32,
+                    background: '#3376a0ff',
+                    borderRadius: 12,
+                    padding: '16px 0',
+                    textAlign: 'center',
+                    color: '#fff',
+                    fontWeight: 800,
+                    fontSize: '1.2rem',
+                    letterSpacing: 0.5
+                  }}>
+                    ✨ Comienza a personalizar tu experiencia en Aura ✨
+                  </div>
                 </div>
+
+                {/* Columna derecha: Neto */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', minHeight: 340, position: 'relative' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginLeft: '-450px' }}>
                     <AnimatedRobot style={{ height: 260, width: 200, marginBottom: 0, alignSelf: 'flex-start', marginTop: '-350px', marginLeft: '20px' }} />
@@ -203,6 +282,7 @@ const AuraPanel = ({
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -238,8 +318,8 @@ const AuraPanel = ({
     }
   };
 
+  // Campana de notificaciones
   const bellRef = React.useRef(null);
-
   React.useEffect(() => {
     if (!showNotifications) return;
     const handleClick = (e) => {
@@ -251,19 +331,9 @@ const AuraPanel = ({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showNotifications, setShowNotifications]);
 
-  const btnHero = {
-    background: '#1ee6d9',
-    color: '#183b54',
-    fontWeight: 700,
-    border: 'none',
-    borderRadius: 8,
-    padding: '8px 18px',
-    fontSize: '1rem',
-    cursor: 'pointer'
-  };
-
   return (
     <div className="aura-panel" style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: '#fff' }}>
+      {/* Header */}
       <header className="aura-header" style={{
         background: '#0a2342', height: '120px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -293,7 +363,8 @@ const AuraPanel = ({
             {(notificationsEnabled ? Number(notificationCount) > 0 : true) && (
               <span style={{
                 position: 'absolute', top: -8, left: -8,
-                minWidth: 22, height: 22, background: notificationsEnabled ? '#e53e3e' : '#888',
+                minWidth: 22, height: 22,
+                background: notificationsEnabled ? '#e53e3e' : '#888',
                 color: '#fff', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 800, fontSize: 14, border: '2px solid #fff',
@@ -320,19 +391,20 @@ const AuraPanel = ({
           >
             <HelpIcon size={28} color="#188fd9" />
           </span>
-            {showHelpDropdown && setShowHelpDropdown && (
-              <HelpDropdownModal
-                open={showHelpDropdown}
-                anchorRef={helpBtnRef}
-                onClose={() => setShowHelpDropdown(false)}
-              />
-            )}
+          {showHelpDropdown && setShowHelpDropdown && (
+            <HelpDropdownModal
+              open={showHelpDropdown}
+              anchorRef={helpBtnRef}
+              onClose={() => setShowHelpDropdown(false)}
+            />
+          )}
           <button className="aura-logout-btn" onClick={onLogout}>
             Cerrar sesión
           </button>
         </div>
       </header>
 
+      {/* Sidebar */}
       <aside className="aura-sidebar" style={{
         background: '#0a2342', minWidth: '250px', width: '305px',
         display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
@@ -368,21 +440,22 @@ const AuraPanel = ({
         </div>
       </aside>
 
+      {/* Contenido principal */}
       <main style={{ marginLeft: '305px', marginTop: '120px', flex: 1, background: '#fff', minHeight: 'calc(100vh - 120px)' }}>
         {renderPanel()}
         <SettingsPanel
           visible={showSettingsPanel}
           anchorRef={ajustesBtnRef}
           onClose={() => setShowSettingsPanel(false)}
-          notificationsEnabled={notificationsEnabled}
-          setNotificationsEnabled={setNotificationsEnabled}
+            notificationsEnabled={notificationsEnabled}
+            setNotificationsEnabled={setNotificationsEnabled}
           darkMode={darkMode}
           setDarkMode={setDarkMode}
-          // Revisa si el prop correcto es onSupport:
           onSupport={() => setShowSupportModal && setShowSupportModal(true)}
         />
       </main>
 
+      {/* Modal perfil */}
       <ProfileModalWrapper
         show={showProfileModal}
         onClose={() => setShowProfileModal(false)}
@@ -393,7 +466,7 @@ const AuraPanel = ({
   );
 };
 
-// Subcomponente para evitar repetición de estilos en el menú
+// Item del menú lateral
 const NavItem = ({ label, icon, active, onClick }) => (
   <li
     onClick={onClick}
