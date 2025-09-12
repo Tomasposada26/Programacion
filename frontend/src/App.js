@@ -75,6 +75,28 @@ function App() {
       });
     }
 
+    // Recuperar cuentas IG vinculadas
+    if (userData?._id && data.token) {
+      try {
+        const accountsRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/instagram-token/user-accounts`,
+          {},
+          handleLogout,
+          data.token
+        );
+        if (accountsRes.ok) {
+          const accountsData = await accountsRes.json();
+          setAccounts(Array.isArray(accountsData) ? accountsData : []);
+        } else {
+          setAccounts([]);
+        }
+      } catch {
+        setAccounts([]);
+      }
+    } else {
+      setAccounts([]);
+    }
+
     // Recuperar notificaciones solo si hay un _id válido
     const userId = userData?._id;
     if (userId) {
