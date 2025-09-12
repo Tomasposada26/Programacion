@@ -5,7 +5,7 @@ import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
 import '../components/InstagramAccountsTable.css';
-import useToast from '../hooks/useToast';
+import { useToast } from '../hooks/useToast';
 
 // Envía todas las cuentas vinculadas al backend al cerrar sesión
 export async function persistInstagramAccountsOnLogout(accounts, user) {
