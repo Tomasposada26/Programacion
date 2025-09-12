@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
@@ -7,36 +6,19 @@ import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
-const CuentasPanel = ({ accounts, setAccounts }) => {
+
+// Ahora recibimos user y token desde props (App.js)
+const CuentasPanel = ({ accounts, setAccounts, user }) => {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
-  const [user, setUser] = useState(null); // Aquí deberías obtener el usuario logueado (JWT)
 
-  // Simulación: obtener usuario logueado (reemplaza por tu lógica real)
-  useEffect(() => {
-    // Obtener el usuario logueado y su JWT real
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-  const decoded = jwtDecode(token);
-        // El backend espera req.user.id como userId
-        setUser({ _id: decoded.id, username: decoded.username || decoded.usuario || '', token });
-      } catch (e) {
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-  }, []);
-
-  // Obtener cuentas vinculadas
+  // Obtener cuentas vinculadas solo si no hay en el estado global y el token es válido
   const fetchAccounts = async () => {
-    if (!user) return;
+    if (!user || !user.token) return;
     setLoading(true);
     try {
-      // Obtener cuentas IG simuladas persistentes del usuario
       const res = await fetch(`${BACKEND_URL}/api/instagram-token/user-accounts`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
@@ -55,15 +37,22 @@ const CuentasPanel = ({ accounts, setAccounts }) => {
           refreshing: false
         })));
       } else {
-        setAccounts([]);
+        // No borres el estado global si falla el fetch
+        // Opcional: muestra un error si quieres
+        // setAccounts([]);
       }
     } catch (e) {
-      setAccounts([]);
+      // No borres el estado global si falla el fetch
     }
     setLoading(false);
   };
 
-  useEffect(() => { fetchAccounts(); }, [user]);
+  useEffect(() => {
+    // Solo hace fetch si no hay cuentas en el estado global
+    if ((!accounts || accounts.length === 0) && user && user.token) {
+      fetchAccounts();
+    }
+  }, [user, accounts]);
 
   // Formatear tiempo para expirar
   function formatTimeToExpire(expires_in, last_refresh) {
@@ -78,7 +67,6 @@ const CuentasPanel = ({ accounts, setAccounts }) => {
   // Vincular cuenta (simulación: abre popup de Instagram OAuth)
   const handleLink = async () => {
     setLinking(true);
-    // Simulación: generar un nombre de usuario aleatorio con @ delante
     const now = new Date();
     const randomName = () => {
       const realNames = [
@@ -102,13 +90,12 @@ const CuentasPanel = ({ accounts, setAccounts }) => {
       autoRefresh: true,
       refreshing: false
     };
-    // Enviar al backend para almacenar en MongoDB (nombre, fecha, estado)
     try {
       await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`
+          Authorization: `Bearer ${user?.token}`
         },
         body: JSON.stringify({
           username,
@@ -116,13 +103,10 @@ const CuentasPanel = ({ accounts, setAccounts }) => {
           active: true
         })
       });
-    } catch (e) {
-      // Si falla, solo simula en frontend
-    }
+    } catch (e) {}
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
       setLinking(false);
-  // setToast({ open: true, message: 'Cuenta vinculada exitosamente (simulada)', type: 'success' });
     }, 1000);
   };
 

@@ -302,7 +302,7 @@ const AuraPanel = ({
       case 'prueba-neto':
         return <PruebaNetoPanel />;
       case 'cuentas':
-        return <CuentasPanel accounts={accounts} setAccounts={setAccounts} />;
+        return <CuentasPanel accounts={accounts} setAccounts={setAccounts} user={user} />;
       case 'ajustes':
         return <SettingsPanel />;
       default:
