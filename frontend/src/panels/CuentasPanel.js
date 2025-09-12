@@ -1,38 +1,11 @@
-
 import React, { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import InstagramLinkCard from '../components/InstagramLinkCard';
 import InstagramAccountsTable from '../components/InstagramAccountsTable';
 import ConfirmModal from '../components/ConfirmModal';
 import '../components/InstagramAccountsTable.css';
-import { useToast } from '../hooks/useToast';
-
-// Envía todas las cuentas vinculadas al backend al cerrar sesión
-export async function persistInstagramAccountsOnLogout(accounts, user) {
-  const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
-  if (!user || !user.token || !Array.isArray(accounts) || accounts.length === 0) return;
-  for (const acc of accounts) {
-    try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`
-        },
-        body: JSON.stringify({
-          username: acc.username,
-          linkedAt: acc.linkedAt || new Date().toISOString(),
-          active: acc.active !== undefined ? acc.active : true
-        })
-      });
-    } catch (e) {
-      // Silenciar error para no bloquear logout
-    }
-  }
-}
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
-
 
 const CuentasPanel = () => {
   const [accounts, setAccounts] = useState([]);
@@ -41,7 +14,6 @@ const CuentasPanel = () => {
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
   const [user, setUser] = useState(null); // Aquí deberías obtener el usuario logueado (JWT)
-  const { setToast } = useToast();
 
   // Simulación: obtener usuario logueado (reemplaza por tu lógica real)
   useEffect(() => {

@@ -1,4 +1,4 @@
-
+//prueba
 // Configuración central de la app Express
 require('dotenv').config();
 const express = require('express');
