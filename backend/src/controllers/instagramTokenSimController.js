@@ -1,3 +1,27 @@
+// POST /api/instagram-token/bulk-save
+exports.bulkSaveAccounts = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    const { accounts } = req.body;
+    if (!userId || !Array.isArray(accounts)) return res.status(400).json({ error: 'Datos inválidos' });
+
+    // Elimina las cuentas anteriores del usuario antes de guardar las nuevas
+    await InstagramAccount.deleteMany({ userId });
+
+    // Agregar userId a cada cuenta
+    const docs = accounts.map(acc => ({
+      userId,
+      username: acc.username,
+      linkedAt: acc.linkedAt,
+      active: acc.active
+    }));
+
+    await InstagramAccount.insertMany(docs);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al guardar cuentas' });
+  }
+};
 // DELETE /api/instagram-token/simulate-link/:id
 exports.deleteSimulatedAccount = async (req, res) => {
   try {

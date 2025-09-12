@@ -7,8 +7,7 @@ import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
-const CuentasPanel = () => {
-  const [accounts, setAccounts] = useState([]);
+const CuentasPanel = ({ accounts, setAccounts }) => {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');

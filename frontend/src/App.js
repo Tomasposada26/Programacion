@@ -1,3 +1,5 @@
+  // Estado global de cuentas IG simuladas para bulk-save
+  const [accounts, setAccounts] = useState([]);
 import React, { useState } from 'react';
 import fetchWithAuth from './utils/fetchWithAuth';
 import { ToastContainer } from 'react-toastify';
@@ -137,12 +139,25 @@ function App() {
   }, [user, notifications, BACKEND_URL]);
 
   // Guardar al cerrar sesión
-  const handleLogout = React.useCallback(() => {
+  const handleLogout = React.useCallback(async () => {
+    // Guardar cuentas IG simuladas en bulk antes de cerrar sesión
+    if (accounts && accounts.length > 0 && user && user.token) {
+      try {
+        await fetch(`${BACKEND_URL}/api/instagram-token/bulk-save`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`
+          },
+          body: JSON.stringify({ accounts: accounts.map(({ username, linkedAt, active }) => ({ username, linkedAt, active })) })
+        });
+      } catch (e) { /* opcional: manejar error */ }
+    }
     persistNotifications(handleLogout);
     setSesionIniciada(false);
     setUser(null);
     setDarkMode(false);
-  }, [persistNotifications]);
+  }, [persistNotifications, accounts, user, BACKEND_URL]);
 
   // Guardar al cerrar la pestaña
   React.useEffect(() => {
@@ -187,6 +202,8 @@ function App() {
                 setShowHelpDropdown={setShowHelpDropdown}
                 helpBtnRef={helpBtnRef}
                 onUserUpdate={handleUserUpdate}
+                accounts={accounts}
+                setAccounts={setAccounts}
               />
             ) : (
               <HomePanel

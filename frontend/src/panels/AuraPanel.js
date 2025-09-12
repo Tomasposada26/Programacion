@@ -1,3 +1,5 @@
+  // Estado global de cuentas IG simuladas
+  const [accounts, setAccounts] = React.useState([]);
 import React from 'react';
 import CuentasPanel from './CuentasPanel';
 
@@ -27,6 +29,8 @@ import UsersIcon from '../assets/UsersIcon';
 
 
 const AuraPanel = ({
+  accounts,
+  setAccounts,
   user,
   onLogout,
   darkMode,
@@ -268,7 +272,7 @@ const AuraPanel = ({
       case 'prueba-neto':
         return <PruebaNetoPanel />;
       case 'cuentas':
-        return <CuentasPanel />;
+        return <CuentasPanel accounts={accounts} setAccounts={setAccounts} />;
       case 'ajustes':
         return <SettingsPanel />;
       default:

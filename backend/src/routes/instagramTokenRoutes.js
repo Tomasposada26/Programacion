@@ -1,3 +1,5 @@
+// Guardar cuentas IG en lote (al cerrar sesión)
+router.post('/bulk-save', authMiddleware, instagramTokenSimController.bulkSaveAccounts);
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
