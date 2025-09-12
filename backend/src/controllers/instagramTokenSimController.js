@@ -3,7 +3,13 @@ exports.bulkSaveAccounts = async (req, res) => {
   try {
     const userId = req.user && req.user.id;
     const { accounts } = req.body;
-    if (!userId || !Array.isArray(accounts)) return res.status(400).json({ error: 'Datos inválidos' });
+    console.log('bulkSaveAccounts called');
+    console.log('userId:', userId);
+    console.log('accounts:', accounts);
+    if (!userId || !Array.isArray(accounts)) {
+      console.log('Datos inválidos:', { userId, accounts });
+      return res.status(400).json({ error: 'Datos inválidos' });
+    }
 
     // Elimina las cuentas anteriores del usuario antes de guardar las nuevas
     await InstagramAccount.deleteMany({ userId });
@@ -16,9 +22,12 @@ exports.bulkSaveAccounts = async (req, res) => {
       active: acc.active
     }));
 
+    console.log('docs to insert:', docs);
     await InstagramAccount.insertMany(docs);
+    console.log('Cuentas IG guardadas correctamente');
     res.json({ success: true });
   } catch (err) {
+    console.error('Error al guardar cuentas IG:', err);
     res.status(500).json({ error: 'Error al guardar cuentas' });
   }
 };
