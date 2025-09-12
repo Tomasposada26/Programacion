@@ -14,6 +14,49 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
   const [search, setSearch] = useState('');
   const [linking, setLinking] = useState(false);
 
+  // --- Expiración y auto-refresh ---
+  // Cada cuenta tendrá: expiresAt (timestamp), autoRefresh (bool), active (bool)
+  // Al montar, si no tiene expiresAt, se le asigna 1 hora desde ahora
+  useEffect(() => {
+    setAccounts(accs => accs.map(acc => {
+      if (!acc.expiresAt) {
+        return { ...acc, expiresAt: Date.now() + 60 * 60 * 1000 };
+      }
+      return acc;
+    }));
+  }, []);
+
+  // Intervalo global para actualizar los contadores cada segundo
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAccounts(accs => accs.map(acc => {
+        if (!acc.expiresAt) return acc;
+        const msLeft = acc.expiresAt - Date.now();
+        // Si ya expiró
+        if (msLeft <= 0) {
+          if (acc.autoRefresh) {
+            // Si auto-refresh, renovar automáticamente
+            return { ...acc, expiresAt: Date.now() + 60 * 60 * 1000, isExpiringSoon: false, active: true };
+          } else if (acc.active) {
+            // Si no auto-refresh, desactivar
+            return { ...acc, active: false, isExpiringSoon: false };
+          }
+        } else if (msLeft <= 5 * 60 * 1000 && acc.autoRefresh && acc.active) {
+          // Si quedan 5 min y auto-refresh, renovar automáticamente
+          return { ...acc, expiresAt: Date.now() + 60 * 60 * 1000, isExpiringSoon: false, active: true };
+        } else if (msLeft <= 5 * 60 * 1000 && acc.active) {
+          // Marcar como pronto a expirar
+          return { ...acc, isExpiringSoon: true };
+        } else if (acc.isExpiringSoon) {
+          // Quitar flag si ya no está pronto a expirar
+          return { ...acc, isExpiringSoon: false };
+        }
+        return acc;
+      }));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setAccounts]);
+
   // Obtener cuentas vinculadas solo si no hay en el estado global y el token es válido
   const fetchAccounts = async () => {
     if (!user || !user.token) return;
@@ -54,14 +97,14 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
     }
   }, [user, accounts]);
 
-  // Formatear tiempo para expirar
-  function formatTimeToExpire(expires_in, last_refresh) {
-    if (!expires_in || !last_refresh) return 'N/A';
-    const ms = (new Date(last_refresh).getTime() + expires_in * 1000) - Date.now();
+  // Formatear tiempo para expirar (mm:ss)
+  function formatTimeToExpire(expiresAt) {
+    if (!expiresAt) return 'N/A';
+    const ms = expiresAt - Date.now();
     if (ms <= 0) return 'Expirado';
-    const d = Math.floor(ms / (24*3600*1000));
-    const h = Math.floor((ms % (24*3600*1000)) / (3600*1000));
-    return `${d}d ${h}h`;
+    const m = Math.floor(ms / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return `${m}m ${s < 10 ? '0' : ''}${s}s`;
   }
 
   // Vincular cuenta (simulación: abre popup de Instagram OAuth)
@@ -128,21 +171,21 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
     setConfirm({ open: false, id: null });
   };
 
-  // Refrescar token (simulado: solo restablece el contador de tiempo para expirar)
+  // Refrescar token manualmente: reinicia el contador a 1 hora
   const handleRefresh = async (id) => {
     setAccounts(accs => accs.map(a =>
       a._id === id
         ? {
             ...a,
             refreshing: true,
-            timeToExpire: '59d 23h',
-            isExpiringSoon: false
+            expiresAt: Date.now() + 60 * 60 * 1000,
+            isExpiringSoon: false,
+            active: true
           }
         : a
     ));
     setTimeout(() => {
       setAccounts(accs => accs.map(a => a._id === id ? { ...a, refreshing: false } : a));
-    // setToast({ open: true, message: 'Token renovado (simulado)', type: 'success' });
     }, 1000);
   };
 
@@ -176,6 +219,7 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
       <InstagramAccountsTable
         accounts={filteredAccounts.map(acc => ({
           ...acc,
+          timeToExpire: formatTimeToExpire(acc.expiresAt),
           onToggleActive: handleToggleActive
         }))}
         onUnlink={id => setConfirm({ open: true, id })}
