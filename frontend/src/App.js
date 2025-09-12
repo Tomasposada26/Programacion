@@ -1,6 +1,4 @@
-  // Estado global de cuentas IG simuladas para bulk-save
-  const [accounts, setAccounts] = useState([]);
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import fetchWithAuth from './utils/fetchWithAuth';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,44 +10,40 @@ import TerminosCondiciones from './legal/TerminosCondiciones';
 import PoliticasEliminacion from './legal/PoliticasEliminacion';
 import SoportePanel from './panels/SoportePanel';
 
-// URL del backend desde variable de entorno (escuchando en el puerto local)
-// const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
-
-
 function App() {
-  // Estado y ref para el modal de ayuda
+  // Cuentas IG simuladas
+  const [accounts, setAccounts] = useState([]);
+
+  // Ayuda
   const [showHelpDropdown, setShowHelpDropdown] = useState(false);
-  const helpBtnRef = React.useRef(null);
-  // Estado de autenticación y usuario
+  const helpBtnRef = useRef(null);
+
+  // Autenticación
   const [sesionIniciada, setSesionIniciada] = useState(false);
   const [user, setUser] = useState(null);
-  //prueba
-  // Estados globales para notificaciones
+
+  // Notificaciones
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-
-  // Estado global de modo oscuro (solo para AuraPanel)
-  const [darkMode, setDarkMode] = useState(false);
-
-  // Estado para mostrar/ocultar el modal de notificaciones
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Estados para errores y datos temporales
+  // UI
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Errores / estados de auth
   const [loginError, setLoginError] = useState('');
   const [registerError, setRegisterError] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
-  // Handlers principales
-  // URL del backend (ajusta si tienes variable de entorno)
   const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
   const handleLogin = async (data) => {
-    setSesionIniciada(true);
-  let userData = null;
+    setLoginError('');
+    let userData = null;
+
     try {
-      // Obtener datos completos del usuario tras login
+      // OJO: revisa la ruta (posible doble /api/)
       const res = await fetchWithAuth(
         `${BACKEND_URL}/api/usuarios/api/usuario/info?usuario=${encodeURIComponent(data.usuario)}`,
         {},
@@ -68,9 +62,11 @@ function App() {
         pais: userData.pais,
         genero: userData.genero,
         fecha_nacimiento: userData.fecha_nacimiento,
-        edad: userData.edad
+        edad: userData.edad,
+        token: data.token // si lo tienes al hacer login
       });
     } catch (err) {
+      // Fallback mínimo
       setUser({
         usuario: data.usuario,
         correo: data.correo,
@@ -78,40 +74,45 @@ function App() {
         ultimaConexion: data.ultimaConexion
       });
     }
-    // Obtener notificaciones persistentes del backend
-    try {
-      const notifRes = await fetchWithAuth(
-        `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userData._id)}`,
-        {},
-        handleLogout
-      );
-      if (notifRes.ok) {
-        const notifs = await notifRes.json();
-        setNotifications(Array.isArray(notifs) ? notifs : []);
-        setNotificationCount(Array.isArray(notifs) ? notifs.length : 0);
-      } else {
+
+    // Recuperar notificaciones solo si hay un _id válido
+    const userId = userData?._id;
+    if (userId) {
+      try {
+        const notifRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userId)}`,
+          {},
+            handleLogout
+        );
+        if (notifRes.ok) {
+          const notifs = await notifRes.json();
+          const arr = Array.isArray(notifs) ? notifs : [];
+            setNotifications(arr);
+            setNotificationCount(arr.length);
+        } else {
+          setNotifications([]);
+          setNotificationCount(0);
+        }
+      } catch {
         setNotifications([]);
         setNotificationCount(0);
       }
-    } catch (e) {
+    } else {
       setNotifications([]);
       setNotificationCount(0);
     }
-    setLoginError('');
+
+    setSesionIniciada(true);
   };
 
   const handleRegister = async (data) => {
-    // Lógica de registro
+    // Aquí iría la lógica real de registro
     setRegisterSuccess(true);
     setRegisterError('');
   };
 
-
-
-
-  // Guardar notificaciones en backend
-  const persistNotifications = React.useCallback((logoutFn) => {
-    if (!user || !user._id || !Array.isArray(notifications)) return;
+  const persistNotifications = useCallback((logoutFn) => {
+    if (!user || !user._id || !Array.isArray(notifications) || notifications.length === 0) return;
     const payload = {
       userId: user._id,
       notificaciones: notifications.map(n => ({
@@ -121,26 +122,30 @@ function App() {
       }))
     };
     const url = `${BACKEND_URL}/api/notificaciones/guardar`;
-    // Usar sendBeacon si está disponible y es seguro
+
     if (navigator.sendBeacon) {
-      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon(url, blob);
-    } else {
-      fetchWithAuth(
-        url,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        },
-        logoutFn
-      );
+      try {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      } catch {
+        // fallback a fetch
+      }
     }
+
+    fetchWithAuth(
+      url,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      },
+      logoutFn
+    );
   }, [user, notifications, BACKEND_URL]);
 
-  // Guardar al cerrar sesión
-  const handleLogout = React.useCallback(async () => {
-    // Guardar cuentas IG simuladas en bulk antes de cerrar sesión
+  const handleLogout = useCallback(async () => {
+    // Guarda cuentas antes de salir
     if (accounts && accounts.length > 0 && user && user.token) {
       try {
         await fetch(`${BACKEND_URL}/api/instagram-token/bulk-save`, {
@@ -149,72 +154,93 @@ function App() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${user.token}`
           },
-          body: JSON.stringify({ accounts: accounts.map(({ username, linkedAt, active }) => ({ username, linkedAt, active })) })
+          body: JSON.stringify({
+            accounts: accounts.map(({ username, linkedAt, active }) => ({
+              username, linkedAt, active
+            }))
+          })
         });
-      } catch (e) { /* opcional: manejar error */ }
+      } catch {
+        // Log silent
+      }
     }
+
+    // Persistir notificaciones
     persistNotifications(handleLogout);
+
     setSesionIniciada(false);
     setUser(null);
     setDarkMode(false);
-  }, [persistNotifications, accounts, user, BACKEND_URL]);
+    setNotifications([]);
+    setNotificationCount(0);
+  }, [accounts, user, BACKEND_URL, persistNotifications]);
 
-  // Guardar al cerrar la pestaña
-  React.useEffect(() => {
+  // Guardar notifs antes de cerrar pestaña
+  useEffect(() => {
     const handleBeforeUnload = () => {
       persistNotifications();
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [user, notifications, persistNotifications]);
+  }, [persistNotifications]);
 
-  // Renderizado principal
-  // Handler para actualizar el usuario global tras editar el perfil
   const handleUserUpdate = (updatedUser) => {
-    setUser(updatedUser);
+    setUser(prev => ({ ...prev, ...updatedUser }));
   };
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Router>
         <Routes>
           <Route path="/politicasdeprivacidad" element={<PoliticasPrivacidad />} />
           <Route path="/terminosycondiciones" element={<TerminosCondiciones />} />
           <Route path="/politicasdeeliminacion" element={<PoliticasEliminacion />} />
           <Route path="/soporte" element={<SoportePanel />} />
-          <Route path="/*" element={
-            sesionIniciada ? (
-              <AuraPanel
-                user={user}
-                onLogout={handleLogout}
-                darkMode={darkMode}
-                setDarkMode={setDarkMode}
-                notifications={notifications}
-                setNotifications={setNotifications}
-                notificationCount={notificationCount}
-                setNotificationCount={setNotificationCount}
-                notificationsEnabled={notificationsEnabled}
-                setNotificationsEnabled={setNotificationsEnabled}
-                showNotifications={showNotifications}
-                setShowNotifications={setShowNotifications}
-                showHelpDropdown={showHelpDropdown}
-                setShowHelpDropdown={setShowHelpDropdown}
-                helpBtnRef={helpBtnRef}
-                onUserUpdate={handleUserUpdate}
-                accounts={accounts}
-                setAccounts={setAccounts}
-              />
-            ) : (
-              <HomePanel
-                onLogin={handleLogin}
-                onRegister={handleRegister}
-                loginError={loginError}
-                registerError={registerError}
-                registerSuccess={registerSuccess}
-              />
-            )
-          } />
+          <Route
+            path="/*"
+            element={
+              sesionIniciada ? (
+                <AuraPanel
+                  user={user}
+                  onLogout={handleLogout}
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                  notificationCount={notificationCount}
+                  setNotificationCount={setNotificationCount}
+                  notificationsEnabled={notificationsEnabled}
+                  setNotificationsEnabled={setNotificationsEnabled}
+                  showNotifications={showNotifications}
+                  setShowNotifications={setShowNotifications}
+                  showHelpDropdown={showHelpDropdown}
+                  setShowHelpDropdown={setShowHelpDropdown}
+                  helpBtnRef={helpBtnRef}
+                  onUserUpdate={handleUserUpdate}
+                  accounts={accounts}
+                  setAccounts={setAccounts}
+                />
+              ) : (
+                <HomePanel
+                  onLogin={handleLogin}
+                  onRegister={handleRegister}
+                  loginError={loginError}
+                  registerError={registerError}
+                  registerSuccess={registerSuccess}
+                />
+              )
+            }
+          />
         </Routes>
       </Router>
     </>
