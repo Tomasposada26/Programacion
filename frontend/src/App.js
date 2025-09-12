@@ -52,6 +52,7 @@ function App() {
       );
       if (!res.ok) throw new Error('No se pudo obtener datos de usuario');
       userData = await res.json();
+      console.log('[LOGIN] Respuesta userData:', userData);
       setUser({
         _id: userData._id,
         nombre: userData.nombre,
@@ -68,10 +69,14 @@ function App() {
       });
       // Si la respuesta del backend trae cuentas IG, úsalas directamente
       if (userData.accounts) {
+        console.log('[LOGIN] Cuentas IG recibidas:', userData.accounts);
         setAccounts(Array.isArray(userData.accounts) ? userData.accounts : []);
+      } else {
+        console.log('[LOGIN] No se recibieron cuentas IG en userData');
       }
     } catch (err) {
       // Fallback mínimo
+      console.error('[LOGIN] Error al procesar login:', err);
       setUser({
         usuario: data.usuario,
         correo: data.correo,
