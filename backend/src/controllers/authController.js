@@ -26,12 +26,21 @@ const login = async (req, res) => {
     user.ultima_conexion = new Date();
     await user.save();
     const token = jwt.sign({ id: user._id, usuario: user.usuario, correo: user.correo }, JWT_SECRET, { expiresIn: '2h' });
+    // Buscar cuentas IG vinculadas
+    let accounts = [];
+    try {
+      const InstagramAccount = require('../models/InstagramAccount');
+      accounts = await InstagramAccount.find({ userId: user._id });
+    } catch (e) {
+      accounts = [];
+    }
     res.json({
       ok: true,
       token,
       usuario: user.usuario,
       correo: user.correo,
-      ultimaConexion: user.ultima_conexion
+      ultimaConexion: user.ultima_conexion,
+      accounts
     });
   } catch (err) {
     console.error('Error en login:', err);

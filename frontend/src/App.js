@@ -39,6 +39,7 @@ function App() {
   const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
   const handleLogin = async (data) => {
+
     setLoginError('');
     let userData = null;
 
@@ -65,6 +66,10 @@ function App() {
         edad: userData.edad,
         token: data.token // si lo tienes al hacer login
       });
+      // Si la respuesta del backend trae cuentas IG, úsalas directamente
+      if (userData.accounts) {
+        setAccounts(Array.isArray(userData.accounts) ? userData.accounts : []);
+      }
     } catch (err) {
       // Fallback mínimo
       setUser({
@@ -73,27 +78,6 @@ function App() {
         token: data.token,
         ultimaConexion: data.ultimaConexion
       });
-    }
-
-    // Recuperar cuentas IG vinculadas
-    if (userData?._id && data.token) {
-      try {
-        const accountsRes = await fetchWithAuth(
-          `${BACKEND_URL}/api/instagram-token/user-accounts`,
-          {},
-          handleLogout,
-          data.token
-        );
-        if (accountsRes.ok) {
-          const accountsData = await accountsRes.json();
-          setAccounts(Array.isArray(accountsData) ? accountsData : []);
-        } else {
-          setAccounts([]);
-        }
-      } catch {
-        setAccounts([]);
-      }
-    } else {
       setAccounts([]);
     }
 
