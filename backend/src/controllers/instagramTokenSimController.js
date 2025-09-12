@@ -1,3 +1,22 @@
+// PATCH /api/instagram-token/update-expiry/:id
+exports.updateExpiry = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    if (!userId) return res.status(401).json({ error: 'No autorizado' });
+    const { id } = req.params;
+    const { expiresAt } = req.body;
+    if (!expiresAt) return res.status(400).json({ error: 'Falta expiresAt' });
+    const updated = await InstagramAccount.findOneAndUpdate(
+      { _id: id, userId },
+      { expiresAt },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'No encontrada' });
+    res.json({ success: true, account: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar expiresAt' });
+  }
+};
 // POST /api/instagram-token/bulk-save
 exports.bulkSaveAccounts = async (req, res) => {
   try {

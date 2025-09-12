@@ -4,7 +4,8 @@ const InstagramAccountSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
   username: { type: String, required: true },
   linkedAt: { type: Date, required: true },
-  active: { type: Boolean, default: true }
+  active: { type: Boolean, default: true },
+  expiresAt: { type: Date }
 });
 
 module.exports = mongoose.model('InstagramAccount', InstagramAccountSchema);

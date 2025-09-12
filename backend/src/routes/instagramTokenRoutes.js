@@ -1,3 +1,5 @@
+// Actualizar expiresAt de una cuenta IG simulada
+router.patch('/update-expiry/:id', authMiddleware, instagramTokenSimController.updateExpiry);
 // Cambio mínimo para forzar redeploy en Render
 const express = require('express');
 const axios = require('axios');
