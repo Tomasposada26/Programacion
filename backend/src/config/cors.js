@@ -1,5 +1,9 @@
 // Configuración de CORS
 module.exports = {
-  origin: process.env.FRONTEND_URL || 'https://programacion-tau.vercel.app',
+  origin: [
+    'https://programacion-tau.vercel.app',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 };
