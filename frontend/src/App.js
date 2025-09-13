@@ -27,6 +27,8 @@ function App() {
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
+  // Notificaciones de cuentas vinculadas (solo para persistencia y recuperación)
+  const [accountNotifications, setAccountNotifications] = useState([]);
 
   // UI
   const [darkMode, setDarkMode] = useState(false);
@@ -87,7 +89,23 @@ function App() {
     }
 
 
-    // Recuperar notificaciones, cuentas vinculadas y notificaciones de cuentas
+  // Recuperar notificaciones generales, cuentas vinculadas y notificaciones de cuentas
+      // Notificaciones de cuentas vinculadas
+      try {
+        const accNotifRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/accounts/account-notifications?userId=${encodeURIComponent(userId)}`,
+          {},
+          handleLogout
+        );
+        if (accNotifRes.ok) {
+          const accNotifs = await accNotifRes.json();
+          setAccountNotifications(Array.isArray(accNotifs) ? accNotifs : []);
+        } else {
+          setAccountNotifications([]);
+        }
+      } catch {
+        setAccountNotifications([]);
+      }
     const userId = userData?._id;
     if (userId) {
       // Notificaciones generales
@@ -191,10 +209,10 @@ function App() {
   }, [user, notifications, BACKEND_URL]);
 
 
+  // Usar el endpoint correcto para cuentas simuladas
   const persistAccounts = useCallback((logoutFn) => {
-    if (!user || !user._id || !Array.isArray(accounts) || accounts.length === 0) return;
+    if (!user || !user.token || !Array.isArray(accounts) || accounts.length === 0) return;
     const payload = {
-      userId: user._id,
       accounts: accounts.map(acc => ({
         username: acc.username,
         linkedAt: acc.linkedAt,
@@ -202,7 +220,7 @@ function App() {
         expiresAt: acc.expiresAt
       }))
     };
-    const url = `${BACKEND_URL}/api/accounts/instagram-accounts/guardar`;
+    const url = `${BACKEND_URL}/api/instagram-token/bulk-save`;
     if (navigator.sendBeacon) {
       try {
         const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
@@ -214,24 +232,22 @@ function App() {
       url,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`
+        },
         body: JSON.stringify(payload)
       },
       logoutFn
     );
   }, [user, accounts, BACKEND_URL]);
 
-  // Similar para notificaciones de cuentas vinculadas
+  // Guardar notificaciones de cuentas vinculadas en su colección
   const persistAccountNotifications = useCallback((logoutFn) => {
-    if (!user || !user._id || !Array.isArray(notifications) || notifications.length === 0) return;
-    // Filtra solo las notificaciones de cuentas vinculadas
-    const accountNotifs = notifications.filter(n => n.text && (
-      n.text.includes('vinculada') || n.text.includes('desactivada') || n.text.includes('eliminada')
-    ));
-    if (accountNotifs.length === 0) return;
+    if (!user || !user._id || !Array.isArray(accountNotifications) || accountNotifications.length === 0) return;
     const payload = {
       userId: user._id,
-      notifications: accountNotifs.map(n => ({
+      notifications: accountNotifications.map(n => ({
         ...n,
         date: n.date ? new Date(n.date) : new Date()
       }))
@@ -253,7 +269,7 @@ function App() {
       },
       logoutFn
     );
-  }, [user, notifications, BACKEND_URL]);
+  }, [user, accountNotifications, BACKEND_URL]);
 
   const handleLogout = useCallback(async () => {
     // Guarda cuentas y notificaciones de cuentas antes de salir
@@ -267,7 +283,7 @@ function App() {
     setNotifications([]);
     setNotificationCount(0);
     setAccounts([]);
-    // setAccountNotifications([]);
+    setAccountNotifications([]);
   }, [persistAccounts, persistAccountNotifications, persistNotifications]);
 
   // Guardar notifs antes de cerrar pestaña

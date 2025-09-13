@@ -309,6 +309,8 @@ const AuraPanel = ({
           setNotifications={setNotifications}
           setNotificationCount={setNotificationCount}
           notifications={notifications}
+          accountNotifications={accountNotifications}
+          setAccountNotifications={setAccountNotifications}
         />;
       case 'ajustes':
         return <SettingsPanel />;

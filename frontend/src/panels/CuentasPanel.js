@@ -8,7 +8,7 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.
 
 
 // Ahora recibimos user y token desde props (App.js)
-const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotificationCount, notifications }) => {
+const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotificationCount, notifications, accountNotifications, setAccountNotifications }) => {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
@@ -169,15 +169,16 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
     } catch (e) {}
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
-      // Notificación: cuenta vinculada
-      if (setNotifications && setNotificationCount) {
+      // Notificación: cuenta vinculada (solo en accountNotifications)
+      if (setAccountNotifications) {
         const notif = {
           id: Date.now() + Math.random(),
           text: `Cuenta ${username} vinculada exitosamente`,
-          date: new Date().toISOString()
+          date: new Date().toISOString(),
+          type: 'vinculada',
+          accountId: fakeAccount._id || '',
         };
-        setNotifications([notif, ...(notifications || [])]);
-        setNotificationCount((notifications?.length || 0) + 1);
+        setAccountNotifications([notif, ...(accountNotifications || [])]);
       }
       setLinking(false);
     }, 1000);
@@ -193,14 +194,15 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
         headers: { Authorization: `Bearer ${user.token}` }
       });
     // Notificación: cuenta desvinculada
-    if (setNotifications && setNotificationCount) {
+    if (setAccountNotifications) {
       const notif = {
         id: Date.now() + Math.random(),
         text: `Cuenta desvinculada exitosamente`,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        type: 'eliminada',
+        accountId: id || '',
       };
-      setNotifications([notif, ...(notifications || [])]);
-      setNotificationCount((notifications?.length || 0) + 1);
+      setAccountNotifications([notif, ...(accountNotifications || [])]);
     }
       fetchAccounts();
     } catch (e) {
@@ -232,14 +234,15 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
   const handleToggleActive = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
     // Notificación: cuenta desactivada
-    if (!value && setNotifications && setNotificationCount) {
+    if (!value && setAccountNotifications) {
       const notif = {
         id: Date.now() + Math.random(),
         text: `Cuenta desactivada`,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        type: 'desactivada',
+        accountId: id || '',
       };
-      setNotifications([notif, ...(notifications || [])]);
-      setNotificationCount((notifications?.length || 0) + 1);
+      setAccountNotifications([notif, ...(accountNotifications || [])]);
     }
   };
 
