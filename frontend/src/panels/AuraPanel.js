@@ -31,8 +31,8 @@ const AuraPanel = ({
   setDarkMode,
   panelActivo: panelActivoProp,
   setPanelActivo: setPanelActivoProp,
-  notifications,
-  setNotifications,
+  globalNotifications,
+  setGlobalNotifications,
   notificationCount,
   setNotificationCount,
   notificationsEnabled,
@@ -58,8 +58,8 @@ const AuraPanel = ({
   handleResetPassword,
   handleVerify,
   onUserUpdate,
-  accountNotifications,
-  setAccountNotifications
+  // accountNotifications,
+  // setAccountNotifications
 }) => {
 
   // Estado interno para panel (si no viene controlado por props)
@@ -386,11 +386,9 @@ const AuraPanel = ({
             <BellDropdownModal
               open={!!showNotifications}
               anchorRef={bellRef}
-              notifications={notifications}
-              setNotifications={setNotifications}
+              notifications={globalNotifications}
+              setNotifications={setGlobalNotifications}
               setNotificationCount={setNotificationCount}
-              accountNotifications={accountNotifications}
-              setAccountNotifications={setAccountNotifications}
               onClose={() => setShowNotifications(false)}
             />
           </span>

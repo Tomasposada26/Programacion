@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/BellDropdownModal.css';
 
-const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotifications, setNotificationCount, accountNotifications = [], setAccountNotifications }) => {
+const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotifications, setNotificationCount }) => {
   if (!open || !anchorRef) return null;
   // Get anchor position
   const rect = anchorRef.current?.getBoundingClientRect();
@@ -19,20 +19,14 @@ const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotificatio
     overflow: 'visible',
   } : { display: 'none' };
 
-  // Unir ambas listas y marcar el tipo
-  const allNotifications = [
-    ...(notifications || []).map(n => ({ ...n, _tipo: 'general' })),
-    ...(accountNotifications || []).map(n => ({ ...n, _tipo: 'cuenta' }))
-  ];
-
   return (
     <div style={style} className="bell-dropdown-modal" onClick={e => e.stopPropagation()}>
       <div className="bell-dropdown-content">
-        {allNotifications.length === 0 ? (
+        {notifications.length === 0 ? (
           <span className="bell-dropdown-empty">No tienes notificaciones</span>
         ) : (
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: 260, overflowY: 'auto' }}>
-            {allNotifications.map(n => (
+            {notifications.map(n => (
               <li key={n.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f7f7fa', borderRadius: 7, marginBottom: 8, padding: '10px 14px', boxShadow: '0 1px 4px #0001' }}>
                 <span style={{ fontWeight: 500, color: '#222', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {n.text}
@@ -53,14 +47,9 @@ const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotificatio
                   title="Eliminar notificación"
                   onClick={e => {
                     e.stopPropagation();
-                    if (n._tipo === 'general') {
-                      const filtered = notifications.filter(x => x.id !== n.id);
-                      setNotifications(filtered);
-                      setNotificationCount(filtered.length);
-                    } else {
-                      const filtered = accountNotifications.filter(x => x.id !== n.id);
-                      setAccountNotifications(filtered);
-                    }
+                    const filtered = notifications.filter(x => x.id !== n.id);
+                    setNotifications(filtered);
+                    setNotificationCount(filtered.length);
                   }}
                 >✕</button>
               </li>

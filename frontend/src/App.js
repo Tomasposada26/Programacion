@@ -22,13 +22,11 @@ function App() {
   const [sesionIniciada, setSesionIniciada] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Notificaciones
-  const [notifications, setNotifications] = useState([]);
+  // Notificaciones unificadas
+  const [globalNotifications, setGlobalNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
-  // Notificaciones de cuentas vinculadas (solo para persistencia y recuperación)
-  const [accountNotifications, setAccountNotifications] = useState([]);
 
   // UI
   const [darkMode, setDarkMode] = useState(false);
@@ -175,38 +173,37 @@ function App() {
     setRegisterError('');
   };
 
-  const persistNotifications = useCallback((logoutFn) => {
-    if (!user || !user._id || !Array.isArray(notifications) || notifications.length === 0) return;
-    const payload = {
-      userId: user._id,
-      notificaciones: notifications.map(n => ({
-        ...n,
-        id: n.id || Date.now().toString() + Math.random().toString(36).slice(2),
-        date: n.date ? new Date(n.date) : new Date()
-      }))
-    };
-    const url = `${BACKEND_URL}/api/notificaciones/guardar`;
-
-    if (navigator.sendBeacon) {
-      try {
-        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-        navigator.sendBeacon(url, blob);
-        return;
-      } catch {
-        // fallback a fetch
-      }
+  // Guardar notificaciones unificadas antes de cerrar sesión o pestaña
+  const persistGlobalNotifications = useCallback((logoutFn) => {
+    if (!user || !user._id || !Array.isArray(globalNotifications) || globalNotifications.length === 0) return;
+    // Separar por tipo
+    const generales = globalNotifications.filter(n => n._tipo === 'general').map(({ _tipo, ...n }) => n);
+    const cuentas = globalNotifications.filter(n => n._tipo === 'cuenta').map(({ _tipo, ...n }) => n);
+    // Guardar generales
+    if (generales.length > 0) {
+      fetchWithAuth(
+        `${BACKEND_URL}/api/notificaciones/guardar`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user._id, notificaciones: generales })
+        },
+        logoutFn
+      );
     }
-
-    fetchWithAuth(
-      url,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      },
-      logoutFn
-    );
-  }, [user, notifications, BACKEND_URL]);
+    // Guardar cuentas
+    if (cuentas.length > 0) {
+      fetchWithAuth(
+        `${BACKEND_URL}/api/accounts/account-notifications/guardar`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user._id, notifications: cuentas })
+        },
+        logoutFn
+      );
+    }
+  }, [user, globalNotifications, BACKEND_URL]);
 
 
   // Usar el endpoint correcto para cuentas simuladas
@@ -243,57 +240,28 @@ function App() {
   }, [user, accounts, BACKEND_URL]);
 
   // Guardar notificaciones de cuentas vinculadas en su colección
-  const persistAccountNotifications = useCallback((logoutFn) => {
-    if (!user || !user._id || !Array.isArray(accountNotifications) || accountNotifications.length === 0) return;
-    const payload = {
-      userId: user._id,
-      notifications: accountNotifications.map(n => ({
-        ...n,
-        date: n.date ? new Date(n.date) : new Date()
-      }))
-    };
-    const url = `${BACKEND_URL}/api/accounts/account-notifications/guardar`;
-    if (navigator.sendBeacon) {
-      try {
-        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-        navigator.sendBeacon(url, blob);
-        return;
-      } catch {}
-    }
-    fetchWithAuth(
-      url,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      },
-      logoutFn
-    );
-  }, [user, accountNotifications, BACKEND_URL]);
 
   const handleLogout = useCallback(async () => {
-    // Guarda cuentas y notificaciones de cuentas antes de salir
+    // Guarda cuentas y notificaciones unificadas antes de salir
     persistAccounts(handleLogout);
-    persistAccountNotifications(handleLogout);
-    persistNotifications(handleLogout);
+    persistGlobalNotifications(handleLogout);
 
     setSesionIniciada(false);
     setUser(null);
     setDarkMode(false);
-    setNotifications([]);
+    setGlobalNotifications([]);
     setNotificationCount(0);
     setAccounts([]);
-    setAccountNotifications([]);
-  }, [persistAccounts, persistAccountNotifications, persistNotifications]);
+  }, [persistAccounts, persistGlobalNotifications]);
 
-  // Guardar notifs antes de cerrar pestaña
+  // Guardar notifs unificadas antes de cerrar pestaña
   useEffect(() => {
     const handleBeforeUnload = () => {
-      persistNotifications();
+      persistGlobalNotifications();
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [persistNotifications]);
+  }, [persistGlobalNotifications]);
 
   const handleUserUpdate = (updatedUser) => {
     setUser(prev => ({ ...prev, ...updatedUser }));
@@ -340,6 +308,8 @@ function App() {
                   onUserUpdate={handleUserUpdate}
                   accounts={accounts}
                   setAccounts={setAccounts}
+                  globalNotifications={globalNotifications}
+                  setGlobalNotifications={setGlobalNotifications}
                 />
               ) : (
                 <HomePanel
