@@ -133,7 +133,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     };
 
     try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
+      const res = await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,49 +146,61 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
           expiresAt
         })
       });
-    } catch (e) {}
-
-    setTimeout(() => {
-      setAccounts(accs => [fakeAccount, ...accs]);
-      if (setGlobalNotifications) {
-        const notif = {
-          id: Date.now() + Math.random(),
-          text: `Cuenta ${username} vinculada exitosamente`,
-          date: new Date().toISOString(),
-          type: 'vinculada',
-          accountId: fakeAccount._id || '',
-          _tipo: 'cuenta'
-        };
-        setGlobalNotifications(prev => [notif, ...(prev || [])]);
+      if (res.ok) {
+        const saved = await res.json();
+        setAccounts(accs => [
+          {
+            ...fakeAccount,
+            _id: saved._id || fakeAccount._id // usa el id real si lo devuelve el backend
+          },
+          ...accs
+        ]);
+        if (setGlobalNotifications) {
+          const notif = {
+            id: Date.now() + Math.random(),
+            text: `Cuenta ${username} vinculada exitosamente`,
+            date: new Date().toISOString(),
+            type: 'vinculada',
+            accountId: saved._id || fakeAccount._id || '',
+            _tipo: 'cuenta'
+          };
+          setGlobalNotifications(prev => [notif, ...(prev || [])]);
+        }
       }
-      setLinking(false);
-    }, 1000);
+    } catch (e) {
+      // opcional: mostrar error
+    }
+    setLinking(false);
   };
 
   // Desvincular cuenta
   const handleUnlink = async (id) => {
-    setAccounts(accs => accs.filter(a => a._id !== id));
-    if (setGlobalNotifications) {
-      const notif = {
-        id: Date.now() + Math.random(),
-        text: `Cuenta desvinculada exitosamente`,
-        date: new Date().toISOString(),
-        type: 'eliminada',
-        accountId: id || '',
-        _tipo: 'cuenta'
-      };
-      setGlobalNotifications(prev => [notif, ...(prev || [])]);
-    }
-    setConfirm({ open: false, id: null });
     setLoading(true);
     try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${user.token}` }
       });
+      if (res.ok) {
+        const acc = accounts.find(a => a._id === id);
+        const username = acc ? acc.username : '';
+        setAccounts(accs => accs.filter(a => a._id !== id));
+        if (setGlobalNotifications) {
+          const notif = {
+            id: Date.now() + Math.random(),
+            text: `Cuenta ${username} desvinculada exitosamente`,
+            date: new Date().toISOString(),
+            type: 'eliminada',
+            accountId: id || '',
+            _tipo: 'cuenta'
+          };
+          setGlobalNotifications(prev => [notif, ...(prev || [])]);
+        }
+      }
     } catch (e) {
       fetchAccounts();
     }
+    setConfirm({ open: false, id: null });
     setLoading(false);
   };
 

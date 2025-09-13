@@ -294,6 +294,7 @@ const AuraPanel = ({
       case 'respuestas':
         return (
           <RespuestasPanel
+            setGlobalNotifications={setGlobalNotifications}
             setNotificationCount={setNotificationCount}
             user={user}
           />
@@ -365,17 +366,17 @@ const AuraPanel = ({
             title="Ver notificaciones"
           >
             <BellIcon size={32} color="#FFD600" />
-            {(notificationsEnabled ? Number(notificationCount) > 0 : true) && (
+            {notificationsEnabled && globalNotifications.length > 0 && (
               <span style={{
                 position: 'absolute', top: -8, left: -8,
                 minWidth: 22, height: 22,
-                background: notificationsEnabled ? '#e53e3e' : '#888',
+                background: '#e53e3e',
                 color: '#fff', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 800, fontSize: 14, border: '2px solid #fff',
-                boxShadow: notificationsEnabled ? '0 2px 8px #e53e3e55' : '0 2px 8px #8885',
+                boxShadow: '0 2px 8px #e53e3e55',
                 zIndex: 2
-              }}>{notificationsEnabled ? notificationCount : '✕'}</span>
+              }}>{globalNotifications.length}</span>
             )}
             <BellDropdownModal
               open={!!showNotifications}

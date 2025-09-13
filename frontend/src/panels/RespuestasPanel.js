@@ -3,7 +3,7 @@ import '../styles/RespuestasPanel.css';
 
 
 
-const RespuestasPanel = ({ setNotifications, setNotificationCount, user }) => {
+const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user }) => {
   const [form, setForm] = useState({
     trigger: '',
     type: '',
@@ -63,12 +63,13 @@ const RespuestasPanel = ({ setNotifications, setNotificationCount, user }) => {
         const reglaCreada = await res.json();
         setReglas(rs => [reglaCreada, ...rs]);
         setForm({ trigger: '', type: '', categories: [], advanced: '', response: '', notes: '', state: true });
-        if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
-          setNotifications(prev => {
+        if (typeof setGlobalNotifications === 'function' && typeof setNotificationCount === 'function') {
+          setGlobalNotifications(prev => {
             const noti = {
               id: Date.now(),
               text: 'Nueva regla agregada exitosamente',
-              date: new Date().toISOString()
+              date: new Date().toISOString(),
+              _tipo: 'general'
             };
             const newArr = [noti, ...(Array.isArray(prev) ? prev : [])];
             setNotificationCount(newArr.length);
@@ -264,11 +265,12 @@ const RespuestasPanel = ({ setNotifications, setNotificationCount, user }) => {
                           const nueva = await res.json();
                           setReglas(rs => [nueva, ...rs]);
                           if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
-                            setNotifications(prev => {
+                            setGlobalNotifications(prev => {
                               const noti = {
                                 id: Date.now(),
                                 text: 'Regla duplicada exitosamente',
-                                date: new Date().toISOString()
+                                date: new Date().toISOString(),
+                                _tipo: 'general'
                               };
                               const newArr = [noti, ...(Array.isArray(prev) ? prev : [])];
                               setNotificationCount(newArr.length);
@@ -305,11 +307,12 @@ const RespuestasPanel = ({ setNotifications, setNotificationCount, user }) => {
                   if (res.ok) {
                     setReglas(rs => rs.filter(r => r._id !== deleteId));
                     if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
-                      setNotifications(prev => {
+                      setGlobalNotifications(prev => {
                         const noti = {
                           id: Date.now(),
                           text: 'Regla eliminada exitosamente',
-                          date: new Date().toISOString()
+                          date: new Date().toISOString(),
+                          _tipo: 'general'
                         };
                         const newArr = [noti, ...(Array.isArray(prev) ? prev : [])];
                         setNotificationCount(newArr.length);
@@ -362,11 +365,12 @@ const RespuestasPanel = ({ setNotifications, setNotificationCount, user }) => {
                         setReglas(rs => rs.map(r => r._id === editId ? actualizada : r));
                         setShowEditModal(false);
                         if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
-                          setNotifications(prev => {
+                          setGlobalNotifications(prev => {
                             const noti = {
                               id: Date.now(),
                               text: 'Regla editada exitosamente',
-                              date: new Date().toISOString()
+                              date: new Date().toISOString(),
+                              _tipo: 'general'
                             };
                             const newArr = [noti, ...(Array.isArray(prev) ? prev : [])];
                             setNotificationCount(newArr.length);
