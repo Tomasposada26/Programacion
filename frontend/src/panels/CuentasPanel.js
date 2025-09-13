@@ -6,7 +6,6 @@ import '../components/InstagramAccountsTable.css';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
-
 // Ahora recibimos user y token desde props (App.js)
 const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, globalNotifications }) => {
   const [loading, setLoading] = useState(false);
@@ -15,8 +14,6 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
   const [linking, setLinking] = useState(false);
 
   // --- Expiración y auto-refresh ---
-  // Cada cuenta tendrá: expiresAt (timestamp), autoRefresh (bool), active (bool)
-  // Al montar, si no tiene expiresAt, se le asigna 1 hora desde ahora
   useEffect(() => {
     setAccounts(accs => accs.map(acc => {
       if (!acc.expiresAt) {
@@ -24,7 +21,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
       }
       return acc;
     }));
-  }, []);
+  }, [setAccounts]);
 
   // Intervalo global para actualizar los contadores cada segundo
   useEffect(() => {
@@ -32,23 +29,18 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
       setAccounts(accs => accs.map(acc => {
         if (!acc.expiresAt) return acc;
         const msLeft = acc.expiresAt - Date.now();
-        // Si ya expiró
+
         if (msLeft <= 0) {
           if (acc.autoRefresh) {
-            // Si auto-refresh, renovar automáticamente
             return { ...acc, expiresAt: Date.now() + 60 * 60 * 1000, isExpiringSoon: false, active: true };
           } else if (acc.active) {
-            // Si no auto-refresh, desactivar
             return { ...acc, active: false, isExpiringSoon: false };
           }
         } else if (msLeft <= 5 * 60 * 1000 && acc.autoRefresh && acc.active) {
-          // Si quedan 5 min y auto-refresh, renovar automáticamente
           return { ...acc, expiresAt: Date.now() + 60 * 60 * 1000, isExpiringSoon: false, active: true };
         } else if (msLeft <= 5 * 60 * 1000 && acc.active) {
-          // Marcar como pronto a expirar
           return { ...acc, isExpiringSoon: true };
         } else if (acc.isExpiringSoon) {
-          // Quitar flag si ya no está pronto a expirar
           return { ...acc, isExpiringSoon: false };
         }
         return acc;
@@ -57,7 +49,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     return () => clearInterval(interval);
   }, [setAccounts]);
 
-  // Obtener cuentas vinculadas solo si no hay en el estado global y el token es válido
+  // Obtener cuentas vinculadas
   const fetchAccounts = async () => {
     if (!user || !user.token) return;
     setLoading(true);
@@ -68,11 +60,9 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
       if (res.ok) {
         const data = await res.json();
         setAccounts(data.map(acc => {
-          // Si no tiene expiresAt, asígnale uno y persiste en backend
           let expiresAt = acc.expiresAt;
           if (!expiresAt) {
             expiresAt = Date.now() + 60 * 60 * 1000;
-            // Persistir en backend
             fetch(`${BACKEND_URL}/api/instagram-token/update-expiry/${acc._id}`, {
               method: 'PATCH',
               headers: {
@@ -82,7 +72,6 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
               body: JSON.stringify({ expiresAt })
             });
           }
-          // autoRefresh: si viene null/undefined, true; si viene false, false
           let autoRefresh = true;
           if (typeof acc.autoRefresh === 'boolean') autoRefresh = acc.autoRefresh;
           return {
@@ -98,26 +87,18 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
             expiresAt
           };
         }));
-      } else {
-        // No borres el estado global si falla el fetch
-        // Opcional: muestra un error si quieres
-        // setAccounts([]);
       }
-    } catch (e) {
-      // No borres el estado global si falla el fetch
-    }
+    } catch (e) {}
     setLoading(false);
   };
 
   useEffect(() => {
-    // Solo hace fetch si no hay cuentas en el estado global
     if ((!accounts || accounts.length === 0) && user && user.token) {
       fetchAccounts();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, accounts, fetchAccounts]);
 
-  // Formatear tiempo para expirar (mm:ss)
+  // Formatear tiempo
   function formatTimeToExpire(expiresAt) {
     if (!expiresAt) return 'N/A';
     const ms = expiresAt - Date.now();
@@ -127,21 +108,17 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     return `${m}m ${s < 10 ? '0' : ''}${s}s`;
   }
 
-  // Vincular cuenta (simulación: abre popup de Instagram OAuth)
+  // Vincular cuenta (simulada)
   const handleLink = async () => {
     setLinking(true);
     const now = new Date();
-    const randomName = () => {
-      const realNames = [
-        'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
-        'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
-        'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
-        'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
-      ];
-      const suffix = Math.random() < 0.5 ? '' : Math.floor(Math.random() * 1000);
-      return `@${realNames[Math.floor(Math.random() * realNames.length)]}${suffix}`;
-    };
-    const username = randomName();
+    const realNames = [
+      'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
+      'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
+      'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
+      'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
+    ];
+    const username = `@${realNames[Math.floor(Math.random() * realNames.length)]}`;
     const expiresAt = Date.now() + 60 * 60 * 1000;
     const fakeAccount = {
       _id: Math.random().toString(36).slice(2),
@@ -154,7 +131,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
       refreshing: false,
       expiresAt
     };
-    // Guardar expiresAt en backend al vincular
+
     try {
       await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
         method: 'POST',
@@ -170,9 +147,9 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
         })
       });
     } catch (e) {}
+
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
-      // Notificación: cuenta vinculada (ahora en globalNotifications)
       if (setGlobalNotifications) {
         const notif = {
           id: Date.now() + Math.random(),
@@ -190,9 +167,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
 
   // Desvincular cuenta
   const handleUnlink = async (id) => {
-    // Eliminación optimista: elimina la cuenta del estado inmediatamente
     setAccounts(accs => accs.filter(a => a._id !== id));
-    // Notificación: cuenta desvinculada
     if (setGlobalNotifications) {
       const notif = {
         id: Date.now() + Math.random(),
@@ -207,30 +182,21 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     setConfirm({ open: false, id: null });
     setLoading(true);
     try {
-      // Eliminar solo la cuenta específica por su _id en la BD
       await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${user.token}` }
       });
     } catch (e) {
-      // Si falla, podrías mostrar un toast y recargar cuentas
-      // setToast({ open: true, message: 'Error al desvincular', type: 'error' });
       fetchAccounts();
     }
     setLoading(false);
   };
 
-  // Refrescar token manualmente: reinicia el contador a 1 hora
+  // Refrescar token
   const handleRefresh = async (id) => {
     setAccounts(accs => accs.map(a =>
       a._id === id
-        ? {
-            ...a,
-            refreshing: true,
-            expiresAt: Date.now() + 60 * 60 * 1000,
-            isExpiringSoon: false,
-            active: true
-          }
+        ? { ...a, refreshing: true, expiresAt: Date.now() + 60 * 60 * 1000, isExpiringSoon: false, active: true }
         : a
     ));
     setTimeout(() => {
@@ -238,10 +204,9 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     }, 1000);
   };
 
-  // Alternar estado activa/desactivada
+  // Activar / desactivar
   const handleToggleActive = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
-    // Notificación: cuenta desactivada o reactivada
     if (setGlobalNotifications) {
       const notif = {
         id: Date.now() + Math.random(),
@@ -255,21 +220,19 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     }
   };
 
-  // Cambiar auto-refresh
-  const handleToggleAutoRefresh = async (id, value) => {
+  // Auto-refresh
+  const handleToggleAutoRefresh = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, autoRefresh: value } : a));
-    // Aquí deberías guardar el valor en el backend si lo soporta
-    // setToast({ open: true, message: value ? 'Auto-refresh activado' : 'Auto-refresh desactivado', type: value ? 'success' : 'warning' });
   };
 
-  // Filtrar cuentas por nombre
+  // Filtrar
   const filteredAccounts = accounts.filter(acc => acc.username.toLowerCase().includes(search.toLowerCase()));
 
   return (
-  <div style={{ width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: '0 auto', padding: 24, overflow: 'visible', marginLeft: '-20ch' }}>
+    <div style={{ width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: '0 auto', padding: 24, overflow: 'visible', marginLeft: '-20ch' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <InstagramLinkCard
-          isLinked={false} // Siempre mostrar el botón de vincular
+          isLinked={false}
           onLink={handleLink}
           onUnlink={() => setConfirm({ open: true, id: user?._id })}
           instagramUser={accounts[0]}

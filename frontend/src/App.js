@@ -39,7 +39,6 @@ function App() {
   const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.onrender.com';
 
   const handleLogin = async (data) => {
-
     setLoginError('');
     let userData = null;
 
@@ -86,24 +85,6 @@ function App() {
       setAccounts([]);
     }
 
-
-  // Recuperar notificaciones generales, cuentas vinculadas y notificaciones de cuentas
-      // Notificaciones de cuentas vinculadas
-      try {
-        const accNotifRes = await fetchWithAuth(
-          `${BACKEND_URL}/api/accounts/account-notifications?userId=${encodeURIComponent(userId)}`,
-          {},
-          handleLogout
-        );
-        if (accNotifRes.ok) {
-          const accNotifs = await accNotifRes.json();
-          setAccountNotifications(Array.isArray(accNotifs) ? accNotifs : []);
-        } else {
-          setAccountNotifications([]);
-        }
-      } catch {
-        setAccountNotifications([]);
-      }
     const userId = userData?._id;
     if (userId) {
       // Notificaciones generales
@@ -116,14 +97,14 @@ function App() {
         if (notifRes.ok) {
           const notifs = await notifRes.json();
           const arr = Array.isArray(notifs) ? notifs : [];
-          setNotifications(arr);
+          setGlobalNotifications(arr);
           setNotificationCount(arr.length);
         } else {
-          setNotifications([]);
+          setGlobalNotifications([]);
           setNotificationCount(0);
         }
       } catch {
-        setNotifications([]);
+        setGlobalNotifications([]);
         setNotificationCount(0);
       }
 
@@ -143,25 +124,10 @@ function App() {
       } catch {
         setAccounts([]);
       }
-
-      // Notificaciones de cuentas vinculadas
-      try {
-        const accNotifRes = await fetchWithAuth(
-          `${BACKEND_URL}/api/accounts/account-notifications?userId=${encodeURIComponent(userId)}`,
-          {},
-          handleLogout
-        );
-        if (accNotifRes.ok) {
-          // Puedes guardar en un estado aparte si lo necesitas
-          // const accNotifs = await accNotifRes.json();
-          // setAccountNotifications(Array.isArray(accNotifs) ? accNotifs : []);
-        }
-      } catch {}
     } else {
-      setNotifications([]);
+      setGlobalNotifications([]);
       setNotificationCount(0);
       setAccounts([]);
-      // setAccountNotifications([]);
     }
 
     setSesionIniciada(true);
@@ -205,7 +171,6 @@ function App() {
     }
   }, [user, globalNotifications, BACKEND_URL]);
 
-
   // Usar el endpoint correcto para cuentas simuladas
   const persistAccounts = useCallback((logoutFn) => {
     if (!user || !user.token || !Array.isArray(accounts) || accounts.length === 0) return;
@@ -238,8 +203,6 @@ function App() {
       logoutFn
     );
   }, [user, accounts, BACKEND_URL]);
-
-  // Guardar notificaciones de cuentas vinculadas en su colección
 
   const handleLogout = useCallback(async () => {
     // Guarda cuentas y notificaciones unificadas antes de salir
@@ -294,8 +257,6 @@ function App() {
                   onLogout={handleLogout}
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
-                  notifications={notifications}
-                  setNotifications={setNotifications}
                   notificationCount={notificationCount}
                   setNotificationCount={setNotificationCount}
                   notificationsEnabled={notificationsEnabled}
