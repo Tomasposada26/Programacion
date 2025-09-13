@@ -386,9 +386,11 @@ const AuraPanel = ({
             <BellDropdownModal
               open={!!showNotifications}
               anchorRef={bellRef}
-              notifications={[...(notifications || []), ...(accountNotifications || [])]}
+              notifications={notifications}
               setNotifications={setNotifications}
               setNotificationCount={setNotificationCount}
+              accountNotifications={accountNotifications}
+              setAccountNotifications={setAccountNotifications}
               onClose={() => setShowNotifications(false)}
             />
           </span>
