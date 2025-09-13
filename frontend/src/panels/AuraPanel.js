@@ -57,7 +57,9 @@ const AuraPanel = ({
   handleVerifyRecoveryCode,
   handleResetPassword,
   handleVerify,
-  onUserUpdate
+  onUserUpdate,
+  accountNotifications,
+  setAccountNotifications
 }) => {
 
   // Estado interno para panel (si no viene controlado por props)
