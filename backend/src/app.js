@@ -14,6 +14,25 @@ const Interesado = require('./models/Interesado');
 const app = express();
 app.use(express.json());
 const corsOptions = require('./config/cors');
+// Middleware CORS personalizado para asegurar cabeceras en todas las respuestas
+app.use((req, res, next) => {
+	const allowedOrigins = [
+		'https://programacion-tau.vercel.app',
+		'http://localhost:3000',
+		process.env.FRONTEND_URL
+	].filter(Boolean);
+	const origin = req.headers.origin;
+	if (allowedOrigins.includes(origin)) {
+		res.header('Access-Control-Allow-Origin', origin);
+	}
+	res.header('Access-Control-Allow-Credentials', 'true');
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+	if (req.method === 'OPTIONS') {
+		return res.sendStatus(200);
+	}
+	next();
+});
 app.use(cors(corsOptions));
 
 const instagramTokenRoutes = require('./routes/instagramTokenRoutes');
@@ -27,7 +46,9 @@ const reglaRoutes = require('./routes/reglaRoutes');
 
 const utilRoutes = require('./routes/utilRoutes');
 const authRoutes = require('./routes/authRoutes');
+
 const notificacionRoutes = require('./routes/notificacionRoutes');
+const accountRoutes = require('./routes/accountRoutes');
 
 
 app.use('/api/interesados', interesadoRoutes);
@@ -36,7 +57,9 @@ app.use('/api/reglas', reglaRoutes);
 app.use('/api/util', utilRoutes);
 app.use('/api/auth', authRoutes);
 
+
 app.use('/api/notificaciones', notificacionRoutes);
+app.use('/api/accounts', accountRoutes);
 
 // Webhook público para Instagram
 const webhookRoutes = require('./routes/webhookRoutes');

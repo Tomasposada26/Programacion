@@ -86,20 +86,22 @@ function App() {
       setAccounts([]);
     }
 
-    // Recuperar notificaciones solo si hay un _id válido
+
+    // Recuperar notificaciones, cuentas vinculadas y notificaciones de cuentas
     const userId = userData?._id;
     if (userId) {
+      // Notificaciones generales
       try {
         const notifRes = await fetchWithAuth(
           `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userId)}`,
           {},
-            handleLogout
+          handleLogout
         );
         if (notifRes.ok) {
           const notifs = await notifRes.json();
           const arr = Array.isArray(notifs) ? notifs : [];
-            setNotifications(arr);
-            setNotificationCount(arr.length);
+          setNotifications(arr);
+          setNotificationCount(arr.length);
         } else {
           setNotifications([]);
           setNotificationCount(0);
@@ -108,9 +110,42 @@ function App() {
         setNotifications([]);
         setNotificationCount(0);
       }
+
+      // Cuentas vinculadas
+      try {
+        const accRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/accounts/instagram-accounts?userId=${encodeURIComponent(userId)}`,
+          {},
+          handleLogout
+        );
+        if (accRes.ok) {
+          const accs = await accRes.json();
+          setAccounts(Array.isArray(accs) ? accs : []);
+        } else {
+          setAccounts([]);
+        }
+      } catch {
+        setAccounts([]);
+      }
+
+      // Notificaciones de cuentas vinculadas
+      try {
+        const accNotifRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/accounts/account-notifications?userId=${encodeURIComponent(userId)}`,
+          {},
+          handleLogout
+        );
+        if (accNotifRes.ok) {
+          // Puedes guardar en un estado aparte si lo necesitas
+          // const accNotifs = await accNotifRes.json();
+          // setAccountNotifications(Array.isArray(accNotifs) ? accNotifs : []);
+        }
+      } catch {}
     } else {
       setNotifications([]);
       setNotificationCount(0);
+      setAccounts([]);
+      // setAccountNotifications([]);
     }
 
     setSesionIniciada(true);
@@ -155,28 +190,75 @@ function App() {
     );
   }, [user, notifications, BACKEND_URL]);
 
-  const handleLogout = useCallback(async () => {
-    // Guarda cuentas antes de salir
-    if (accounts && accounts.length > 0 && user && user.token) {
-      try {
-        await fetch(`${BACKEND_URL}/api/instagram-token/bulk-save`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`
-          },
-          body: JSON.stringify({
-            accounts: accounts.map(({ username, linkedAt, active }) => ({
-              username, linkedAt, active
-            }))
-          })
-        });
-      } catch {
-        // Log silent
-      }
-    }
 
-    // Persistir notificaciones
+  const persistAccounts = useCallback((logoutFn) => {
+    if (!user || !user._id || !Array.isArray(accounts) || accounts.length === 0) return;
+    const payload = {
+      userId: user._id,
+      accounts: accounts.map(acc => ({
+        username: acc.username,
+        linkedAt: acc.linkedAt,
+        active: acc.active,
+        expiresAt: acc.expiresAt
+      }))
+    };
+    const url = `${BACKEND_URL}/api/accounts/instagram-accounts/guardar`;
+    if (navigator.sendBeacon) {
+      try {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      } catch {}
+    }
+    fetchWithAuth(
+      url,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      },
+      logoutFn
+    );
+  }, [user, accounts, BACKEND_URL]);
+
+  // Similar para notificaciones de cuentas vinculadas
+  const persistAccountNotifications = useCallback((logoutFn) => {
+    if (!user || !user._id || !Array.isArray(notifications) || notifications.length === 0) return;
+    // Filtra solo las notificaciones de cuentas vinculadas
+    const accountNotifs = notifications.filter(n => n.text && (
+      n.text.includes('vinculada') || n.text.includes('desactivada') || n.text.includes('eliminada')
+    ));
+    if (accountNotifs.length === 0) return;
+    const payload = {
+      userId: user._id,
+      notifications: accountNotifs.map(n => ({
+        ...n,
+        date: n.date ? new Date(n.date) : new Date()
+      }))
+    };
+    const url = `${BACKEND_URL}/api/accounts/account-notifications/guardar`;
+    if (navigator.sendBeacon) {
+      try {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      } catch {}
+    }
+    fetchWithAuth(
+      url,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      },
+      logoutFn
+    );
+  }, [user, notifications, BACKEND_URL]);
+
+  const handleLogout = useCallback(async () => {
+    // Guarda cuentas y notificaciones de cuentas antes de salir
+    persistAccounts(handleLogout);
+    persistAccountNotifications(handleLogout);
     persistNotifications(handleLogout);
 
     setSesionIniciada(false);
@@ -184,7 +266,9 @@ function App() {
     setDarkMode(false);
     setNotifications([]);
     setNotificationCount(0);
-  }, [accounts, user, BACKEND_URL, persistNotifications]);
+    setAccounts([]);
+    // setAccountNotifications([]);
+  }, [persistAccounts, persistAccountNotifications, persistNotifications]);
 
   // Guardar notifs antes de cerrar pestaña
   useEffect(() => {

@@ -166,20 +166,6 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
         })
       });
     } catch (e) {}
-    try {
-      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user?.token}`
-        },
-        body: JSON.stringify({
-          username,
-          linkedAt: now.toISOString(),
-          active: true
-        })
-      });
-    } catch (e) {}
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
       // Notificación: cuenta vinculada
