@@ -57,9 +57,7 @@ const AuraPanel = ({
   handleVerifyRecoveryCode,
   handleResetPassword,
   handleVerify,
-  onUserUpdate,
-  // accountNotifications,
-  // setAccountNotifications
+  onUserUpdate
 }) => {
 
   // Estado interno para panel (si no viene controlado por props)
@@ -296,7 +294,6 @@ const AuraPanel = ({
       case 'respuestas':
         return (
           <RespuestasPanel
-            setNotifications={setNotifications}
             setNotificationCount={setNotificationCount}
             user={user}
           />
@@ -308,11 +305,8 @@ const AuraPanel = ({
           accounts={accounts} 
           setAccounts={setAccounts} 
           user={user}
-          setNotifications={setNotifications}
-          setNotificationCount={setNotificationCount}
-          notifications={notifications}
-          accountNotifications={accountNotifications}
-          setAccountNotifications={setAccountNotifications}
+          setGlobalNotifications={setGlobalNotifications}
+          globalNotifications={globalNotifications}
         />;
       case 'ajustes':
         return <SettingsPanel />;
