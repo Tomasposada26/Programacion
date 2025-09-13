@@ -264,7 +264,7 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                         if (res.ok) {
                           const nueva = await res.json();
                           setReglas(rs => [nueva, ...rs]);
-                          if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
+                          if (typeof setGlobalNotifications === 'function' && typeof setNotificationCount === 'function') {
                             setGlobalNotifications(prev => {
                               const noti = {
                                 id: Date.now(),
@@ -306,7 +306,7 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                   const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${deleteId}`, { method: 'DELETE' });
                   if (res.ok) {
                     setReglas(rs => rs.filter(r => r._id !== deleteId));
-                    if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
+                    if (typeof setGlobalNotifications === 'function' && typeof setNotificationCount === 'function') {
                       setGlobalNotifications(prev => {
                         const noti = {
                           id: Date.now(),
@@ -364,7 +364,7 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                         const actualizada = await res.json();
                         setReglas(rs => rs.map(r => r._id === editId ? actualizada : r));
                         setShowEditModal(false);
-                        if (typeof setNotifications === 'function' && typeof setNotificationCount === 'function') {
+                        if (typeof setGlobalNotifications === 'function' && typeof setNotificationCount === 'function') {
                           setGlobalNotifications(prev => {
                             const noti = {
                               id: Date.now(),

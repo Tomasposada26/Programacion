@@ -30,7 +30,6 @@ const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotificatio
               <li key={n.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f7f7fa', borderRadius: 7, marginBottom: 8, padding: '10px 14px', boxShadow: '0 1px 4px #0001' }}>
                 <span style={{ fontWeight: 500, color: '#222', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {n.text}
-                  {n._tipo === 'cuenta' && <span style={{ color: '#188fd9', fontWeight: 700, marginLeft: 8 }}>[Cuenta IG]</span>}
                 </span>
                 <span style={{ fontSize: 12, color: '#888', marginLeft: 18, marginRight: 8, minWidth: 120, textAlign: 'right', flexShrink: 0 }}>
                   {(() => {
