@@ -82,6 +82,9 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
               body: JSON.stringify({ expiresAt })
             });
           }
+          // autoRefresh: si viene null/undefined, true; si viene false, false
+          let autoRefresh = true;
+          if (typeof acc.autoRefresh === 'boolean') autoRefresh = acc.autoRefresh;
           return {
             ...acc,
             _id: acc._id,
@@ -90,7 +93,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
             isExpiringSoon: false,
             active: acc.active,
             linkedAt: acc.linkedAt ? new Date(acc.linkedAt).toLocaleString() : 'N/A',
-            autoRefresh: acc.autoRefresh !== undefined ? acc.autoRefresh : true,
+            autoRefresh,
             refreshing: false,
             expiresAt
           };
