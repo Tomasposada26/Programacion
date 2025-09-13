@@ -8,7 +8,7 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || 'https://programacion-gdr0.
 
 
 // Ahora recibimos user y token desde props (App.js)
-const CuentasPanel = ({ accounts, setAccounts, user }) => {
+const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotificationCount, notifications }) => {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
@@ -182,6 +182,16 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
     } catch (e) {}
     setTimeout(() => {
       setAccounts(accs => [fakeAccount, ...accs]);
+      // Notificación: cuenta vinculada
+      if (setNotifications && setNotificationCount) {
+        const notif = {
+          id: Date.now() + Math.random(),
+          text: `Cuenta ${username} vinculada exitosamente`,
+          date: new Date().toISOString()
+        };
+        setNotifications([notif, ...(notifications || [])]);
+        setNotificationCount((notifications?.length || 0) + 1);
+      }
       setLinking(false);
     }, 1000);
   };
@@ -195,7 +205,16 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${user.token}` }
       });
-    // setToast({ open: true, message: 'Cuenta desvinculada', type: 'success' });
+    // Notificación: cuenta desvinculada
+    if (setNotifications && setNotificationCount) {
+      const notif = {
+        id: Date.now() + Math.random(),
+        text: `Cuenta desvinculada exitosamente`,
+        date: new Date().toISOString()
+      };
+      setNotifications([notif, ...(notifications || [])]);
+      setNotificationCount((notifications?.length || 0) + 1);
+    }
       fetchAccounts();
     } catch (e) {
     // setToast({ open: true, message: 'Error al desvincular', type: 'error' });
@@ -225,7 +244,16 @@ const CuentasPanel = ({ accounts, setAccounts, user }) => {
   // Alternar estado activa/desactivada
   const handleToggleActive = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
-    // setToast({ open: true, message: value ? 'Cuenta activada' : 'Cuenta desactivada', type: value ? 'success' : 'warning' });
+    // Notificación: cuenta desactivada
+    if (!value && setNotifications && setNotificationCount) {
+      const notif = {
+        id: Date.now() + Math.random(),
+        text: `Cuenta desactivada`,
+        date: new Date().toISOString()
+      };
+      setNotifications([notif, ...(notifications || [])]);
+      setNotificationCount((notifications?.length || 0) + 1);
+    }
   };
 
   // Cambiar auto-refresh
