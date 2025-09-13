@@ -49,7 +49,6 @@ const BellDropdownModal = ({ open, anchorRef, notifications = [], setNotificatio
                     e.stopPropagation();
                     const filtered = notifications.filter(x => x.id !== n.id);
                     setNotifications(filtered);
-                    setNotificationCount(filtered.length);
                   }}
                 >✕</button>
               </li>

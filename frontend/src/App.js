@@ -25,6 +25,11 @@ function App() {
   // Notificaciones unificadas
   const [globalNotifications, setGlobalNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
+
+  // Sincronizar contador con la cantidad real de notificaciones
+  useEffect(() => {
+    setNotificationCount(globalNotifications.length);
+  }, [globalNotifications]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
 
