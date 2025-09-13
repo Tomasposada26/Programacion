@@ -159,7 +159,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
           accountId: fakeAccount._id || '',
           _tipo: 'cuenta'
         };
-        setGlobalNotifications([notif, ...(globalNotifications || [])]);
+        setGlobalNotifications(prev => [notif, ...(prev || [])]);
       }
       setLinking(false);
     }, 1000);
@@ -177,7 +177,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
         accountId: id || '',
         _tipo: 'cuenta'
       };
-      setGlobalNotifications([notif, ...(globalNotifications || [])]);
+      setGlobalNotifications(prev => [notif, ...(prev || [])]);
     }
     setConfirm({ open: false, id: null });
     setLoading(true);
@@ -216,7 +216,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
         accountId: id || '',
         _tipo: 'cuenta'
       };
-      setGlobalNotifications([notif, ...(globalNotifications || [])]);
+      setGlobalNotifications(prev => [notif, ...(prev || [])]);
     }
   };
 
