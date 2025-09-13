@@ -186,13 +186,8 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
 
   // Desvincular cuenta
   const handleUnlink = async (id) => {
-    setLoading(true);
-    try {
-      // Eliminar solo la cuenta específica por su _id en la BD
-      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
+    // Eliminación optimista: elimina la cuenta del estado inmediatamente
+    setAccounts(accs => accs.filter(a => a._id !== id));
     // Notificación: cuenta desvinculada
     if (setAccountNotifications) {
       const notif = {
@@ -204,12 +199,20 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
       };
       setAccountNotifications([notif, ...(accountNotifications || [])]);
     }
-      fetchAccounts();
+    setConfirm({ open: false, id: null });
+    setLoading(true);
+    try {
+      // Eliminar solo la cuenta específica por su _id en la BD
+      await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
     } catch (e) {
-    // setToast({ open: true, message: 'Error al desvincular', type: 'error' });
+      // Si falla, podrías mostrar un toast y recargar cuentas
+      // setToast({ open: true, message: 'Error al desvincular', type: 'error' });
+      fetchAccounts();
     }
     setLoading(false);
-    setConfirm({ open: false, id: null });
   };
 
   // Refrescar token manualmente: reinicia el contador a 1 hora
@@ -233,13 +236,13 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
   // Alternar estado activa/desactivada
   const handleToggleActive = (id, value) => {
     setAccounts(accs => accs.map(a => a._id === id ? { ...a, active: value } : a));
-    // Notificación: cuenta desactivada
-    if (!value && setAccountNotifications) {
+    // Notificación: cuenta desactivada o reactivada
+    if (setAccountNotifications) {
       const notif = {
         id: Date.now() + Math.random(),
-        text: `Cuenta desactivada`,
+        text: value ? `Cuenta activada` : `Cuenta desactivada`,
         date: new Date().toISOString(),
-        type: 'desactivada',
+        type: value ? 'activada' : 'desactivada',
         accountId: id || '',
       };
       setAccountNotifications([notif, ...(accountNotifications || [])]);
