@@ -85,9 +85,12 @@ function App() {
       setAccounts([]);
     }
 
+
     const userId = userData?._id;
     if (userId) {
-      // Notificaciones generales
+      // Notificaciones generales y de cuentas
+      let generales = [];
+      let cuentas = [];
       try {
         const notifRes = await fetchWithAuth(
           `${BACKEND_URL}/api/notificaciones?userId=${encodeURIComponent(userId)}`,
@@ -96,17 +99,23 @@ function App() {
         );
         if (notifRes.ok) {
           const notifs = await notifRes.json();
-          const arr = Array.isArray(notifs) ? notifs : [];
-          setGlobalNotifications(arr);
-          setNotificationCount(arr.length);
-        } else {
-          setGlobalNotifications([]);
-          setNotificationCount(0);
+          generales = Array.isArray(notifs) ? notifs.map(n => ({ ...n, _tipo: 'general' })) : [];
         }
-      } catch {
-        setGlobalNotifications([]);
-        setNotificationCount(0);
-      }
+      } catch {}
+      try {
+        const cuentasRes = await fetchWithAuth(
+          `${BACKEND_URL}/api/accounts/account-notifications?userId=${encodeURIComponent(userId)}`,
+          {},
+          handleLogout
+        );
+        if (cuentasRes.ok) {
+          const cuentasArr = await cuentasRes.json();
+          cuentas = Array.isArray(cuentasArr) ? cuentasArr.map(n => ({ ...n, _tipo: 'cuenta' })) : [];
+        }
+      } catch {}
+      const todas = [...generales, ...cuentas];
+      setGlobalNotifications(todas);
+      setNotificationCount(todas.length);
 
       // Cuentas vinculadas
       try {
