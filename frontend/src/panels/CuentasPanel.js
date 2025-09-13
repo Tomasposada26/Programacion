@@ -111,7 +111,8 @@ const CuentasPanel = ({ accounts, setAccounts, user, setNotifications, setNotifi
     if ((!accounts || accounts.length === 0) && user && user.token) {
       fetchAccounts();
     }
-  }, [user, accounts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Formatear tiempo para expirar (mm:ss)
   function formatTimeToExpire(expiresAt) {
