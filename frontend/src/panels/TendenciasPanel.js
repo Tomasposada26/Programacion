@@ -245,7 +245,7 @@ export default function TendenciasPanel() {
 
       // Solo generar mock si no hay ofertas aún (primera carga o actualizar datos)
       if (!ofertas.length) {
-        setOfertas(generarOfertasMock(120));
+        setOfertas(generarOfertasMock(500));
       }
       setLastUpdate(new Date());
     } catch (e) {
@@ -396,6 +396,8 @@ const handleUpdate = () => {
               <YAxis allowDecimals={false} fontSize={12} />
               <Tooltip formatter={v => [`${v} ofertas`, 'Publicaciones']} />
               <Line type="monotone" dataKey="ofertas" stroke="#188fd9" strokeWidth={3} dot={{ r: 5 }} isAnimationActive animationDuration={900} />
+              {/* Zoom con Brush */}
+              <Brush dataKey="fecha" height={22} stroke="#188fd9" travellerWidth={10} startIndex={Math.max(0, publicacionesPorDia.length - 30)} endIndex={publicacionesPorDia.length - 1} />
             </LineChart>
           </ResponsiveContainer>
         </div>
