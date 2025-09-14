@@ -116,6 +116,25 @@ export default function TendenciasPanel() {
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
 
+  // Filtrado real solo con filtros aplicados
+  const ofertasFiltradas = useMemo(() => {
+    let filtered = ofertas;
+    if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
+    if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
+    if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
+    if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
+    if (filtros.keyword && filtros.keyword.trim()) {
+      const kw = filtros.keyword.trim().toLowerCase();
+      filtered = filtered.filter(of =>
+        (of.titulo && of.titulo.toLowerCase().includes(kw)) ||
+        (of.empresa && of.empresa.toLowerCase().includes(kw)) ||
+        (of.sector && of.sector.toLowerCase().includes(kw)) ||
+        (of.descripcion && of.descripcion.toLowerCase().includes(kw))
+      );
+    }
+    return filtered;
+  }, [ofertas, filtros]);
+
   // KPIs y gráficos filtrados
   const hashtagsFiltrados = useMemo(() => {
     const counts = {};
@@ -268,26 +287,6 @@ export default function TendenciasPanel() {
     const set = new Set(ofertas.map(of => of.sector));
     return ['Todos', ...Array.from(set).sort()];
   }, [ofertas]);
-
-  // Filtrado real solo con filtros aplicados
-  const ofertasFiltradas = useMemo(() => {
-    let filtered = ofertas;
-    if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
-    if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
-    if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
-    if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
-    if (filtros.keyword && filtros.keyword.trim()) {
-      const kw = filtros.keyword.trim().toLowerCase();
-      filtered = filtered.filter(of =>
-        (of.titulo && of.titulo.toLowerCase().includes(kw)) ||
-        (of.empresa && of.empresa.toLowerCase().includes(kw)) ||
-        (of.sector && of.sector.toLowerCase().includes(kw)) ||
-        (of.descripcion && of.descripcion.toLowerCase().includes(kw))
-      );
-    }
-    return filtered;
-  }, [ofertas, filtros]);
-
 
   // Paginación clásica: calcular total de páginas
   const totalPages = Math.ceil(ofertasFiltradas.length / ofertasPerPage);
