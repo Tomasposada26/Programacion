@@ -34,24 +34,27 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
   // Filtros
   const [ciudad, setCiudad] = useState('Todas');
   const [sector, setSector] = useState('Todos');
   const [fecha, setFecha] = useState({ desde: '', hasta: '' });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
-
+  // Scroll infinito
+  const [ofertasPage, setOfertasPage] = useState(1);
+  const ofertasPerPage = 7;
   // Opciones simuladas
   const ciudades = ['Todas', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla'];
   const sectores = ['Todos', 'Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura'];
 
   // Fetch de datos
-
   const fetchTendencias = async () => {
     setLoading(true);
     try {
@@ -80,13 +83,13 @@ export default function TendenciasPanel() {
 
       // Ofertas recientes (mock: reconstruir desde sectores y días)
       setOfertas([
-        { titulo: 'Desarrollador Fullstack', ciudad: 'Bogotá', empresa: 'TechCol', fecha: '2025-09-12', sector: 'Tecnología' },
-        { titulo: 'Analista de Datos', ciudad: 'Medellín', empresa: 'DataCorp', fecha: '2025-09-11', sector: 'Tecnología' },
-        { titulo: 'Diseñador UX/UI', ciudad: 'Cali', empresa: 'Creativa', fecha: '2025-09-10', sector: 'Tecnología' },
-        { titulo: 'Gerente de Proyectos', ciudad: 'Barranquilla', empresa: 'Proyectos SAS', fecha: '2025-09-09', sector: 'Finanzas' },
-        { titulo: 'Enfermero/a', ciudad: 'Bogotá', empresa: 'SaludTotal', fecha: '2025-09-08', sector: 'Salud' },
-        { titulo: 'Profesor de Inglés', ciudad: 'Cali', empresa: 'Colegio ABC', fecha: '2025-09-07', sector: 'Educación' },
-        { titulo: 'Operario de Planta', ciudad: 'Medellín', empresa: 'Industrias XYZ', fecha: '2025-09-06', sector: 'Manufactura' },
+        { titulo: 'Desarrollador Fullstack', ciudad: 'Bogotá', empresa: 'TechCol', fecha: '2025-09-12', sector: 'Tecnología', descripcion: 'Desarrollo de aplicaciones web y móviles.' },
+        { titulo: 'Analista de Datos', ciudad: 'Medellín', empresa: 'DataCorp', fecha: '2025-09-11', sector: 'Tecnología', descripcion: 'Análisis de grandes volúmenes de datos.' },
+        { titulo: 'Diseñador UX/UI', ciudad: 'Cali', empresa: 'Creativa', fecha: '2025-09-10', sector: 'Tecnología', descripcion: 'Diseño de interfaces y experiencia de usuario.' },
+        { titulo: 'Gerente de Proyectos', ciudad: 'Barranquilla', empresa: 'Proyectos SAS', fecha: '2025-09-09', sector: 'Finanzas', descripcion: 'Gestión de proyectos financieros.' },
+        { titulo: 'Enfermero/a', ciudad: 'Bogotá', empresa: 'SaludTotal', fecha: '2025-09-08', sector: 'Salud', descripcion: 'Atención a pacientes y apoyo clínico.' },
+        { titulo: 'Profesor de Inglés', ciudad: 'Cali', empresa: 'Colegio ABC', fecha: '2025-09-07', sector: 'Educación', descripcion: 'Enseñanza de inglés a estudiantes.' },
+        { titulo: 'Operario de Planta', ciudad: 'Medellín', empresa: 'Industrias XYZ', fecha: '2025-09-06', sector: 'Manufactura', descripcion: 'Operación de maquinaria industrial.' },
       ]);
 
       setLastUpdate(new Date());
@@ -99,7 +102,6 @@ export default function TendenciasPanel() {
     setLoading(false);
   };
 
-
   useEffect(() => {
     fetchTendencias();
     // eslint-disable-next-line
@@ -109,7 +111,42 @@ export default function TendenciasPanel() {
     fetchTendencias();
   };
 
-  // ...existing code...
+  // Filtro por palabra clave y paginación
+  const ofertasFiltradas = useMemo(() => {
+    let filtered = ofertas;
+    if (keyword.trim()) {
+      const kw = keyword.trim().toLowerCase();
+      filtered = filtered.filter(of =>
+        (of.titulo && of.titulo.toLowerCase().includes(kw)) ||
+        (of.empresa && of.empresa.toLowerCase().includes(kw)) ||
+        (of.sector && of.sector.toLowerCase().includes(kw)) ||
+        (of.descripcion && of.descripcion.toLowerCase().includes(kw))
+      );
+    }
+    return filtered;
+  }, [ofertas, keyword]);
+
+  const ofertasPaginadas = useMemo(() => {
+    return ofertasFiltradas.slice(0, ofertasPage * ofertasPerPage);
+  }, [ofertasFiltradas, ofertasPage]);
+
+  // Ranking de crecimiento (mock: top ciudades y sectores por cantidad de vacantes)
+  const rankingCiudades = useMemo(() => {
+    const counts = {};
+    ofertas.forEach(of => {
+      counts[of.ciudad] = (counts[of.ciudad] || 0) + 1;
+    });
+    return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
+  }, [ofertas]);
+  const rankingSectores = useMemo(() => {
+    const counts = {};
+    ofertas.forEach(of => {
+      counts[of.sector] = (counts[of.sector] || 0) + 1;
+    });
+    return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
+  }, [ofertas]);
+
+  // ...resto del render y componentes...
   return (
     <div style={{ padding: 32, maxWidth: 1200, margin: '0 auto' }}>
       {/* Barra de actualización */}
@@ -254,42 +291,104 @@ export default function TendenciasPanel() {
         {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
         {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
         {/* Mapa de calor real con react-leaflet */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
-          <MapaCalorColombia ciudades={(() => {
-            // Coordenadas de ciudades principales
-            const coordsMap = {
-              'Bogotá': [4.711, -74.0721],
-              'Medellín': [6.2442, -75.5812],
-              'Cali': [3.4516, -76.532],
-              'Barranquilla': [10.9685, -74.7813],
-              'Cartagena': [10.391, -75.4794],
-              'Bucaramanga': [7.1193, -73.1227],
-              'Pereira': [4.8143, -75.6946],
-              'Manizales': [5.0703, -75.5138],
-              'Santa Marta': [11.2408, -74.199],
-            };
-            // Filtrar ofertas según los filtros activos
-            let filtered = ofertas;
-            if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-            if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-            if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-            if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
-            // Agrupar por ciudad y contar vacantes
-            const counts = {};
-            filtered.forEach(of => {
-              if (!counts[of.ciudad]) counts[of.ciudad] = 0;
-              counts[of.ciudad]++;
-            });
-            // Convertir a array de objetos para el mapa
-            return Object.entries(counts).map(([nombre, vacantes]) => ({
-              nombre,
-              coords: coordsMap[nombre] || [4.5, -74.1],
-              vacantes
-            }));
-          })()} />
+          <MapaCalorColombia
+            ciudades={(() => {
+              // Coordenadas de ciudades principales
+              const coordsMap = {
+                'Bogotá': [4.711, -74.0721],
+                'Medellín': [6.2442, -75.5812],
+                'Cali': [3.4516, -76.532],
+                'Barranquilla': [10.9685, -74.7813],
+                'Cartagena': [10.391, -75.4794],
+                'Bucaramanga': [7.1193, -73.1227],
+                'Pereira': [4.8143, -75.6946],
+                'Manizales': [5.0703, -75.5138],
+                'Santa Marta': [11.2408, -74.199],
+              };
+              // Filtrar ofertas según los filtros activos
+              let filtered = ofertas;
+              if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+              if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+              if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+              if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+              // Agrupar por ciudad y contar vacantes y ofertas
+              const counts = {};
+              filtered.forEach(of => {
+                if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
+                counts[of.ciudad].vacantes++;
+                counts[of.ciudad].ofertas.push(of);
+              });
+              // Convertir a array de objetos para el mapa
+              return Object.entries(counts).map(([nombre, data]) => ({
+                nombre,
+                coords: coordsMap[nombre] || [4.5, -74.1],
+                vacantes: data.vacantes,
+                ofertas: data.ofertas
+              }));
+            })()}
+            onCiudadClick={nombre => setCiudadSeleccionada(nombre)}
+          />
+          {/* Resumen/lista de vacantes al hacer click en ciudad */}
+          {ciudadSeleccionada && (() => {
+            const ciudadesData = (() => {
+              // Repetimos la lógica de agrupación para obtener las ofertas de la ciudad seleccionada
+              const coordsMap = {
+                'Bogotá': [4.711, -74.0721],
+                'Medellín': [6.2442, -75.5812],
+                'Cali': [3.4516, -76.532],
+                'Barranquilla': [10.9685, -74.7813],
+                'Cartagena': [10.391, -75.4794],
+                'Bucaramanga': [7.1193, -73.1227],
+                'Pereira': [4.8143, -75.6946],
+                'Manizales': [5.0703, -75.5138],
+                'Santa Marta': [11.2408, -74.199],
+              };
+              let filtered = ofertas;
+              if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+              if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+              if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+              if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+              const counts = {};
+              filtered.forEach(of => {
+                if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
+                counts[of.ciudad].vacantes++;
+                counts[of.ciudad].ofertas.push(of);
+              });
+              return Object.entries(counts).map(([nombre, data]) => ({
+                nombre,
+                coords: coordsMap[nombre] || [4.5, -74.1],
+                vacantes: data.vacantes,
+                ofertas: data.ofertas
+              }));
+            })();
+            const ciudadData = ciudadesData.find(c => c.nombre === ciudadSeleccionada);
+            return ciudadData ? (
+              <div style={{ position: 'absolute', right: 24, top: 80, zIndex: 1200, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #0002', padding: 16, minWidth: 260 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <b style={{ fontSize: 16 }}>{ciudadSeleccionada}</b>
+                  <button onClick={() => setCiudadSeleccionada(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#eb3b5a' }}>×</button>
+                </div>
+                <div style={{ maxHeight: 180, overflowY: 'auto' }}>
+                  {ciudadData.ofertas.slice(0, 10).map((of, i) => (
+                    <div key={i} style={{ borderBottom: '1px solid #eee', padding: '6px 0' }}>
+                      <div style={{ fontWeight: 500 }}>{of.titulo || of.puesto || 'Vacante'}</div>
+                      <div style={{ fontSize: 12, color: '#888' }}>{of.empresa || ''}</div>
+                      <div style={{ fontSize: 12, color: '#188fd9' }}>{of.sector || ''}</div>
+                    </div>
+                  ))}
+                  {ciudadData.ofertas.length > 10 && (
+                    <div style={{ textAlign: 'center', color: '#888', fontSize: 13, marginTop: 6 }}>...más vacantes</div>
+                  )}
+                </div>
+              </div>
+            ) : null;
+          })()}
         </div>
       </div>
+
+
     </div>
   );
 }
