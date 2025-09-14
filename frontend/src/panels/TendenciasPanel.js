@@ -34,6 +34,76 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  // Generador de ofertas mock
+  function generarOfertasMock(cantidad = 100) {
+    const titulos = [
+      'Desarrollador Fullstack', 'Analista de Datos', 'Diseñador UX/UI', 'Gerente de Proyectos',
+      'Enfermero/a', 'Profesor de Inglés', 'Operario de Planta', 'Ingeniero DevOps', 'Psicólogo Organizacional',
+      'Vendedor Comercial', 'Contador Público', 'Abogado Corporativo', 'Community Manager', 'Científico de Datos',
+      'Técnico de Soporte', 'Médico General', 'Auxiliar Administrativo', 'Jefe de Producción', 'Redactor Creativo',
+      'Especialista en Marketing', 'Consultor SAP', 'Arquitecto de Software', 'Recepcionista', 'Diseñador Gráfico',
+      'Ingeniero Civil', 'Técnico Electricista', 'Farmacéutico', 'Chef Ejecutivo', 'Barista', 'Camarero/a',
+      'Logístico', 'Ingeniero Químico', 'Analista Financiero', 'Scrum Master', 'Tester QA', 'Desarrollador Móvil',
+      'Especialista en RRHH', 'Gerente Comercial', 'Director de Arte', 'Product Owner', 'Data Engineer',
+      'Especialista en SEO', 'Ingeniero Mecánico', 'Técnico en Redes', 'Fisioterapeuta', 'Nutricionista',
+      'Técnico en Mantenimiento', 'Supervisor de Planta', 'Ingeniero Electrónico', 'Técnico Biomédico',
+      'Asistente Legal', 'Auxiliar de Enfermería', 'Técnico en Logística', 'Ingeniero Ambiental',
+      'Desarrollador Frontend', 'Desarrollador Backend', 'Analista de Seguridad', 'Técnico de Laboratorio',
+      'Ingeniero Industrial', 'Técnico en Calidad', 'Jefe de Ventas', 'Especialista en Compras',
+      'Técnico en Refrigeración', 'Ingeniero de Sistemas', 'Técnico en Telecomunicaciones', 'Jefe de Recursos Humanos',
+      'Especialista en BI', 'Técnico en Automatización', 'Ingeniero de Procesos', 'Técnico en Producción',
+      'Especialista en E-commerce', 'Técnico en Salud Ocupacional', 'Ingeniero de Proyectos', 'Técnico en Seguridad',
+      'Especialista en Logística', 'Técnico en Inventarios', 'Ingeniero de Alimentos', 'Técnico en Química',
+      'Especialista en Capacitación', 'Técnico en Documentación', 'Ingeniero de Campo', 'Técnico en Ensamble',
+      'Especialista en Exportaciones', 'Técnico en Importaciones', 'Ingeniero de Planta', 'Técnico en Control de Calidad',
+      'Especialista en Producción', 'Técnico en Empaque', 'Ingeniero de Desarrollo', 'Técnico en Pruebas',
+      'Especialista en Ventas Digitales', 'Técnico en Marketing Digital', 'Ingeniero de Soporte', 'Técnico en Soporte Técnico',
+      'Especialista en Seguridad Informática', 'Técnico en Seguridad Industrial', 'Ingeniero de Mantenimiento', 'Técnico en Mantenimiento Industrial'
+    ];
+    const empresas = [
+      'TechCol', 'DataCorp', 'Creativa', 'Proyectos SAS', 'SaludTotal', 'Colegio ABC', 'Industrias XYZ',
+      'Finanzas Plus', 'Educavida', 'ManuCol', 'LogiExpress', 'Farmalab', 'LegalCo', 'Comercializadora Andina',
+      'RedesNet', 'BioSalud', 'NutriCol', 'ArteStudio', 'RRHH Global', 'EcomMarket', 'SistemasPro', 'Ambiental S.A.',
+      'Quimicor', 'Alimentos del Valle', 'ExportaFácil', 'ImportaYa', 'CampoLab', 'Empaques SAS', 'Ventas Digitales',
+      'SoporteTotal', 'SeguridadPro', 'Mantenimiento Express', 'Calidad Global', 'CapacitaYa', 'Documenta', 'PlantaCol',
+      'Producción SAS', 'DesarrolloPro', 'PruebasLab', 'VentasOnline', 'Marketing360', 'SoporteIT', 'SeguridadInd',
+      'Mantenimiento SAS'
+    ];
+    const descripciones = [
+      'Desarrollo de aplicaciones web y móviles.', 'Análisis de grandes volúmenes de datos.',
+      'Diseño de interfaces y experiencia de usuario.', 'Gestión de proyectos financieros.',
+      'Atención a pacientes y apoyo clínico.', 'Enseñanza de inglés a estudiantes.',
+      'Operación de maquinaria industrial.', 'Soporte técnico a usuarios.', 'Gestión de redes sociales.',
+      'Supervisión de procesos de manufactura.', 'Control de calidad en planta.', 'Elaboración de reportes financieros.',
+      'Implementación de campañas de marketing.', 'Desarrollo de soluciones en la nube.',
+      'Mantenimiento preventivo y correctivo.', 'Gestión de inventarios.', 'Atención al cliente.',
+      'Optimización de procesos logísticos.', 'Elaboración de estudios de mercado.', 'Capacitación de personal.'
+    ];
+    const ciudadesMock = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta'];
+    const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
+    const hoy = new Date();
+    const ofertas = [];
+    for (let i = 0; i < cantidad; i++) {
+      const titulo = titulos[Math.floor(Math.random() * titulos.length)] + ' ' + (i+1);
+      const empresa = empresas[Math.floor(Math.random() * empresas.length)];
+      const ciudad = ciudadesMock[Math.floor(Math.random() * ciudadesMock.length)];
+      const sector = sectoresMock[Math.floor(Math.random() * sectoresMock.length)];
+      const descripcion = descripciones[Math.floor(Math.random() * descripciones.length)];
+      const fecha = new Date(hoy.getTime() - Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000); // hasta 60 días atrás
+      ofertas.push({
+        titulo,
+        ciudad,
+        empresa,
+        fecha: fecha.toISOString().slice(0, 10),
+        sector,
+        descripcion
+      });
+    }
+    return ofertas;
+  }
+
+  // Botón de aplicar filtros (dummy para evitar error)
+  const handleAplicarFiltros = () => {};
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
   // Filtros
   const [ciudad, setCiudad] = useState('Todas');
