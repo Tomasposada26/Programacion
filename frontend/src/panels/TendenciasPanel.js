@@ -125,14 +125,14 @@ export default function TendenciasPanel() {
   // Botón de aplicar filtros (dummy para evitar error)
 
   // Filtros principales
-  const [ciudad, setCiudad] = useState(['Todas']);
-  const [sector, setSector] = useState(['Todos']);
+  const [ciudad, setCiudad] = useState('Todas');
+  const [sector, setSector] = useState('Todos');
   const [fecha, setFecha] = useState({ desde: '', hasta: '' });
   const [keyword, setKeyword] = useState('');
 
   // Filtros temporales (inputs)
-  const [tmpCiudad, setTmpCiudad] = useState(['Todas']);
-  const [tmpSector, setTmpSector] = useState(['Todos']);
+  const [tmpCiudad, setTmpCiudad] = useState('Todas');
+  const [tmpSector, setTmpSector] = useState('Todos');
   const [tmpFecha, setTmpFecha] = useState({ desde: '', hasta: '' });
   const [tmpKeyword, setTmpKeyword] = useState('');
 
@@ -145,8 +145,8 @@ export default function TendenciasPanel() {
   }, [ciudad, sector, fecha, keyword]);
 
   const handleAplicarFiltros = () => {
-    setCiudad(tmpCiudad.length === 0 ? ['Todas'] : tmpCiudad);
-    setSector(tmpSector.length === 0 ? ['Todos'] : tmpSector);
+    setCiudad(tmpCiudad);
+    setSector(tmpSector);
     setFecha(tmpFecha);
     setKeyword(tmpKeyword);
     setOfertasPage(1); // Reiniciar paginación
@@ -162,8 +162,8 @@ export default function TendenciasPanel() {
   // Un solo filtro global para KPIs y paginación
   const ofertasFiltradas = useMemo(() => {
     let filtered = ofertas;
-    if (ciudad && !ciudad.includes('Todas')) filtered = filtered.filter(of => ciudad.includes(of.ciudad));
-    if (sector && !sector.includes('Todos')) filtered = filtered.filter(of => sector.includes(of.sector));
+    if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+    if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
     if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
     if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
     if (keyword.trim()) {
@@ -310,34 +310,14 @@ const handleUpdate = () => {
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <select
-            multiple
-            value={tmpCiudad.includes('Todas') ? [] : tmpCiudad}
-            onChange={e => {
-              const selected = Array.from(e.target.selectedOptions, o => o.value);
-              setTmpCiudad(selected.length === 0 ? ['Todas'] : selected);
-            }}
-            style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', padding: 6, height: 120 }}
-          >
-            {ciudades.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+          <select value={tmpCiudad} onChange={e => setTmpCiudad(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+            {ciudades.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <select
-            multiple
-            value={tmpSector.includes('Todos') ? [] : tmpSector}
-            onChange={e => {
-              const selected = Array.from(e.target.selectedOptions, o => o.value);
-              setTmpSector(selected.length === 0 ? ['Todos'] : selected);
-            }}
-            style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', padding: 6, height: 120 }}
-          >
-            {sectores.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+          <select value={tmpSector} onChange={e => setTmpSector(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+            {sectores.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div>
