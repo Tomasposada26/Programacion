@@ -476,10 +476,10 @@ export default function TendenciasPanel() {
                 };
                 // Filtrar ofertas según los filtros activos
                 let filtered = ofertas;
-                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+                if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
+                if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
+                if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
+                if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
                 // Agrupar por ciudad y contar vacantes y ofertas
                 const counts = {};
                 filtered.forEach(of => {
@@ -513,10 +513,10 @@ export default function TendenciasPanel() {
                   'Santa Marta': [11.2408, -74.199],
                 };
                 let filtered = ofertas;
-                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+                if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
+                if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
+                if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
+                if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
                 const counts = {};
                 filtered.forEach(of => {
                   if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
