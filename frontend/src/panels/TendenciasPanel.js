@@ -208,9 +208,13 @@ export default function TendenciasPanel() {
     return filtered;
   }, [ofertas, keyword]);
 
+
+  // Paginación clásica: calcular total de páginas
+  const totalPages = Math.ceil(ofertasFiltradas.length / ofertasPerPage);
   const ofertasPaginadas = useMemo(() => {
-    return ofertasFiltradas.slice(0, ofertasPage * ofertasPerPage);
-  }, [ofertasFiltradas, ofertasPage]);
+    const start = (ofertasPage - 1) * ofertasPerPage;
+    return ofertasFiltradas.slice(start, start + ofertasPerPage);
+  }, [ofertasFiltradas, ofertasPage, ofertasPerPage]);
 
   // Ranking de crecimiento (mock: top ciudades y sectores por cantidad de vacantes)
   const rankingCiudades = useMemo(() => {
