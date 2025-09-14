@@ -397,8 +397,33 @@ export default function TendenciasPanel() {
             </div>
           )}
         </div>
-        {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
-        {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
+        {/* Card cuadrada: Top empresas */}
+        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 20, marginBottom: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+          <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 14 }}>Empresas con más vacantes</h3>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', width: '100%' }}>
+            {(() => {
+              // Calcular top empresas
+              const empresaCounts = {};
+              ofertas.forEach(of => {
+                if (!empresaCounts[of.empresa]) empresaCounts[of.empresa] = 0;
+                empresaCounts[of.empresa]++;
+              });
+              const topEmpresas = Object.entries(empresaCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+              return topEmpresas.map(([empresa, count], i) => (
+                <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 12, padding: '14px 18px', minWidth: 90, minHeight: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    {empresa[0]}
+                  </div>
+                  <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 15, textAlign: 'center', marginBottom: 2 }}>{empresa}</div>
+                  <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 16 }}>{count}</div>
+                  <div style={{ color: '#888', fontSize: 12 }}>vacantes</div>
+                </div>
+              ));
+            })()}
+          </div>
+        </div>
         {/* Mapa de calor real con react-leaflet */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
