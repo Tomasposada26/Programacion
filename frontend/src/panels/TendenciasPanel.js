@@ -310,67 +310,35 @@ const handleUpdate = () => {
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <div style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', cursor: 'pointer', padding: 6 }}>
-              {tmpCiudad.length === 0 || tmpCiudad.includes('Todas') ? 'Todas' : tmpCiudad.join(', ')}
-            </div>
-            <div style={{ position: 'absolute', zIndex: 10, background: '#fff', border: '1px solid #d0d7e2', borderRadius: 6, marginTop: 2, minWidth: 140, maxHeight: 220, overflowY: 'auto', boxShadow: '0 2px 8px #0002' }}>
-              {ciudades.map(c => (
-                <div key={c} style={{ padding: '4px 10px', cursor: 'pointer', background: tmpCiudad.includes(c) ? '#eaf6ff' : '#fff', fontWeight: tmpCiudad.includes(c) ? 700 : 400 }}
-                  onClick={() => {
-                    if (c === 'Todas') {
-                      setTmpCiudad(['Todas']);
-                    } else {
-                      let next;
-                      if (tmpCiudad.includes('Todas')) {
-                        next = [c];
-                      } else if (tmpCiudad.includes(c)) {
-                        next = tmpCiudad.filter(x => x !== c);
-                        if (next.length === 0) next = ['Todas'];
-                      } else {
-                        next = [...tmpCiudad, c];
-                      }
-                      setTmpCiudad(next);
-                    }
-                  }}
-                >
-                  <input type="checkbox" checked={tmpCiudad.includes(c)} readOnly style={{ marginRight: 6 }} />{c}
-                </div>
-              ))}
-            </div>
-          </div>
+          <select
+            multiple
+            value={tmpCiudad.includes('Todas') ? [] : tmpCiudad}
+            onChange={e => {
+              const selected = Array.from(e.target.selectedOptions, o => o.value);
+              setTmpCiudad(selected.length === 0 ? ['Todas'] : selected);
+            }}
+            style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', padding: 6, height: 120 }}
+          >
+            {ciudades.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <div style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', cursor: 'pointer', padding: 6 }}>
-              {tmpSector.length === 0 || tmpSector.includes('Todos') ? 'Todos' : tmpSector.join(', ')}
-            </div>
-            <div style={{ position: 'absolute', zIndex: 10, background: '#fff', border: '1px solid #d0d7e2', borderRadius: 6, marginTop: 2, minWidth: 140, maxHeight: 220, overflowY: 'auto', boxShadow: '0 2px 8px #0002' }}>
-              {sectores.map(s => (
-                <div key={s} style={{ padding: '4px 10px', cursor: 'pointer', background: tmpSector.includes(s) ? '#eaf6ff' : '#fff', fontWeight: tmpSector.includes(s) ? 700 : 400 }}
-                  onClick={() => {
-                    if (s === 'Todos') {
-                      setTmpSector(['Todos']);
-                    } else {
-                      let next;
-                      if (tmpSector.includes('Todos')) {
-                        next = [s];
-                      } else if (tmpSector.includes(s)) {
-                        next = tmpSector.filter(x => x !== s);
-                        if (next.length === 0) next = ['Todos'];
-                      } else {
-                        next = [...tmpSector, s];
-                      }
-                      setTmpSector(next);
-                    }
-                  }}
-                >
-                  <input type="checkbox" checked={tmpSector.includes(s)} readOnly style={{ marginRight: 6 }} />{s}
-                </div>
-              ))}
-            </div>
-          </div>
+          <select
+            multiple
+            value={tmpSector.includes('Todos') ? [] : tmpSector}
+            onChange={e => {
+              const selected = Array.from(e.target.selectedOptions, o => o.value);
+              setTmpSector(selected.length === 0 ? ['Todos'] : selected);
+            }}
+            style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', padding: 6, height: 120 }}
+          >
+            {sectores.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Desde:</label>
