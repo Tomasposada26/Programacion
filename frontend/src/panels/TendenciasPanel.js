@@ -229,32 +229,8 @@ export default function TendenciasPanel() {
             ))}
           </ul>
         </div>
-        {/* Nube de palabras real */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Nube de palabras</h3>
-          <div style={{ width: '100%', height: 180 }}>
-            {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
-              <WordCloud
-                words={hashtags}
-                options={{
-                  rotations: 2,
-                  rotationAngles: [-30, 30],
-                  fontSizes: [18, 48],
-                  enableTooltip: true,
-                  deterministic: false,
-                  fontFamily: 'Montserrat, Arial',
-                  scale: 'sqrt',
-                  spiral: 'archimedean',
-                  transitionDuration: 600,
-                }}
-              />
-            ) : (
-              <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
-                No hay datos de hashtags para mostrar.
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
+        {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
         {/* Mapa de calor (placeholder) */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
