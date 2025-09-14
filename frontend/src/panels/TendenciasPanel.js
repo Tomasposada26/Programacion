@@ -381,20 +381,14 @@ export default function TendenciasPanel() {
               </li>
             ))}
           </ul>
-          {/* Paginación */}
+          {/* Paginación simplificada */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 12 }}>
-              <button onClick={() => setOfertasPage(p => Math.max(1, p - 1))} disabled={ofertasPage === 1} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === 1 ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === 1 ? 'not-allowed' : 'pointer' }}>Anterior</button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setOfertasPage(i + 1)}
-                  style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === i + 1 ? '#188fd9' : '#fff', color: ofertasPage === i + 1 ? '#fff' : '#188fd9', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button onClick={() => setOfertasPage(p => Math.min(totalPages, p + 1))} disabled={ofertasPage === totalPages} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === totalPages ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === totalPages ? 'not-allowed' : 'pointer' }}>Siguiente</button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+              <button onClick={() => setOfertasPage(1)} disabled={ofertasPage === 1} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === 1 ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === 1 ? 'not-allowed' : 'pointer' }}>Inicio</button>
+              <button onClick={() => setOfertasPage(p => Math.max(1, p - 1))} disabled={ofertasPage === 1} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === 1 ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === 1 ? 'not-allowed' : 'pointer' }}>Anterior</button>
+              <span style={{ alignSelf: 'center', fontWeight: 600, color: '#232a3b', fontSize: 15 }}>Página {ofertasPage} de {totalPages}</span>
+              <button onClick={() => setOfertasPage(p => Math.min(totalPages, p + 1))} disabled={ofertasPage === totalPages} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === totalPages ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === totalPages ? 'not-allowed' : 'pointer' }}>Siguiente</button>
+              <button onClick={() => setOfertasPage(totalPages)} disabled={ofertasPage === totalPages} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === totalPages ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === totalPages ? 'not-allowed' : 'pointer' }}>Final</button>
             </div>
           )}
           {ofertasFiltradas.length === 0 && (
