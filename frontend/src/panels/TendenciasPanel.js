@@ -208,7 +208,7 @@ export default function TendenciasPanel() {
       // Hashtags
       const resHash = await fetch(`${API_BASE}/hashtags${query}`);
       const hashtagsData = await resHash.json();
-      setHashtags(hashtagsData.map(h => ({ text: h.hashtag, value: h.count })));
+  // setHashtags eliminado: hashtags ahora se calculan dinámicamente
 
       // Ofertas por día
       const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
@@ -227,7 +227,7 @@ export default function TendenciasPanel() {
 
       setLastUpdate(new Date());
     } catch (e) {
-      setHashtags([]);
+  // setHashtags eliminado: hashtags ahora se calculan dinámicamente
       setOfertas([]);
       setPublicacionesPorDia([]);
       setSectoresPie([]);
