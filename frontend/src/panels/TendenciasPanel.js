@@ -296,31 +296,6 @@ export default function TendenciasPanel() {
         </div>
       </div>
 
-      {/* Panel: Top Empresas */}
-      <div style={{ display: 'flex', gap: 18, margin: '32px 0 0 0', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
-        {(() => {
-          const counts = {};
-          ofertas.forEach(of => {
-            if (!of.empresa) return;
-            counts[of.empresa] = (counts[of.empresa] || 0) + 1;
-          });
-          const topEmpresas = Object.entries(counts)
-            .map(([empresa, total]) => ({ empresa, total }))
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 6);
-          return topEmpresas.map(({ empresa, total }) => (
-            <div key={empresa} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: '14px 22px', minWidth: 120, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
-                {empresa[0]}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <span style={{ fontWeight: 700, color: '#232a3b', fontSize: 16 }}>{empresa}</span>
-                <span style={{ color: '#888', fontSize: 14 }}>{total} vacantes</span>
-              </div>
-            </div>
-          ));
-        })()}
-      </div>
 
       {/* Panel de Insights */}
       <div style={{ width: '100%', margin: '32px 0 0 0', display: 'flex', justifyContent: 'center' }}>
@@ -444,11 +419,41 @@ export default function TendenciasPanel() {
           )}
         </div>
         {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
-        {/* Mapa de calor real con react-leaflet */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        {/* Mapa de calor real con react-leaflet y Top Empresas vertical */}
+        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
           <MapaCalorColombia
             ciudades={(() => {
+          {/* Top Empresas vertical dentro de la card del mapa */}
+          <div style={{ width: '100%', marginTop: 28 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: '#188fd9', marginBottom: 12, textAlign: 'center' }}>
+              Empresas con más vacantes actualmente
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
+              {(() => {
+                const counts = {};
+                ofertas.forEach(of => {
+                  if (!of.empresa) return;
+                  counts[of.empresa] = (counts[of.empresa] || 0) + 1;
+                });
+                const topEmpresas = Object.entries(counts)
+                  .map(([empresa, total]) => ({ empresa, total }))
+                  .sort((a, b) => b.total - a.total)
+                  .slice(0, 6);
+                return topEmpresas.map(({ empresa, total }) => (
+                  <div key={empresa} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: '10px 18px', minWidth: 210, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                      {empresa[0]}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontWeight: 700, color: '#232a3b', fontSize: 15 }}>{empresa}</span>
+                      <span style={{ color: '#888', fontSize: 13 }}>{total} vacantes</span>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
               // Coordenadas de ciudades principales
               const coordsMap = {
                 'Bogotá': [4.711, -74.0721],
