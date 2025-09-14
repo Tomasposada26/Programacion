@@ -1,6 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
+import WordCloud from 'react-wordcloud';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/scale.css';
+import 'react-wordcloud/dist/index.css';
 // Tooltip personalizado para hashtags
 function CustomHashtagTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
@@ -229,12 +233,30 @@ export default function TendenciasPanel() {
             ))}
           </ul>
         </div>
-        {/* Nube de palabras (placeholder) */}
+        {/* Nube de palabras real */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Nube de palabras</h3>
-          <div style={{ width: '100%', height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontStyle: 'italic', fontSize: 18, border: '1px dashed #d0d7e2', borderRadius: 8 }}>
-            {/* Aquí iría react-wordcloud si se instala */}
-            (Próximamente: visualización interactiva)
+          <div style={{ width: '100%', height: 180 }}>
+            {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
+              <WordCloud
+                words={hashtags}
+                options={{
+                  rotations: 2,
+                  rotationAngles: [-30, 30],
+                  fontSizes: [18, 48],
+                  enableTooltip: true,
+                  deterministic: false,
+                  fontFamily: 'Montserrat, Arial',
+                  scale: 'sqrt',
+                  spiral: 'archimedean',
+                  transitionDuration: 600,
+                }}
+              />
+            ) : (
+              <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+                No hay datos de hashtags para mostrar.
+              </div>
+            )}
           </div>
         </div>
         {/* Mapa de calor (placeholder) */}
