@@ -1,5 +1,4 @@
-  // Estado para mostrar top 5 hashtags
-  const [showTop5, setShowTop5] = useState(false);
+// ...existing code...
 import MapaCalorColombia from '../components/MapaCalorColombia';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -36,6 +35,8 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  // Estado para mostrar top 5 hashtags
+  const [showTop5, setShowTop5] = useState(false);
   // Generador de ofertas mock
   function generarOfertasMock(cantidad = 100) {
     const titulos = [
