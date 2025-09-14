@@ -102,57 +102,40 @@ export default function TendenciasPanel() {
     return ofertas;
   }
 
-  // Botón de aplicar filtros (dummy para evitar error)
-  const handleAplicarFiltros = () => {};
+  // Persistencia y filtros desacoplados
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
-  // Filtros
-  const [ciudad, setCiudad] = useState('Todas');
-  const [sector, setSector] = useState('Todos');
-  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
+  // Filtros reales (los que filtran)
+  const [filtros, setFiltros] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
+  // Filtros temporales (los que se editan en UI)
+  const [filtrosPendientes, setFiltrosPendientes] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
-  // Scroll infinito
+  // Paginación
   const [ofertasPage, setOfertasPage] = useState(1);
   const ofertasPerPage = 7;
   // Opciones simuladas
   const ciudades = ['Todas', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla'];
   const sectores = ['Todos', 'Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura'];
 
-  // Fetch de datos
-  const fetchTendencias = async () => {
-    setLoading(true);
-    try {
-      // Query params para filtros
-      const params = [];
-      if (fecha.desde) params.push(`desde=${fecha.desde}`);
-      if (fecha.hasta) params.push(`hasta=${fecha.hasta}`);
-      if (ciudad && ciudad !== 'Todas') params.push(`ciudad=${encodeURIComponent(ciudad)}`);
-      if (sector && sector !== 'Todos') params.push(`sector=${encodeURIComponent(sector)}`);
-      const query = params.length ? `?${params.join('&')}` : '';
+  // Cargar datos persistentes al iniciar
 
-      // Hashtags
-      const resHash = await fetch(`${API_BASE}/hashtags${query}`);
-      const hashtagsData = await resHash.json();
-      setHashtags(hashtagsData.map(h => ({ text: h.hashtag, value: h.count })));
-
-      // Ofertas por día
-      const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
-      const diaData = await resDia.json();
-      setPublicacionesPorDia(diaData.map(d => ({ fecha: d.fecha.slice(0, 10), ofertas: d.total })));
-
-      // Sectores
-      const resSec = await fetch(`${API_BASE}/sectores${query}`);
-      const secData = await resSec.json();
-      setSectoresPie(secData.map(s => ({ name: s.sector, value: s.count })));
-
-      // Ofertas recientes (mock masivo y variado)
-      setOfertas(generarOfertasMock(200));
+  useEffect(() => {
+    const persist = localStorage.getItem('auraDashboardData');
+    if (persist) {
+      const data = JSON.parse(persist);
+      setOfertas(data.ofertas || []);
+      setHashtags(data.hashtags || []);
+      setPublicacionesPorDia(data.publicacionesPorDia || []);
+      setSectoresPie(data.sectoresPie || []);
+      setLastUpdate(data.lastUpdate ? new Date(data.lastUpdate) : new Date());
+    } else {
+      // Generar y guardar todo
+      const nuevas = generarOfertasMock(200);
       // Simular hashtags, publicacionesPorDia y sectoresPie para que los gráficos cambien
       const hashtagsEjemplo = [
         { text: '#empleo', value: Math.floor(Math.random()*100+50) },
@@ -160,8 +143,7 @@ export default function TendenciasPanel() {
         { text: '#vacante', value: Math.floor(Math.random()*60+20) },
         { text: '#colombia', value: Math.floor(Math.random()*40+10) },
         { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
-      ];
-      setHashtags(hashtagsEjemplo.sort((a,b)=>b.value-a.value));
+      ].sort((a,b)=>b.value-a.value);
       const dias = Array.from({length: 14}, (_,i) => {
         const d = new Date();
         d.setDate(d.getDate()-i);
@@ -170,34 +152,82 @@ export default function TendenciasPanel() {
           ofertas: Math.floor(Math.random()*30+5)
         };
       }).reverse();
-      setPublicacionesPorDia(dias);
       const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
-      setSectoresPie(sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)})));
-
+      const sectoresPieEjemplo = sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)}));
+      setOfertas(nuevas);
+      setHashtags(hashtagsEjemplo);
+      setPublicacionesPorDia(dias);
+      setSectoresPie(sectoresPieEjemplo);
       setLastUpdate(new Date());
-    } catch (e) {
-      setHashtags([]);
-      setOfertas([]);
-      setPublicacionesPorDia([]);
-      setSectoresPie([]);
+      localStorage.setItem('auraDashboardData', JSON.stringify({
+        ofertas: nuevas,
+        hashtags: hashtagsEjemplo,
+        publicacionesPorDia: dias,
+        sectoresPie: sectoresPieEjemplo,
+        lastUpdate: new Date().toISOString()
+      }));
     }
-    setLoading(false);
-  };
+  }, []);
 
-  useEffect(() => {
-    fetchTendencias();
-    // eslint-disable-next-line
-  }, [fecha.desde, fecha.hasta, ciudad, sector]);
+  // Actualizar datos y persistir
 
   const handleUpdate = () => {
-    fetchTendencias();
+    setLoading(true);
+    setTimeout(() => {
+      const nuevas = generarOfertasMock(200);
+      const hashtagsEjemplo = [
+        { text: '#empleo', value: Math.floor(Math.random()*100+50) },
+        { text: '#trabajo', value: Math.floor(Math.random()*80+30) },
+        { text: '#vacante', value: Math.floor(Math.random()*60+20) },
+        { text: '#colombia', value: Math.floor(Math.random()*40+10) },
+        { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
+      ].sort((a,b)=>b.value-a.value);
+      const dias = Array.from({length: 14}, (_,i) => {
+        const d = new Date();
+        d.setDate(d.getDate()-i);
+        return {
+          fecha: d.toISOString().slice(0,10),
+          ofertas: Math.floor(Math.random()*30+5)
+        };
+      }).reverse();
+      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
+      const sectoresPieEjemplo = sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)}));
+      setOfertas(nuevas);
+      setHashtags(hashtagsEjemplo);
+      setPublicacionesPorDia(dias);
+      setSectoresPie(sectoresPieEjemplo);
+      const now = new Date();
+      setLastUpdate(now);
+      localStorage.setItem('auraDashboardData', JSON.stringify({
+        ofertas: nuevas,
+        hashtags: hashtagsEjemplo,
+        publicacionesPorDia: dias,
+        sectoresPie: sectoresPieEjemplo,
+        lastUpdate: now.toISOString()
+      }));
+      setLoading(false);
+    }, 800);
   };
 
-  // Filtro por palabra clave y paginación
+  // Aplicar filtros: pasar filtrosPendientes a filtros reales
+  const handleAplicarFiltros = () => {
+    setFiltros({ ...filtrosPendientes });
+    setOfertasPage(1);
+  };
+
+
+
+
+
+  // Filtrado real solo con filtros aplicados
   const ofertasFiltradas = useMemo(() => {
     let filtered = ofertas;
-    if (keyword.trim()) {
-      const kw = keyword.trim().toLowerCase();
+    if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
+    if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
+    if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
+    if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
+    if (filtros.keyword && filtros.keyword.trim()) {
+      const kw = filtros.keyword.trim().toLowerCase();
       filtered = filtered.filter(of =>
         (of.titulo && of.titulo.toLowerCase().includes(kw)) ||
         (of.empresa && of.empresa.toLowerCase().includes(kw)) ||
@@ -206,7 +236,7 @@ export default function TendenciasPanel() {
       );
     }
     return filtered;
-  }, [ofertas, keyword]);
+  }, [ofertas, filtros]);
 
 
   // Paginación clásica: calcular total de páginas
@@ -248,30 +278,31 @@ export default function TendenciasPanel() {
         Tendencias Laborales en Colombia
       </h2>
       {/* Filtros */}
+
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <select value={ciudad} onChange={e => setCiudad(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={filtrosPendientes.ciudad} onChange={e => setFiltrosPendientes(f => ({ ...f, ciudad: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {ciudades.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <select value={sector} onChange={e => setSector(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={filtrosPendientes.sector} onChange={e => setFiltrosPendientes(f => ({ ...f, sector: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {sectores.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Desde:</label>
-          <input type="date" value={fecha.desde} onChange={e => setFecha(f => ({ ...f, desde: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={filtrosPendientes.fecha.desde} onChange={e => setFiltrosPendientes(f => ({ ...f, fecha: { ...f.fecha, desde: e.target.value } }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Hasta:</label>
-          <input type="date" value={fecha.hasta} onChange={e => setFecha(f => ({ ...f, hasta: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={filtrosPendientes.fecha.hasta} onChange={e => setFiltrosPendientes(f => ({ ...f, fecha: { ...f.fecha, hasta: e.target.value } }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Palabra clave:</label>
-          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
+          <input type="text" value={filtrosPendientes.keyword} onChange={e => setFiltrosPendientes(f => ({ ...f, keyword: e.target.value }))} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
         </div>
         <button onClick={handleAplicarFiltros} style={{ background: '#20bf6b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s', marginLeft: 8 }}>
           Aplicar filtros
