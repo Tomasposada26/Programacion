@@ -320,7 +320,7 @@ export default function TendenciasPanel() {
         {/* KPI: Total ofertas */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Ofertas activas</div>
-          <div style={{ fontWeight: 800, fontSize: 32, color: '#188fd9' }}>{ofertas.length}</div>
+          <div style={{ fontWeight: 800, fontSize: 32, color: '#188fd9' }}>{totalOfertas}</div>
         </div>
         {/* KPI: Hashtag más popular */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
