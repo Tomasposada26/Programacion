@@ -1,10 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
-import WordCloud from 'react-wordcloud';
-import 'tippy.js/dist/tippy.css';
-import 'tippy.js/animations/scale.css';
-import 'react-wordcloud/lib/default.min.css';
 // Tooltip personalizado para hashtags
 function CustomHashtagTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
