@@ -230,6 +230,39 @@ export default function TendenciasPanel() {
     return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
   }, [ofertas]);
 
+  // Top Empresas (puedes usar este bloque donde quieras mostrar el ranking)
+  function TopEmpresas({ ofertas }) {
+    const counts = {};
+    ofertas.forEach(of => {
+      if (!of.empresa) return;
+      counts[of.empresa] = (counts[of.empresa] || 0) + 1;
+    });
+    const topEmpresas = Object.entries(counts)
+      .map(([empresa, total]) => ({ empresa, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+    return (
+      <div style={{ width: '100%', marginTop: 10 }}>
+        <div style={{ fontWeight: 800, fontSize: 18, color: '#188fd9', marginBottom: 12, textAlign: 'center' }}>
+          Empresas con más vacantes actualmente
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
+          {topEmpresas.map(({ empresa, total }) => (
+            <div key={empresa} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: '10px 18px', minWidth: 210, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                {empresa[0]}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 700, color: '#232a3b', fontSize: 15 }}>{empresa}</span>
+                <span style={{ color: '#888', fontSize: 13 }}>{total} vacantes</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: 32, maxWidth: 1200, margin: '0 auto' }}>
       {/* Barra de actualización */}
@@ -295,7 +328,6 @@ export default function TendenciasPanel() {
           <div style={{ fontWeight: 800, fontSize: 24, color: '#20bf6b' }}>+8%</div>
         </div>
       </div>
-
 
       {/* Panel de Insights */}
       <div style={{ width: '100%', margin: '32px 0 0 0', display: 'flex', justifyContent: 'center' }}>
@@ -418,77 +450,50 @@ export default function TendenciasPanel() {
             </div>
           )}
         </div>
-        {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
         {/* Mapa de calor real con react-leaflet y Top Empresas vertical */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', position: 'relative' }}>
+        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'stretch', position: 'relative', overflow: 'visible' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
-          <MapaCalorColombia
-            ciudades={(() => {
-          {/* Top Empresas vertical dentro de la card del mapa */}
-          <div style={{ width: '100%', marginTop: 28 }}>
-            <div style={{ fontWeight: 800, fontSize: 18, color: '#188fd9', marginBottom: 12, textAlign: 'center' }}>
-              Empresas con más vacantes actualmente
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
-              {(() => {
+          <div style={{ width: '100%', minHeight: 320, borderRadius: 12, overflow: 'hidden', marginBottom: 18 }}>
+            <MapaCalorColombia
+              ciudades={(() => {
+                // Coordenadas de ciudades principales
+                const coordsMap = {
+                  'Bogotá': [4.711, -74.0721],
+                  'Medellín': [6.2442, -75.5812],
+                  'Cali': [3.4516, -76.532],
+                  'Barranquilla': [10.9685, -74.7813],
+                  'Cartagena': [10.391, -75.4794],
+                  'Bucaramanga': [7.1193, -73.1227],
+                  'Pereira': [4.8143, -75.6946],
+                  'Manizales': [5.0703, -75.5138],
+                  'Santa Marta': [11.2408, -74.199],
+                };
+                // Filtrar ofertas según los filtros activos
+                let filtered = ofertas;
+                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+                // Agrupar por ciudad y contar vacantes y ofertas
                 const counts = {};
-                ofertas.forEach(of => {
-                  if (!of.empresa) return;
-                  counts[of.empresa] = (counts[of.empresa] || 0) + 1;
+                filtered.forEach(of => {
+                  if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
+                  counts[of.ciudad].vacantes++;
+                  counts[of.ciudad].ofertas.push(of);
                 });
-                const topEmpresas = Object.entries(counts)
-                  .map(([empresa, total]) => ({ empresa, total }))
-                  .sort((a, b) => b.total - a.total)
-                  .slice(0, 6);
-                return topEmpresas.map(({ empresa, total }) => (
-                  <div key={empresa} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: '10px 18px', minWidth: 210, display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
-                      {empresa[0]}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ fontWeight: 700, color: '#232a3b', fontSize: 15 }}>{empresa}</span>
-                      <span style={{ color: '#888', fontSize: 13 }}>{total} vacantes</span>
-                    </div>
-                  </div>
-                ));
+                // Convertir a array de objetos para el mapa
+                return Object.entries(counts).map(([nombre, data]) => ({
+                  nombre,
+                  coords: coordsMap[nombre] || [4.5, -74.1],
+                  vacantes: data.vacantes,
+                  ofertas: data.ofertas
+                }));
               })()}
-            </div>
+              onCiudadClick={nombre => setCiudadSeleccionada(nombre)}
+            />
           </div>
-              // Coordenadas de ciudades principales
-              const coordsMap = {
-                'Bogotá': [4.711, -74.0721],
-                'Medellín': [6.2442, -75.5812],
-                'Cali': [3.4516, -76.532],
-                'Barranquilla': [10.9685, -74.7813],
-                'Cartagena': [10.391, -75.4794],
-                'Bucaramanga': [7.1193, -73.1227],
-                'Pereira': [4.8143, -75.6946],
-                'Manizales': [5.0703, -75.5138],
-                'Santa Marta': [11.2408, -74.199],
-              };
-              // Filtrar ofertas según los filtros activos
-              let filtered = ofertas;
-              if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-              if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-              if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-              if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
-              // Agrupar por ciudad y contar vacantes y ofertas
-              const counts = {};
-              filtered.forEach(of => {
-                if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
-                counts[of.ciudad].vacantes++;
-                counts[of.ciudad].ofertas.push(of);
-              });
-              // Convertir a array de objetos para el mapa
-              return Object.entries(counts).map(([nombre, data]) => ({
-                nombre,
-                coords: coordsMap[nombre] || [4.5, -74.1],
-                vacantes: data.vacantes,
-                ofertas: data.ofertas
-              }));
-            })()}
-            onCiudadClick={nombre => setCiudadSeleccionada(nombre)}
-          />
+          {/* Top Empresas vertical debajo del mapa */}
+          <TopEmpresas ofertas={ofertas} />
           {/* Resumen/lista de vacantes al hacer click en ciudad */}
           {ciudadSeleccionada && (() => {
             const ciudadesData = (() => {
