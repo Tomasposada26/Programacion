@@ -86,7 +86,11 @@ export default function TendenciasPanel() {
       'Mantenimiento preventivo y correctivo.', 'Gestión de inventarios.', 'Atención al cliente.',
       'Optimización de procesos logísticos.', 'Elaboración de estudios de mercado.', 'Capacitación de personal.'
     ];
-    const ciudadesMock = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta'];
+    const ciudadesMock = [
+      'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta',
+      'Cúcuta', 'Ibagué', 'Villavicencio', 'Neiva', 'Armenia', 'Popayán', 'Montería', 'Sincelejo', 'Valledupar',
+      'Pasto', 'Tunja', 'Riohacha', 'Quibdó'
+    ];
     const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
     const hoy = new Date();
     const ofertas = [];
@@ -217,7 +221,6 @@ export default function TendenciasPanel() {
   const [ofertasPage, setOfertasPage] = useState(1);
   const ofertasPerPage = 7;
   // Opciones simuladas: mostrar todas las ciudades y sectores disponibles
-  const ciudadesMock = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta'];
   const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
   const ciudades = ['Todas', ...ciudadesMock];
   const sectores = ['Todos', ...sectoresMock];
