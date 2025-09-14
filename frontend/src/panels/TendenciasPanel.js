@@ -157,8 +157,20 @@ export default function TendenciasPanel() {
       .sort((a, b) => b.value - a.value);
   }, [ofertasFiltradas]);
   const [ofertas, setOfertas] = useState([]);
-  const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
-  const [sectoresPie, setSectoresPie] = useState([]);
+  // Publicaciones por día dinámicas según las ofertas filtradas
+  const publicacionesPorDia = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      if (of.fecha) {
+        counts[of.fecha] = (counts[of.fecha] || 0) + 1;
+      }
+    });
+    // Devolver array ordenado por fecha ascendente
+    return Object.entries(counts)
+      .map(([fecha, ofertas]) => ({ fecha, ofertas }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }, [ofertasFiltradas]);
+  // (sectoresPie eliminado, la gráfica de sectores es dinámica)
 
   // KPIs filtrados según ciudad/sector/fecha/keyword
   // Un solo filtro global para KPIs y paginación
@@ -197,6 +209,7 @@ export default function TendenciasPanel() {
 
   // Fetch de datos
   const fetchTendencias = async () => {
+
     setLoading(true);
     try {
       // Query params para filtros
@@ -207,39 +220,32 @@ export default function TendenciasPanel() {
       if (sector && sector !== 'Todos') params.push(`sector=${encodeURIComponent(sector)}`);
       const query = params.length ? `?${params.join('&')}` : '';
 
-
-      // Ofertas por día
-      const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
-      const diaData = await resDia.json();
-      setPublicacionesPorDia(diaData.map(d => ({ fecha: d.fecha.slice(0, 10), ofertas: d.total })));
-
-      // Sectores
-      const resSec = await fetch(`${API_BASE}/sectores${query}`);
-      const secData = await resSec.json();
-      setSectoresPie(secData.map(s => ({ name: s.sector, value: s.count })));
+      // Ofertas por día (ejemplo de fetch, puedes eliminar si no usas la respuesta)
+      // const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
+      // const diaData = await resDia.json();
 
       // Solo generar mock si no hay ofertas aún (primera carga o actualizar datos)
-      if (ofertas.length === 0) {
-        setOfertas(generarOfertasMock(200));
+      if (!ofertas.length) {
+        setOfertas(generarOfertasMock(120));
       }
-
       setLastUpdate(new Date());
     } catch (e) {
-      setOfertas([]);
-      setPublicacionesPorDia([]);
-      setSectoresPie([]);
+      // Manejo de error opcional
+      console.error('Error al actualizar tendencias:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  useEffect(() => {
-    fetchTendencias();
-    // eslint-disable-next-line
-  }, [fecha.desde, fecha.hasta, ciudad, sector]);
+// useEffect para cargar datos al inicio o cuando cambian los filtros principales
+useEffect(() => {
+  fetchTendencias();
+  // eslint-disable-next-line
+}, [fecha.desde, fecha.hasta, ciudad, sector]);
 
-  const handleUpdate = () => {
-    fetchTendencias();
-  };
+const handleUpdate = () => {
+  fetchTendencias();
+};
 
 
 
