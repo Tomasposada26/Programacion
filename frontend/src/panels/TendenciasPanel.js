@@ -115,12 +115,56 @@ export default function TendenciasPanel() {
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
-  // Paginación
-  const [ofertasPage, setOfertasPage] = useState(1);
-  const ofertasPerPage = 7;
-  // Opciones simuladas
-  const ciudades = ['Todas', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla'];
-  const sectores = ['Todos', 'Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura'];
+
+  // KPIs y gráficos filtrados
+  const hashtagsFiltrados = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      if (of.hashtags && Array.isArray(of.hashtags)) {
+        of.hashtags.forEach(tag => {
+          counts[tag] = (counts[tag] || 0) + 1;
+        });
+      } else if (of.titulo) {
+        of.titulo.split(' ').forEach(word => {
+          if (word.startsWith('#')) {
+            counts[word] = (counts[word] || 0) + 1;
+          }
+        });
+      }
+    });
+    const arr = Object.entries(counts).map(([text, value]) => ({ text, value }));
+    return arr.length > 0 ? arr.sort((a, b) => b.value - a.value) : hashtags;
+  }, [ofertasFiltradas, hashtags]);
+
+  const publicacionesPorDiaFiltradas = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      counts[of.fecha] = (counts[of.fecha] || 0) + 1;
+    });
+    return publicacionesPorDia.map(d => ({
+      fecha: d.fecha,
+      ofertas: counts[d.fecha] || 0
+    }));
+  }, [ofertasFiltradas, publicacionesPorDia]);
+
+  const sectoresPieFiltrados = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      counts[of.sector] = (counts[of.sector] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [ofertasFiltradas]);
+
+  const rankingEmpresasFiltrado = useMemo(() => {
+    const empresaCounts = {};
+    ofertasFiltradas.forEach(of => {
+      empresaCounts[of.empresa] = (empresaCounts[of.empresa] || 0) + 1;
+    });
+    return Object.entries(empresaCounts)
+      .map(([empresa, count]) => ({ empresa, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+  }, [ofertasFiltradas]);
 
   // Cargar datos persistentes al iniciar
 
@@ -215,9 +259,15 @@ export default function TendenciasPanel() {
     setOfertasPage(1);
   };
 
-
-
-
+  // Opciones simuladas (ahora dinámicas)
+  const ciudades = useMemo(() => {
+    const set = new Set(ofertas.map(of => of.ciudad));
+    return ['Todas', ...Array.from(set).sort()];
+  }, [ofertas]);
+  const sectores = useMemo(() => {
+    const set = new Set(ofertas.map(of => of.sector));
+    return ['Todos', ...Array.from(set).sort()];
+  }, [ofertas]);
 
   // Filtrado real solo con filtros aplicados
   const ofertasFiltradas = useMemo(() => {
@@ -320,7 +370,7 @@ export default function TendenciasPanel() {
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Hashtag más popular</div>
           <div style={{ fontWeight: 800, fontSize: 24, color: '#232a3b' }}>
-            {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text ? hashtags[0].text : 'N/A'}
+            {Array.isArray(hashtagsFiltrados) && hashtagsFiltrados.length > 0 && hashtagsFiltrados[0].text ? hashtagsFiltrados[0].text : 'N/A'}
           </div>
         </div>
         {/* KPI: Variación semanal (mock) */}
@@ -334,9 +384,9 @@ export default function TendenciasPanel() {
         {/* Gráfica de barras de hashtags */}
         <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
-          {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
+          {Array.isArray(hashtagsFiltrados) && hashtagsFiltrados.length > 0 && hashtagsFiltrados[0].text !== undefined ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+              <BarChart data={hashtagsFiltrados} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="text" type="category" width={120} />
@@ -354,7 +404,7 @@ export default function TendenciasPanel() {
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Publicaciones de ofertas (últimos días)</h3>
           <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={publicacionesPorDia} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
+            <LineChart data={publicacionesPorDiaFiltradas} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="fecha" fontSize={12} />
               <YAxis allowDecimals={false} fontSize={12} />
@@ -368,7 +418,7 @@ export default function TendenciasPanel() {
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Distribución por sector</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
-              data={[...sectoresPie].sort((a, b) => b.value - a.value)}
+              data={[...sectoresPieFiltrados].sort((a, b) => b.value - a.value)}
               layout="vertical"
               margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
             >
@@ -390,7 +440,7 @@ export default function TendenciasPanel() {
                 }}
               />
               <Bar dataKey="value" barSize={22} isAnimationActive animationDuration={1200}>
-                {[...sectoresPie].sort((a, b) => b.value - a.value).map((entry, i) => (
+                {[...sectoresPieFiltrados].sort((a, b) => b.value - a.value).map((entry, i) => (
                   <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
                 ))}
                 {/* Etiquetas de valor al final de cada barra */}
@@ -399,7 +449,7 @@ export default function TendenciasPanel() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        {/* Ofertas recientes con paginación clásica */}
+        {/* Ofertas recientes with paginación clásica */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Ofertas recientes</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, minHeight: 180, transition: 'min-height 0.4s' }}>
@@ -434,27 +484,16 @@ export default function TendenciasPanel() {
           <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', height: '50%', minHeight: 120, maxHeight: 'none' }}>
             <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Empresas con más vacantes</h3>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', width: '100%' }}>
-              {(() => {
-                // Calcular top empresas
-                const empresaCounts = {};
-                ofertas.forEach(of => {
-                  if (!empresaCounts[of.empresa]) empresaCounts[of.empresa] = 0;
-                  empresaCounts[of.empresa]++;
-                });
-                const topEmpresas = Object.entries(empresaCounts)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 6);
-                return topEmpresas.map(([empresa, count], i) => (
-                  <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 10, padding: '10px 12px', minWidth: 80, minHeight: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
-                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-                      {empresa[0]}
-                    </div>
-                    <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 13, textAlign: 'center', marginBottom: 1 }}>{empresa}</div>
-                    <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 14 }}>{count}</div>
-                    <div style={{ color: '#888', fontSize: 11 }}>vacantes</div>
+              {rankingEmpresasFiltrado.map(({ empresa, count }, i) => (
+                <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 10, padding: '10px 12px', minWidth: 80, minHeight: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+                    {empresa[0]}
                   </div>
-                ));
-              })()}
+                  <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 13, textAlign: 'center', marginBottom: 1 }}>{empresa}</div>
+                  <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 14 }}>{count}</div>
+                  <div style={{ color: '#888', fontSize: 11 }}>vacantes</div>
+                </div>
+              ))}
             </div>
           </div>
           {/* Card: Mapa de calor */}
