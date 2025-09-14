@@ -157,7 +157,9 @@ export default function TendenciasPanel() {
         {/* KPI: Hashtag más popular */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Hashtag más popular</div>
-          <div style={{ fontWeight: 800, fontSize: 24, color: '#232a3b' }}>{hashtags[0].text}</div>
+          <div style={{ fontWeight: 800, fontSize: 24, color: '#232a3b' }}>
+            {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text ? hashtags[0].text : 'N/A'}
+          </div>
         </div>
         {/* KPI: Variación semanal (mock) */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
@@ -170,15 +172,21 @@ export default function TendenciasPanel() {
         {/* Gráfica de barras de hashtags */}
         <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" hide />
-              <YAxis dataKey="text" type="category" width={120} />
-              <Tooltip content={<CustomHashtagTooltip />} />
-              <Bar dataKey="value" fill="#188fd9" radius={[0, 8, 8, 0]} barSize={28} isAnimationActive animationDuration={900} />
-            </BarChart>
-          </ResponsiveContainer>
+          {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" hide />
+                <YAxis dataKey="text" type="category" width={120} />
+                <Tooltip content={<CustomHashtagTooltip />} />
+                <Bar dataKey="value" fill="#188fd9" radius={[0, 8, 8, 0]} barSize={28} isAnimationActive animationDuration={900} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+              No hay datos de hashtags para mostrar.
+            </div>
+          )}
         </div>
         {/* Gráfico de líneas: publicaciones por día */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
