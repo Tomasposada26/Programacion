@@ -364,18 +364,40 @@ export default function TendenciasPanel() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        {/* Ofertas recientes */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
+        {/* Ofertas recientes con paginación clásica */}
+        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Ofertas recientes</h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {ofertas.map((of, i) => (
-              <li key={i} style={{ marginBottom: 18, paddingBottom: 10, borderBottom: '1px solid #e0e7ef' }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, minHeight: 180, transition: 'min-height 0.4s' }}>
+            {ofertasPaginadas.map((of, i) => (
+              <li key={i} style={{ marginBottom: 18, paddingBottom: 10, borderBottom: '1px solid #e0e7ef', opacity: 1, transform: 'translateY(0)', transition: 'all 0.4s cubic-bezier(.4,1.2,.6,1)' }}>
                 <div style={{ fontWeight: 700, color: '#188fd9', fontSize: 18 }}>{of.titulo}</div>
                 <div style={{ color: '#232a3b', fontSize: 15 }}>{of.empresa} - {of.ciudad}</div>
                 <div style={{ color: '#888', fontSize: 13 }}>{of.fecha} | <span style={{ color: '#20bf6b' }}>{of.sector}</span></div>
+                {of.descripcion && <div style={{ color: '#555', fontSize: 13, marginTop: 4 }}>{of.descripcion}</div>}
               </li>
             ))}
           </ul>
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 12 }}>
+              <button onClick={() => setOfertasPage(p => Math.max(1, p - 1))} disabled={ofertasPage === 1} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === 1 ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === 1 ? 'not-allowed' : 'pointer' }}>Anterior</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setOfertasPage(i + 1)}
+                  style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === i + 1 ? '#188fd9' : '#fff', color: ofertasPage === i + 1 ? '#fff' : '#188fd9', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button onClick={() => setOfertasPage(p => Math.min(totalPages, p + 1))} disabled={ofertasPage === totalPages} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #188fd9', background: ofertasPage === totalPages ? '#eee' : '#fff', color: '#188fd9', fontWeight: 700, cursor: ofertasPage === totalPages ? 'not-allowed' : 'pointer' }}>Siguiente</button>
+            </div>
+          )}
+          {ofertasFiltradas.length === 0 && (
+            <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+              No hay ofertas para mostrar.
+            </div>
+          )}
         </div>
         {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
         {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
