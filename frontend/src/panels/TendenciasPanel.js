@@ -1,3 +1,4 @@
+import MapaCalorColombia from '../components/MapaCalorColombia';
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -201,19 +202,40 @@ export default function TendenciasPanel() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        {/* Gráfico de pastel: distribución por sector */}
+        {/* Gráfico de barras horizontal: distribución por sector */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Distribución por sector</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
-              <Pie data={sectoresPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label isAnimationActive animationDuration={900}>
-                {sectoresPie.map((entry, i) => (
-                  <Cell key={`cell-${i}`} fill={pieColors[i % pieColors.length]} />
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart
+              data={[...sectoresPie].sort((a, b) => b.value - a.value)}
+              layout="vertical"
+              margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" allowDecimals={false} tick={{ fill: '#232a3b', fontWeight: 600, fontSize: 14 }} />
+              <YAxis dataKey="name" type="category" width={120} tick={{ fill: '#232a3b', fontWeight: 700, fontSize: 15 }} />
+              <Tooltip 
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const p = payload[0];
+                    return (
+                      <div style={{ background: '#fff', border: '1px solid #d0d7e2', borderRadius: 8, padding: 10, boxShadow: '0 2px 8px #0002', color: '#232a3b', fontWeight: 600 }}>
+                        <div style={{ color: p.color, fontWeight: 800 }}>{p.payload.name}</div>
+                        <div>Vacantes: <b>{p.value}</b></div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar dataKey="value" barSize={22} isAnimationActive animationDuration={1200}>
+                {[...sectoresPie].sort((a, b) => b.value - a.value).map((entry, i) => (
+                  <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
                 ))}
-              </Pie>
-              <Tooltip content={<CustomPieTooltip />} />
-              <Legend />
-            </PieChart>
+                {/* Etiquetas de valor al final de cada barra */}
+                <LabelList dataKey="value" position="right" style={{ fill: '#232a3b', fontWeight: 700, fontSize: 15, textShadow: '0 1px 2px #fff8' }} formatter={v => v} />
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
         {/* Ofertas recientes */}
@@ -231,12 +253,41 @@ export default function TendenciasPanel() {
         </div>
         {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
         {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
-        {/* Mapa de calor (placeholder) */}
+        {/* Mapa de calor real con react-leaflet */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
-          <div style={{ width: '100%', height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontStyle: 'italic', fontSize: 18, border: '1px dashed #d0d7e2', borderRadius: 8 }}>
-            (Próximamente: mapa interactivo de Colombia)
-          </div>
+          <MapaCalorColombia ciudades={(() => {
+            // Coordenadas de ciudades principales
+            const coordsMap = {
+              'Bogotá': [4.711, -74.0721],
+              'Medellín': [6.2442, -75.5812],
+              'Cali': [3.4516, -76.532],
+              'Barranquilla': [10.9685, -74.7813],
+              'Cartagena': [10.391, -75.4794],
+              'Bucaramanga': [7.1193, -73.1227],
+              'Pereira': [4.8143, -75.6946],
+              'Manizales': [5.0703, -75.5138],
+              'Santa Marta': [11.2408, -74.199],
+            };
+            // Filtrar ofertas según los filtros activos
+            let filtered = ofertas;
+            if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+            if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+            if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+            if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+            // Agrupar por ciudad y contar vacantes
+            const counts = {};
+            filtered.forEach(of => {
+              if (!counts[of.ciudad]) counts[of.ciudad] = 0;
+              counts[of.ciudad]++;
+            });
+            // Convertir a array de objetos para el mapa
+            return Object.entries(counts).map(([nombre, vacantes]) => ({
+              nombre,
+              coords: coordsMap[nombre] || [4.5, -74.1],
+              vacantes
+            }));
+          })()} />
         </div>
       </div>
     </div>
