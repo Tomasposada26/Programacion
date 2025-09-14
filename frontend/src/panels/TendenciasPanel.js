@@ -135,24 +135,7 @@ export default function TendenciasPanel() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
   // Datos
-  // Los hashtags se calculan dinámicamente de las ofertas filtradas
-  const hashtags = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.descripcion) {
-        // Extraer hashtags del texto (palabras que empiezan por #)
-        const matches = of.descripcion.match(/#[\wáéíóúÁÉÍÓÚñÑ]+/g);
-        if (matches) {
-          matches.forEach(tag => {
-            counts[tag] = (counts[tag] || 0) + 1;
-          });
-        }
-      }
-    });
-    return Object.entries(counts)
-      .map(([text, value]) => ({ text, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [ofertasFiltradas]);
+  const [hashtags, setHashtags] = useState([]);
   const [mostrarTopHashtags, setMostrarTopHashtags] = useState(true);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
@@ -208,7 +191,7 @@ export default function TendenciasPanel() {
       // Hashtags
       const resHash = await fetch(`${API_BASE}/hashtags${query}`);
       const hashtagsData = await resHash.json();
-  // setHashtags eliminado: hashtags ahora se calculan dinámicamente
+      setHashtags(hashtagsData.map(h => ({ text: h.hashtag, value: h.count })));
 
       // Ofertas por día
       const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
@@ -227,7 +210,7 @@ export default function TendenciasPanel() {
 
       setLastUpdate(new Date());
     } catch (e) {
-  // setHashtags eliminado: hashtags ahora se calculan dinámicamente
+      setHashtags([]);
       setOfertas([]);
       setPublicacionesPorDia([]);
       setSectoresPie([]);
