@@ -312,6 +312,10 @@ export default function TendenciasPanel() {
     return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
   }, [ofertas]);
 
+  // Paginación
+  const [ofertasPage, setOfertasPage] = useState(1);
+  const ofertasPerPage = 7;
+
   // ...resto del render y componentes...
   return (
     <div style={{ padding: 32, maxWidth: 1200, margin: '0 auto' }}>
