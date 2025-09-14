@@ -102,29 +102,32 @@ export default function TendenciasPanel() {
     return ofertas;
   }
 
-  // Persistencia y filtros desacoplados
+  // Botón de aplicar filtros (dummy para evitar error)
+  const handleAplicarFiltros = () => {};
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
-  // Filtros reales (los que filtran)
-  const [filtros, setFiltros] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
-  // Filtros temporales (los que se editan en UI)
-  const [filtrosPendientes, setFiltrosPendientes] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
+  // Filtros
+  const [ciudad, setCiudad] = useState('Todas');
+  const [sector, setSector] = useState('Todos');
+  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
 
-  // Filtrado real solo con filtros aplicados
+  // KPIs filtrados según ciudad/sector/fecha/keyword
+  // Un solo filtro global para KPIs y paginación
   const ofertasFiltradas = useMemo(() => {
     let filtered = ofertas;
-    if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
-    if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
-    if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
-    if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
-    if (filtros.keyword && filtros.keyword.trim()) {
-      const kw = filtros.keyword.trim().toLowerCase();
+    if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+    if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+    if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+    if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+    if (keyword.trim()) {
+      const kw = keyword.trim().toLowerCase();
       filtered = filtered.filter(of =>
         (of.titulo && of.titulo.toLowerCase().includes(kw)) ||
         (of.empresa && of.empresa.toLowerCase().includes(kw)) ||
@@ -133,72 +136,52 @@ export default function TendenciasPanel() {
       );
     }
     return filtered;
-  }, [ofertas, filtros]);
+  }, [ofertas, ciudad, sector, fecha, keyword]);
 
-  // KPIs y gráficos filtrados
-  const hashtagsFiltrados = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.hashtags && Array.isArray(of.hashtags)) {
-        of.hashtags.forEach(tag => {
-          counts[tag] = (counts[tag] || 0) + 1;
-        });
-      } else if (of.titulo) {
-        of.titulo.split(' ').forEach(word => {
-          if (word.startsWith('#')) {
-            counts[word] = (counts[word] || 0) + 1;
-          }
-        });
-      }
-    });
-    const arr = Object.entries(counts).map(([text, value]) => ({ text, value }));
-    return arr.length > 0 ? arr.sort((a, b) => b.value - a.value) : hashtags;
-  }, [ofertasFiltradas, hashtags]);
+  // KPIs para mostrar (filtrados)
+  const totalOfertas = ofertasFiltradas.length;
+  const totalCiudades = new Set(ofertasFiltradas.map(of => of.ciudad)).size;
+  const totalSectores = new Set(ofertasFiltradas.map(of => of.sector)).size;
+  const totalEmpresas = new Set(ofertasFiltradas.map(of => of.empresa)).size;
+  const totalHashtags = hashtags.length;
+  // Scroll infinito
+  const [ofertasPage, setOfertasPage] = useState(1);
+  const ofertasPerPage = 7;
+  // Opciones simuladas: mostrar todas las ciudades y sectores disponibles
+  const ciudadesMock = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta'];
+  const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
+  const ciudades = ['Todas', ...ciudadesMock];
+  const sectores = ['Todos', ...sectoresMock];
 
-  const publicacionesPorDiaFiltradas = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      counts[of.fecha] = (counts[of.fecha] || 0) + 1;
-    });
-    return publicacionesPorDia.map(d => ({
-      fecha: d.fecha,
-      ofertas: counts[d.fecha] || 0
-    }));
-  }, [ofertasFiltradas, publicacionesPorDia]);
+  // Fetch de datos
+  const fetchTendencias = async () => {
+    setLoading(true);
+    try {
+      // Query params para filtros
+      const params = [];
+      if (fecha.desde) params.push(`desde=${fecha.desde}`);
+      if (fecha.hasta) params.push(`hasta=${fecha.hasta}`);
+      if (ciudad && ciudad !== 'Todas') params.push(`ciudad=${encodeURIComponent(ciudad)}`);
+      if (sector && sector !== 'Todos') params.push(`sector=${encodeURIComponent(sector)}`);
+      const query = params.length ? `?${params.join('&')}` : '';
 
-  const sectoresPieFiltrados = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      counts[of.sector] = (counts[of.sector] || 0) + 1;
-    });
-    return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-  }, [ofertasFiltradas]);
+      // Hashtags
+      const resHash = await fetch(`${API_BASE}/hashtags${query}`);
+      const hashtagsData = await resHash.json();
+      setHashtags(hashtagsData.map(h => ({ text: h.hashtag, value: h.count })));
 
-  const rankingEmpresasFiltrado = useMemo(() => {
-    const empresaCounts = {};
-    ofertasFiltradas.forEach(of => {
-      empresaCounts[of.empresa] = (empresaCounts[of.empresa] || 0) + 1;
-    });
-    return Object.entries(empresaCounts)
-      .map(([empresa, count]) => ({ empresa, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 6);
-  }, [ofertasFiltradas]);
+      // Ofertas por día
+      const resDia = await fetch(`${API_BASE}/ofertas-por-dia${query}`);
+      const diaData = await resDia.json();
+      setPublicacionesPorDia(diaData.map(d => ({ fecha: d.fecha.slice(0, 10), ofertas: d.total })));
 
-  // Cargar datos persistentes al iniciar
+      // Sectores
+      const resSec = await fetch(`${API_BASE}/sectores${query}`);
+      const secData = await resSec.json();
+      setSectoresPie(secData.map(s => ({ name: s.sector, value: s.count })));
 
-  useEffect(() => {
-    const persist = localStorage.getItem('auraDashboardData');
-    if (persist) {
-      const data = JSON.parse(persist);
-      setOfertas(data.ofertas || []);
-      setHashtags(data.hashtags || []);
-      setPublicacionesPorDia(data.publicacionesPorDia || []);
-      setSectoresPie(data.sectoresPie || []);
-      setLastUpdate(data.lastUpdate ? new Date(data.lastUpdate) : new Date());
-    } else {
-      // Generar y guardar todo
-      const nuevas = generarOfertasMock(200);
+      // Ofertas recientes (mock masivo y variado)
+      setOfertas(generarOfertasMock(200));
       // Simular hashtags, publicacionesPorDia y sectoresPie para que los gráficos cambien
       const hashtagsEjemplo = [
         { text: '#empleo', value: Math.floor(Math.random()*100+50) },
@@ -206,7 +189,8 @@ export default function TendenciasPanel() {
         { text: '#vacante', value: Math.floor(Math.random()*60+20) },
         { text: '#colombia', value: Math.floor(Math.random()*40+10) },
         { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
-      ].sort((a,b)=>b.value-a.value);
+      ];
+      setHashtags(hashtagsEjemplo.sort((a,b)=>b.value-a.value));
       const dias = Array.from({length: 14}, (_,i) => {
         const d = new Date();
         d.setDate(d.getDate()-i);
@@ -215,78 +199,30 @@ export default function TendenciasPanel() {
           ofertas: Math.floor(Math.random()*30+5)
         };
       }).reverse();
-      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
-      const sectoresPieEjemplo = sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)}));
-      setOfertas(nuevas);
-      setHashtags(hashtagsEjemplo);
       setPublicacionesPorDia(dias);
-      setSectoresPie(sectoresPieEjemplo);
-      setLastUpdate(new Date());
-      localStorage.setItem('auraDashboardData', JSON.stringify({
-        ofertas: nuevas,
-        hashtags: hashtagsEjemplo,
-        publicacionesPorDia: dias,
-        sectoresPie: sectoresPieEjemplo,
-        lastUpdate: new Date().toISOString()
-      }));
-    }
-  }, []);
+      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
+      setSectoresPie(sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)})));
 
-  // Actualizar datos y persistir
+      setLastUpdate(new Date());
+    } catch (e) {
+      setHashtags([]);
+      setOfertas([]);
+      setPublicacionesPorDia([]);
+      setSectoresPie([]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTendencias();
+    // eslint-disable-next-line
+  }, [fecha.desde, fecha.hasta, ciudad, sector]);
 
   const handleUpdate = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const nuevas = generarOfertasMock(200);
-      const hashtagsEjemplo = [
-        { text: '#empleo', value: Math.floor(Math.random()*100+50) },
-        { text: '#trabajo', value: Math.floor(Math.random()*80+30) },
-        { text: '#vacante', value: Math.floor(Math.random()*60+20) },
-        { text: '#colombia', value: Math.floor(Math.random()*40+10) },
-        { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
-      ].sort((a,b)=>b.value-a.value);
-      const dias = Array.from({length: 14}, (_,i) => {
-        const d = new Date();
-        d.setDate(d.getDate()-i);
-        return {
-          fecha: d.toISOString().slice(0,10),
-          ofertas: Math.floor(Math.random()*30+5)
-        };
-      }).reverse();
-      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
-      const sectoresPieEjemplo = sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)}));
-      setOfertas(nuevas);
-      setHashtags(hashtagsEjemplo);
-      setPublicacionesPorDia(dias);
-      setSectoresPie(sectoresPieEjemplo);
-      const now = new Date();
-      setLastUpdate(now);
-      localStorage.setItem('auraDashboardData', JSON.stringify({
-        ofertas: nuevas,
-        hashtags: hashtagsEjemplo,
-        publicacionesPorDia: dias,
-        sectoresPie: sectoresPieEjemplo,
-        lastUpdate: now.toISOString()
-      }));
-      setLoading(false);
-    }, 800);
+    fetchTendencias();
   };
 
-  // Aplicar filtros: pasar filtrosPendientes a filtros reales
-  const handleAplicarFiltros = () => {
-    setFiltros({ ...filtrosPendientes });
-    setOfertasPage(1);
-  };
 
-  // Opciones simuladas (ahora dinámicas)
-  const ciudades = useMemo(() => {
-    const set = new Set(ofertas.map(of => of.ciudad));
-    return ['Todas', ...Array.from(set).sort()];
-  }, [ofertas]);
-  const sectores = useMemo(() => {
-    const set = new Set(ofertas.map(of => of.sector));
-    return ['Todos', ...Array.from(set).sort()];
-  }, [ofertas]);
 
   // Paginación clásica: calcular total de páginas
   const totalPages = Math.ceil(ofertasFiltradas.length / ofertasPerPage);
@@ -311,10 +247,6 @@ export default function TendenciasPanel() {
     return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
   }, [ofertas]);
 
-  // Paginación
-  const [ofertasPage, setOfertasPage] = useState(1);
-  const ofertasPerPage = 7;
-
   // ...resto del render y componentes...
   return (
     <div style={{ padding: 32, maxWidth: 1200, margin: '0 auto' }}>
@@ -331,31 +263,30 @@ export default function TendenciasPanel() {
         Tendencias Laborales en Colombia
       </h2>
       {/* Filtros */}
-
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <select value={filtrosPendientes.ciudad} onChange={e => setFiltrosPendientes(f => ({ ...f, ciudad: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={ciudad} onChange={e => setCiudad(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {ciudades.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <select value={filtrosPendientes.sector} onChange={e => setFiltrosPendientes(f => ({ ...f, sector: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={sector} onChange={e => setSector(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {sectores.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Desde:</label>
-          <input type="date" value={filtrosPendientes.fecha.desde} onChange={e => setFiltrosPendientes(f => ({ ...f, fecha: { ...f.fecha, desde: e.target.value } }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={fecha.desde} onChange={e => setFecha(f => ({ ...f, desde: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Hasta:</label>
-          <input type="date" value={filtrosPendientes.fecha.hasta} onChange={e => setFiltrosPendientes(f => ({ ...f, fecha: { ...f.fecha, hasta: e.target.value } }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={fecha.hasta} onChange={e => setFecha(f => ({ ...f, hasta: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Palabra clave:</label>
-          <input type="text" value={filtrosPendientes.keyword} onChange={e => setFiltrosPendientes(f => ({ ...f, keyword: e.target.value }))} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
+          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
         </div>
         <button onClick={handleAplicarFiltros} style={{ background: '#20bf6b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s', marginLeft: 8 }}>
           Aplicar filtros
@@ -373,7 +304,7 @@ export default function TendenciasPanel() {
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Hashtag más popular</div>
           <div style={{ fontWeight: 800, fontSize: 24, color: '#232a3b' }}>
-            {Array.isArray(hashtagsFiltrados) && hashtagsFiltrados.length > 0 && hashtagsFiltrados[0].text ? hashtagsFiltrados[0].text : 'N/A'}
+            {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text ? hashtags[0].text : 'N/A'}
           </div>
         </div>
         {/* KPI: Variación semanal (mock) */}
@@ -387,9 +318,9 @@ export default function TendenciasPanel() {
         {/* Gráfica de barras de hashtags */}
         <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
-          {Array.isArray(hashtagsFiltrados) && hashtagsFiltrados.length > 0 && hashtagsFiltrados[0].text !== undefined ? (
+          {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hashtagsFiltrados} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="text" type="category" width={120} />
@@ -407,7 +338,7 @@ export default function TendenciasPanel() {
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Publicaciones de ofertas (últimos días)</h3>
           <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={publicacionesPorDiaFiltradas} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
+            <LineChart data={publicacionesPorDia} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="fecha" fontSize={12} />
               <YAxis allowDecimals={false} fontSize={12} />
@@ -421,7 +352,7 @@ export default function TendenciasPanel() {
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Distribución por sector</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
-              data={[...sectoresPieFiltrados].sort((a, b) => b.value - a.value)}
+              data={[...sectoresPie].sort((a, b) => b.value - a.value)}
               layout="vertical"
               margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
             >
@@ -443,7 +374,7 @@ export default function TendenciasPanel() {
                 }}
               />
               <Bar dataKey="value" barSize={22} isAnimationActive animationDuration={1200}>
-                {[...sectoresPieFiltrados].sort((a, b) => b.value - a.value).map((entry, i) => (
+                {[...sectoresPie].sort((a, b) => b.value - a.value).map((entry, i) => (
                   <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
                 ))}
                 {/* Etiquetas de valor al final de cada barra */}
@@ -452,7 +383,7 @@ export default function TendenciasPanel() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        {/* Ofertas recientes with paginación clásica */}
+        {/* Ofertas recientes con paginación clásica */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Ofertas recientes</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, minHeight: 180, transition: 'min-height 0.4s' }}>
@@ -487,16 +418,27 @@ export default function TendenciasPanel() {
           <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', height: '50%', minHeight: 120, maxHeight: 'none' }}>
             <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Empresas con más vacantes</h3>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', width: '100%' }}>
-              {rankingEmpresasFiltrado.map(({ empresa, count }, i) => (
-                <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 10, padding: '10px 12px', minWidth: 80, minHeight: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
-                  <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-                    {empresa[0]}
+              {(() => {
+                // Calcular top empresas
+                const empresaCounts = {};
+                ofertas.forEach(of => {
+                  if (!empresaCounts[of.empresa]) empresaCounts[of.empresa] = 0;
+                  empresaCounts[of.empresa]++;
+                });
+                const topEmpresas = Object.entries(empresaCounts)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 6);
+                return topEmpresas.map(([empresa, count], i) => (
+                  <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 10, padding: '10px 12px', minWidth: 80, minHeight: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+                      {empresa[0]}
+                    </div>
+                    <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 13, textAlign: 'center', marginBottom: 1 }}>{empresa}</div>
+                    <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 14 }}>{count}</div>
+                    <div style={{ color: '#888', fontSize: 11 }}>vacantes</div>
                   </div>
-                  <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 13, textAlign: 'center', marginBottom: 1 }}>{empresa}</div>
-                  <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 14 }}>{count}</div>
-                  <div style={{ color: '#888', fontSize: 11 }}>vacantes</div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
           </div>
           {/* Card: Mapa de calor */}
@@ -518,10 +460,10 @@ export default function TendenciasPanel() {
                 };
                 // Filtrar ofertas según los filtros activos
                 let filtered = ofertas;
-                if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
-                if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
-                if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
-                if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
+                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
                 // Agrupar por ciudad y contar vacantes y ofertas
                 const counts = {};
                 filtered.forEach(of => {
@@ -555,10 +497,10 @@ export default function TendenciasPanel() {
                   'Santa Marta': [11.2408, -74.199],
                 };
                 let filtered = ofertas;
-                if (filtros.ciudad && filtros.ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === filtros.ciudad);
-                if (filtros.sector && filtros.sector !== 'Todos') filtered = filtered.filter(of => of.sector === filtros.sector);
-                if (filtros.fecha.desde) filtered = filtered.filter(of => of.fecha >= filtros.fecha.desde);
-                if (filtros.fecha.hasta) filtered = filtered.filter(of => of.fecha <= filtros.fecha.hasta);
+                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
                 const counts = {};
                 filtered.forEach(of => {
                   if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
