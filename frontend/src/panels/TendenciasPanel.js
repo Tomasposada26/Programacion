@@ -166,32 +166,6 @@ export default function TendenciasPanel() {
   const totalSectores = new Set(ofertasFiltradas.map(of => of.sector)).size;
   const totalEmpresas = new Set(ofertasFiltradas.map(of => of.empresa)).size;
   const totalHashtags = hashtags.length;
-
-  // Variación semanal real según los filtros
-  function getWeekNumber(dateStr) {
-    const d = new Date(dateStr);
-    d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + 4 - (d.getDay()||7));
-    const yearStart = new Date(d.getFullYear(),0,1);
-    return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-  }
-  const now = new Date();
-  const thisYear = now.getFullYear();
-  const thisWeek = getWeekNumber(now.toISOString().slice(0,10));
-  const ofertasSemanaActual = ofertasFiltradas.filter(of => {
-    const d = new Date(of.fecha);
-    return d.getFullYear() === thisYear && getWeekNumber(of.fecha) === thisWeek;
-  }).length;
-  const ofertasSemanaAnterior = ofertasFiltradas.filter(of => {
-    const d = new Date(of.fecha);
-    return d.getFullYear() === thisYear && getWeekNumber(of.fecha) === (thisWeek-1);
-  }).length;
-  let variacionSemanal = 0;
-  if (ofertasSemanaAnterior > 0) {
-    variacionSemanal = ((ofertasSemanaActual - ofertasSemanaAnterior) / ofertasSemanaAnterior) * 100;
-  } else if (ofertasSemanaActual > 0) {
-    variacionSemanal = 100;
-  }
   // Scroll infinito
   const [ofertasPage, setOfertasPage] = useState(1);
   const ofertasPerPage = 7;
@@ -228,28 +202,10 @@ export default function TendenciasPanel() {
       const secData = await resSec.json();
       setSectoresPie(secData.map(s => ({ name: s.sector, value: s.count })));
 
-      // Ofertas recientes (mock masivo y variado)
-      setOfertas(generarOfertasMock(200));
-      // Simular hashtags, publicacionesPorDia y sectoresPie para que los gráficos cambien
-      const hashtagsEjemplo = [
-        { text: '#empleo', value: Math.floor(Math.random()*100+50) },
-        { text: '#trabajo', value: Math.floor(Math.random()*80+30) },
-        { text: '#vacante', value: Math.floor(Math.random()*60+20) },
-        { text: '#colombia', value: Math.floor(Math.random()*40+10) },
-        { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
-      ];
-      setHashtags(hashtagsEjemplo.sort((a,b)=>b.value-a.value));
-      const dias = Array.from({length: 14}, (_,i) => {
-        const d = new Date();
-        d.setDate(d.getDate()-i);
-        return {
-          fecha: d.toISOString().slice(0,10),
-          ofertas: Math.floor(Math.random()*30+5)
-        };
-      }).reverse();
-      setPublicacionesPorDia(dias);
-      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
-      setSectoresPie(sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)})));
+      // Solo generar mock si no hay ofertas aún (primera carga o actualizar datos)
+      if (ofertas.length === 0) {
+        setOfertas(generarOfertasMock(200));
+      }
 
       setLastUpdate(new Date());
     } catch (e) {
@@ -355,12 +311,10 @@ export default function TendenciasPanel() {
             {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text ? hashtags[0].text : 'N/A'}
           </div>
         </div>
-        {/* KPI: Variación semanal real */}
+        {/* KPI: Variación semanal (mock) */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Variación semanal</div>
-          <div style={{ fontWeight: 800, fontSize: 24, color: variacionSemanal >= 0 ? '#20bf6b' : '#eb3b5a' }}>
-            {variacionSemanal > 0 ? '+' : ''}{Math.round(variacionSemanal)}%
-          </div>
+          <div style={{ fontWeight: 800, fontSize: 24, color: '#20bf6b' }}>+8%</div>
         </div>
       </div>
 
