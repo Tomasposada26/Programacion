@@ -166,6 +166,32 @@ export default function TendenciasPanel() {
   const totalSectores = new Set(ofertasFiltradas.map(of => of.sector)).size;
   const totalEmpresas = new Set(ofertasFiltradas.map(of => of.empresa)).size;
   const totalHashtags = hashtags.length;
+
+  // Variación semanal real según los filtros
+  function getWeekNumber(dateStr) {
+    const d = new Date(dateStr);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay()||7));
+    const yearStart = new Date(d.getFullYear(),0,1);
+    return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+  }
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisWeek = getWeekNumber(now.toISOString().slice(0,10));
+  const ofertasSemanaActual = ofertasFiltradas.filter(of => {
+    const d = new Date(of.fecha);
+    return d.getFullYear() === thisYear && getWeekNumber(of.fecha) === thisWeek;
+  }).length;
+  const ofertasSemanaAnterior = ofertasFiltradas.filter(of => {
+    const d = new Date(of.fecha);
+    return d.getFullYear() === thisYear && getWeekNumber(of.fecha) === (thisWeek-1);
+  }).length;
+  let variacionSemanal = 0;
+  if (ofertasSemanaAnterior > 0) {
+    variacionSemanal = ((ofertasSemanaActual - ofertasSemanaAnterior) / ofertasSemanaAnterior) * 100;
+  } else if (ofertasSemanaActual > 0) {
+    variacionSemanal = 100;
+  }
   // Scroll infinito
   const [ofertasPage, setOfertasPage] = useState(1);
   const ofertasPerPage = 7;
@@ -329,10 +355,12 @@ export default function TendenciasPanel() {
             {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text ? hashtags[0].text : 'N/A'}
           </div>
         </div>
-        {/* KPI: Variación semanal (mock) */}
+        {/* KPI: Variación semanal real */}
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Variación semanal</div>
-          <div style={{ fontWeight: 800, fontSize: 24, color: '#20bf6b' }}>+8%</div>
+          <div style={{ fontWeight: 800, fontSize: 24, color: variacionSemanal >= 0 ? '#20bf6b' : '#eb3b5a' }}>
+            {variacionSemanal > 0 ? '+' : ''}{Math.round(variacionSemanal)}%
+          </div>
         </div>
       </div>
 
@@ -396,9 +424,21 @@ export default function TendenciasPanel() {
                 }}
               />
               <Bar dataKey="value" barSize={22} isAnimationActive animationDuration={1200}>
-                {[...sectoresPie].sort((a, b) => b.value - a.value).map((entry, i) => (
-                  <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
-                ))}
+                {(() => {
+                  // Agrupar por sector las ofertas filtradas
+                  const counts = ofertasFiltradas.reduce((acc, of) => {
+                    acc[of.sector] = (acc[of.sector] || 0) + 1;
+                    return acc;
+                  }, {});
+                  let arr = Object.entries(counts).map(([name, value]) => ({ name, value }));
+                  // Si hay un sector seleccionado, solo mostrar ese sector
+                  if (sector && sector !== 'Todos') {
+                    arr = arr.filter(s => s.name === sector);
+                  }
+                  return arr.sort((a, b) => b.value - a.value).map((entry, i) => (
+                    <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
+                  ));
+                })()}
                 {/* Etiquetas de valor al final de cada barra */}
                 <LabelList dataKey="value" position="right" style={{ fill: '#232a3b', fontWeight: 700, fontSize: 15, textShadow: '0 1px 2px #fff8' }} formatter={v => v} />
               </Bar>
