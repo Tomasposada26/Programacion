@@ -320,24 +320,52 @@ export default function TendenciasPanel() {
 
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
         {/* Gráfica de barras de hashtags */}
-        <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
+        <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
-          {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" hide />
-                <YAxis dataKey="text" type="category" width={120} />
-                <Tooltip content={<CustomHashtagTooltip />} />
-                <Bar dataKey="value" fill="#188fd9" radius={[0, 8, 8, 0]} barSize={28} isAnimationActive animationDuration={900} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
-              No hay datos de hashtags para mostrar.
-            </div>
-          )}
+          {(() => {
+            // Calcular hashtags de las ofertas filtradas
+            const hashtagCounts = {};
+            ofertasFiltradas.forEach(of => {
+              if (of.hashtags && Array.isArray(of.hashtags)) {
+                of.hashtags.forEach(ht => {
+                  if (ht && typeof ht === 'string') {
+                    hashtagCounts[ht] = (hashtagCounts[ht] || 0) + 1;
+                  }
+                });
+              }
+            });
+            const hashtagsFiltrados = Object.entries(hashtagCounts)
+              .map(([text, value]) => ({ text, value }))
+              .sort((a, b) => b.value - a.value);
+            if (hashtagsFiltrados.length > 0) {
+              return (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={showTop5 ? hashtagsFiltrados.slice(0, 5) : hashtagsFiltrados} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="text" type="category" width={120} />
+                    <Tooltip content={<CustomHashtagTooltip />} />
+                    <Bar dataKey="value" fill="#188fd9" radius={[0, 8, 8, 0]} barSize={28} isAnimationActive animationDuration={900} />
+                  </BarChart>
+                </ResponsiveContainer>
+              );
+            } else {
+              return (
+                <div style={{ color: '#bbb', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+                  No hay datos de hashtags para mostrar.
+                </div>
+              );
+            }
+          })()}
+          <button
+            style={{ position: 'absolute', left: 18, bottom: 18, fontSize: 13, padding: '4px 12px', borderRadius: 8, border: '1px solid #188fd9', background: '#f7faff', color: '#188fd9', fontWeight: 700, cursor: 'pointer', boxShadow: '0 1px 4px #0001' }}
+            onClick={() => setShowTop5(s => !s)}
+          >
+            {showTop5 ? 'Ver todos' : 'Ver top 5'}
+          </button>
         </div>
+  // Estado para mostrar top 5 hashtags
+  const [showTop5, setShowTop5] = useState(false);
         {/* Gráfico de líneas: publicaciones por día */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Publicaciones de ofertas (últimos días)</h3>
