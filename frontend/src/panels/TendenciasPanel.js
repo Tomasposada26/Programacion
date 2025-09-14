@@ -33,35 +33,6 @@ function CustomPieTooltip({ active, payload }) {
 const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
-  // Hashtags y publicaciones por día calculados a partir de las ofertas filtradas
-  const hashtags = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.descripcion) {
-        // Extraer hashtags del texto (palabras que empiezan por #)
-        const matches = of.descripcion.match(/#[\wáéíóúñ]+/gi);
-        if (matches) {
-          matches.forEach(tag => {
-            counts[tag] = (counts[tag] || 0) + 1;
-          });
-        }
-      }
-    });
-    return Object.entries(counts).map(([text, value]) => ({ text, value })).sort((a, b) => b.value - a.value);
-  }, [ofertasFiltradas]);
-
-  const publicacionesPorDia = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.fecha) {
-        counts[of.fecha] = (counts[of.fecha] || 0) + 1;
-      }
-    });
-    // Ordenar por fecha ascendente
-    return Object.entries(counts)
-      .map(([fecha, ofertas]) => ({ fecha, ofertas }))
-      .sort((a, b) => a.fecha.localeCompare(b.fecha));
-  }, [ofertasFiltradas]);
 export default function TendenciasPanel() {
   // Generador de ofertas mock
   function generarOfertasMock(cantidad = 100) {
