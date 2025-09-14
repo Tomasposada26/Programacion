@@ -385,7 +385,19 @@ const handleUpdate = () => {
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Distribución por sector</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
-              data={[...sectoresPie].sort((a, b) => b.value - a.value)}
+              data={(() => {
+                // Agrupar por sector las ofertas filtradas
+                const counts = ofertasFiltradas.reduce((acc, of) => {
+                  acc[of.sector] = (acc[of.sector] || 0) + 1;
+                  return acc;
+                }, {});
+                let arr = Object.entries(counts).map(([name, value]) => ({ name, value }));
+                // Si hay un sector seleccionado, solo mostrar ese sector
+                if (sector && sector !== 'Todos') {
+                  arr = arr.filter(s => s.name === sector);
+                }
+                return arr.sort((a, b) => b.value - a.value);
+              })()}
               layout="vertical"
               margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
             >
