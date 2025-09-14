@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from 'leaflet';
+if (typeof window !== 'undefined') window.L = L;
 // Gradiente de azul (#188fd9) a rojo (#eb3b5a)
 function getColor(vacantes, min, max) {
   if (max === min) return "#188fd9";
