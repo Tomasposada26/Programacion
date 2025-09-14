@@ -125,14 +125,14 @@ export default function TendenciasPanel() {
   // Botón de aplicar filtros (dummy para evitar error)
 
   // Filtros principales
-  const [ciudad, setCiudad] = useState('Todas');
-  const [sector, setSector] = useState('Todos');
+  const [ciudad, setCiudad] = useState(['Todas']);
+  const [sector, setSector] = useState(['Todos']);
   const [fecha, setFecha] = useState({ desde: '', hasta: '' });
   const [keyword, setKeyword] = useState('');
 
   // Filtros temporales (inputs)
-  const [tmpCiudad, setTmpCiudad] = useState('Todas');
-  const [tmpSector, setTmpSector] = useState('Todos');
+  const [tmpCiudad, setTmpCiudad] = useState(['Todas']);
+  const [tmpSector, setTmpSector] = useState(['Todos']);
   const [tmpFecha, setTmpFecha] = useState({ desde: '', hasta: '' });
   const [tmpKeyword, setTmpKeyword] = useState('');
 
@@ -145,8 +145,8 @@ export default function TendenciasPanel() {
   }, [ciudad, sector, fecha, keyword]);
 
   const handleAplicarFiltros = () => {
-    setCiudad(tmpCiudad);
-    setSector(tmpSector);
+    setCiudad(tmpCiudad.length === 0 ? ['Todas'] : tmpCiudad);
+    setSector(tmpSector.length === 0 ? ['Todos'] : tmpSector);
     setFecha(tmpFecha);
     setKeyword(tmpKeyword);
     setOfertasPage(1); // Reiniciar paginación
@@ -162,8 +162,8 @@ export default function TendenciasPanel() {
   // Un solo filtro global para KPIs y paginación
   const ofertasFiltradas = useMemo(() => {
     let filtered = ofertas;
-    if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-    if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+    if (ciudad && !ciudad.includes('Todas')) filtered = filtered.filter(of => ciudad.includes(of.ciudad));
+    if (sector && !sector.includes('Todos')) filtered = filtered.filter(of => sector.includes(of.sector));
     if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
     if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
     if (keyword.trim()) {
@@ -310,15 +310,67 @@ const handleUpdate = () => {
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <select value={tmpCiudad} onChange={e => setTmpCiudad(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
-            {ciudades.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', cursor: 'pointer', padding: 6 }}>
+              {tmpCiudad.length === 0 || tmpCiudad.includes('Todas') ? 'Todas' : tmpCiudad.join(', ')}
+            </div>
+            <div style={{ position: 'absolute', zIndex: 10, background: '#fff', border: '1px solid #d0d7e2', borderRadius: 6, marginTop: 2, minWidth: 140, maxHeight: 220, overflowY: 'auto', boxShadow: '0 2px 8px #0002' }}>
+              {ciudades.map(c => (
+                <div key={c} style={{ padding: '4px 10px', cursor: 'pointer', background: tmpCiudad.includes(c) ? '#eaf6ff' : '#fff', fontWeight: tmpCiudad.includes(c) ? 700 : 400 }}
+                  onClick={() => {
+                    if (c === 'Todas') {
+                      setTmpCiudad(['Todas']);
+                    } else {
+                      let next;
+                      if (tmpCiudad.includes('Todas')) {
+                        next = [c];
+                      } else if (tmpCiudad.includes(c)) {
+                        next = tmpCiudad.filter(x => x !== c);
+                        if (next.length === 0) next = ['Todas'];
+                      } else {
+                        next = [...tmpCiudad, c];
+                      }
+                      setTmpCiudad(next);
+                    }
+                  }}
+                >
+                  <input type="checkbox" checked={tmpCiudad.includes(c)} readOnly style={{ marginRight: 6 }} />{c}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <select value={tmpSector} onChange={e => setTmpSector(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
-            {sectores.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{ minWidth: 140, border: '1px solid #d0d7e2', borderRadius: 6, background: '#fff', cursor: 'pointer', padding: 6 }}>
+              {tmpSector.length === 0 || tmpSector.includes('Todos') ? 'Todos' : tmpSector.join(', ')}
+            </div>
+            <div style={{ position: 'absolute', zIndex: 10, background: '#fff', border: '1px solid #d0d7e2', borderRadius: 6, marginTop: 2, minWidth: 140, maxHeight: 220, overflowY: 'auto', boxShadow: '0 2px 8px #0002' }}>
+              {sectores.map(s => (
+                <div key={s} style={{ padding: '4px 10px', cursor: 'pointer', background: tmpSector.includes(s) ? '#eaf6ff' : '#fff', fontWeight: tmpSector.includes(s) ? 700 : 400 }}
+                  onClick={() => {
+                    if (s === 'Todos') {
+                      setTmpSector(['Todos']);
+                    } else {
+                      let next;
+                      if (tmpSector.includes('Todos')) {
+                        next = [s];
+                      } else if (tmpSector.includes(s)) {
+                        next = tmpSector.filter(x => x !== s);
+                        if (next.length === 0) next = ['Todos'];
+                      } else {
+                        next = [...tmpSector, s];
+                      }
+                      setTmpSector(next);
+                    }
+                  }}
+                >
+                  <input type="checkbox" checked={tmpSector.includes(s)} readOnly style={{ marginRight: 6 }} />{s}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Desde:</label>
