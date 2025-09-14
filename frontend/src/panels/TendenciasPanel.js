@@ -397,10 +397,10 @@ export default function TendenciasPanel() {
             </div>
           )}
         </div>
-        {/* Columna: Top empresas arriba, mapa abajo */}
-        <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Columna: Top empresas arriba, mapa abajo, ambas alineadas en altura */}
+        <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', height: '100%', gap: 12 }}>
           {/* Card: Top empresas */}
-          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', minHeight: 120, maxHeight: 170 }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', height: '50%', minHeight: 120, maxHeight: 'none' }}>
             <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Empresas con más vacantes</h3>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', width: '100%' }}>
               {(() => {
@@ -427,7 +427,7 @@ export default function TendenciasPanel() {
             </div>
           </div>
           {/* Card: Mapa de calor */}
-          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 260, maxHeight: 320, position: 'relative' }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '50%', minHeight: 120, maxHeight: 'none', position: 'relative' }}>
             <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Mapa de calor por ciudad</h3>
             <MapaCalorColombia
               ciudades={(() => {
