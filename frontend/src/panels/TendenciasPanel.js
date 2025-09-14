@@ -135,7 +135,24 @@ export default function TendenciasPanel() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
   // Datos
-  const [hashtags, setHashtags] = useState([]);
+  // Los hashtags se calculan dinámicamente de las ofertas filtradas
+  const hashtags = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      if (of.descripcion) {
+        // Extraer hashtags del texto (palabras que empiezan por #)
+        const matches = of.descripcion.match(/#[\wáéíóúÁÉÍÓÚñÑ]+/g);
+        if (matches) {
+          matches.forEach(tag => {
+            counts[tag] = (counts[tag] || 0) + 1;
+          });
+        }
+      }
+    });
+    return Object.entries(counts)
+      .map(([text, value]) => ({ text, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [ofertasFiltradas]);
   const [mostrarTopHashtags, setMostrarTopHashtags] = useState(true);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
