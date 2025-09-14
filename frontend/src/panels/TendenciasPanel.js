@@ -136,6 +136,7 @@ export default function TendenciasPanel() {
   const [loading, setLoading] = useState(false);
   // Datos
   const [hashtags, setHashtags] = useState([]);
+  const [mostrarTopHashtags, setMostrarTopHashtags] = useState(true);
   const [ofertas, setOfertas] = useState([]);
   const [publicacionesPorDia, setPublicacionesPorDia] = useState([]);
   const [sectoresPie, setSectoresPie] = useState([]);
@@ -321,10 +322,18 @@ export default function TendenciasPanel() {
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
         {/* Gráfica de barras de hashtags */}
         <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
-          <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h3 style={{ color: '#232a3b', fontWeight: 700, margin: 0 }}># Hashtags más usados</h3>
+            <button
+              onClick={() => setMostrarTopHashtags(v => !v)}
+              style={{ fontSize: 13, padding: '4px 12px', borderRadius: 8, border: '1px solid #188fd9', background: '#fff', color: '#188fd9', fontWeight: 700, cursor: 'pointer', marginLeft: 12 }}
+            >
+              {mostrarTopHashtags ? 'Ver todos' : 'Top 5'}
+            </button>
+          </div>
           {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+              <BarChart data={(mostrarTopHashtags ? hashtags.slice(0, 5) : hashtags)} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="text" type="category" width={120} />
