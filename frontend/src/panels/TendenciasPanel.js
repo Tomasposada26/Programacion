@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import WordCloud from 'react-wordcloud';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
-import 'react-wordcloud/dist/index.css';
+import 'react-wordcloud/lib/default.min.css';
 // Tooltip personalizado para hashtags
 function CustomHashtagTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
