@@ -104,6 +104,12 @@ export default function TendenciasPanel() {
 
   // Botón de aplicar filtros (dummy para evitar error)
 
+  // Filtros principales
+  const [ciudad, setCiudad] = useState('Todas');
+  const [sector, setSector] = useState('Todos');
+  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
+  const [keyword, setKeyword] = useState('');
+
   // Filtros temporales (inputs)
   const [tmpCiudad, setTmpCiudad] = useState('Todas');
   const [tmpSector, setTmpSector] = useState('Todos');
@@ -126,13 +132,8 @@ export default function TendenciasPanel() {
     setOfertasPage(1); // Reiniciar paginación
   };
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
-  // Filtros
-  const [ciudad, setCiudad] = useState('Todas');
-  const [sector, setSector] = useState('Todos');
-  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
   const [ofertas, setOfertas] = useState([]);
