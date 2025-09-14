@@ -35,7 +35,7 @@ const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
   // Generador de ofertas mock
-  function generarOfertasMock(cantidad = 100) {
+  function generarOfertasMock(cantidad = 500) {
     const titulos = [
       'Desarrollador Fullstack', 'Analista de Datos', 'Diseñador UX/UI', 'Gerente de Proyectos',
       'Enfermero/a', 'Profesor de Inglés', 'Operario de Planta', 'Ingeniero DevOps', 'Psicólogo Organizacional',
@@ -69,6 +69,13 @@ export default function TendenciasPanel() {
       'Producción SAS', 'DesarrolloPro', 'PruebasLab', 'VentasOnline', 'Marketing360', 'SoporteIT', 'SeguridadInd',
       'Mantenimiento SAS'
     ];
+    const hashtagsMock = [
+      '#Trabajo', '#Empleo', '#Vacante', '#Colombia', '#Oportunidad', '#Talento', '#Carrera', '#Profesional',
+      '#Tecnología', '#Salud', '#Educación', '#Finanzas', '#Logística', '#Legal', '#Comercial', '#Marketing',
+      '#Ingeniería', '#Alimentos', '#Química', '#Ambiental', '#Remoto', '#Presencial', '#FullTime', '#PartTime',
+      '#Urgente', '#Contratación', '#Equipo', '#Desarrollo', '#Innovación', '#Crecimiento', '#Bienestar', '#RRHH',
+      '#Empresa', '#Proyecto', '#Liderazgo', '#Creatividad', '#Data', '#Digital', '#Ventas', '#Soporte', '#Calidad'
+    ];
     const descripciones = [
       'Desarrollo de aplicaciones web y móviles.', 'Análisis de grandes volúmenes de datos.',
       'Diseño de interfaces y experiencia de usuario.', 'Gestión de proyectos financieros.',
@@ -88,7 +95,14 @@ export default function TendenciasPanel() {
       const empresa = empresas[Math.floor(Math.random() * empresas.length)];
       const ciudad = ciudadesMock[Math.floor(Math.random() * ciudadesMock.length)];
       const sector = sectoresMock[Math.floor(Math.random() * sectoresMock.length)];
-      const descripcion = descripciones[Math.floor(Math.random() * descripciones.length)];
+      let descripcion = descripciones[Math.floor(Math.random() * descripciones.length)];
+      // Agregar entre 1 y 3 hashtags aleatorios a la descripción
+      const numTags = 1 + Math.floor(Math.random() * 3);
+      const tags = [];
+      for (let t = 0; t < numTags; t++) {
+        tags.push(hashtagsMock[Math.floor(Math.random() * hashtagsMock.length)]);
+      }
+      descripcion += ' ' + tags.join(' ');
       const fecha = new Date(hoy.getTime() - Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000); // hasta 60 días atrás
       ofertas.push({
         titulo,
