@@ -34,6 +34,14 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  // Ciudades y sectores mock globales
+  const ciudadesMock = [
+    'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta',
+    'Cúcuta', 'Ibagué', 'Villavicencio', 'Neiva', 'Armenia', 'Popayán', 'Montería', 'Sincelejo', 'Valledupar',
+    'Pasto', 'Tunja', 'Riohacha', 'Quibdó'
+  ];
+  const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
+
   // Generador de ofertas mock
   function generarOfertasMock(cantidad = 500) {
     const titulos = [
@@ -86,12 +94,6 @@ export default function TendenciasPanel() {
       'Mantenimiento preventivo y correctivo.', 'Gestión de inventarios.', 'Atención al cliente.',
       'Optimización de procesos logísticos.', 'Elaboración de estudios de mercado.', 'Capacitación de personal.'
     ];
-    const ciudadesMock = [
-      'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta',
-      'Cúcuta', 'Ibagué', 'Villavicencio', 'Neiva', 'Armenia', 'Popayán', 'Montería', 'Sincelejo', 'Valledupar',
-      'Pasto', 'Tunja', 'Riohacha', 'Quibdó'
-    ];
-    const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
     const hoy = new Date();
     const ofertas = [];
     for (let i = 0; i < cantidad; i++) {
@@ -221,7 +223,6 @@ export default function TendenciasPanel() {
   const [ofertasPage, setOfertasPage] = useState(1);
   const ofertasPerPage = 7;
   // Opciones simuladas: mostrar todas las ciudades y sectores disponibles
-  const sectoresMock = ['Tecnología', 'Salud', 'Educación', 'Finanzas', 'Manufactura', 'Logística', 'Legal', 'Comercial', 'Marketing', 'Ingeniería', 'Alimentos', 'Química', 'Ambiental'];
   const ciudades = ['Todas', ...ciudadesMock];
   const sectores = ['Todos', ...sectoresMock];
 
