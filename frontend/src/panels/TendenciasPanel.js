@@ -81,16 +81,28 @@ export default function TendenciasPanel() {
       const secData = await resSec.json();
       setSectoresPie(secData.map(s => ({ name: s.sector, value: s.count })));
 
-      // Ofertas recientes (mock: reconstruir desde sectores y días)
-      setOfertas([
-        { titulo: 'Desarrollador Fullstack', ciudad: 'Bogotá', empresa: 'TechCol', fecha: '2025-09-12', sector: 'Tecnología', descripcion: 'Desarrollo de aplicaciones web y móviles.' },
-        { titulo: 'Analista de Datos', ciudad: 'Medellín', empresa: 'DataCorp', fecha: '2025-09-11', sector: 'Tecnología', descripcion: 'Análisis de grandes volúmenes de datos.' },
-        { titulo: 'Diseñador UX/UI', ciudad: 'Cali', empresa: 'Creativa', fecha: '2025-09-10', sector: 'Tecnología', descripcion: 'Diseño de interfaces y experiencia de usuario.' },
-        { titulo: 'Gerente de Proyectos', ciudad: 'Barranquilla', empresa: 'Proyectos SAS', fecha: '2025-09-09', sector: 'Finanzas', descripcion: 'Gestión de proyectos financieros.' },
-        { titulo: 'Enfermero/a', ciudad: 'Bogotá', empresa: 'SaludTotal', fecha: '2025-09-08', sector: 'Salud', descripcion: 'Atención a pacientes y apoyo clínico.' },
-        { titulo: 'Profesor de Inglés', ciudad: 'Cali', empresa: 'Colegio ABC', fecha: '2025-09-07', sector: 'Educación', descripcion: 'Enseñanza de inglés a estudiantes.' },
-        { titulo: 'Operario de Planta', ciudad: 'Medellín', empresa: 'Industrias XYZ', fecha: '2025-09-06', sector: 'Manufactura', descripcion: 'Operación de maquinaria industrial.' },
-      ]);
+      // Ofertas recientes (mock masivo y variado)
+      setOfertas(generarOfertasMock(200));
+      // Simular hashtags, publicacionesPorDia y sectoresPie para que los gráficos cambien
+      const hashtagsEjemplo = [
+        { text: '#empleo', value: Math.floor(Math.random()*100+50) },
+        { text: '#trabajo', value: Math.floor(Math.random()*80+30) },
+        { text: '#vacante', value: Math.floor(Math.random()*60+20) },
+        { text: '#colombia', value: Math.floor(Math.random()*40+10) },
+        { text: '#oportunidad', value: Math.floor(Math.random()*30+5) }
+      ];
+      setHashtags(hashtagsEjemplo.sort((a,b)=>b.value-a.value));
+      const dias = Array.from({length: 14}, (_,i) => {
+        const d = new Date();
+        d.setDate(d.getDate()-i);
+        return {
+          fecha: d.toISOString().slice(0,10),
+          ofertas: Math.floor(Math.random()*30+5)
+        };
+      }).reverse();
+      setPublicacionesPorDia(dias);
+      const sectoresEjemplo = ['Tecnología','Salud','Educación','Finanzas','Manufactura','Logística','Legal','Comercial','Marketing','Ingeniería','Alimentos','Química','Ambiental'];
+      setSectoresPie(sectoresEjemplo.map(s=>({name:s,value:Math.floor(Math.random()*60+10)})));
 
       setLastUpdate(new Date());
     } catch (e) {
@@ -183,6 +195,13 @@ export default function TendenciasPanel() {
           <label style={{ fontWeight: 600, marginRight: 8 }}>Hasta:</label>
           <input type="date" value={fecha.hasta} onChange={e => setFecha(f => ({ ...f, hasta: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
+        <div>
+          <label style={{ fontWeight: 600, marginRight: 8 }}>Palabra clave:</label>
+          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
+        </div>
+        <button onClick={handleAplicarFiltros} style={{ background: '#20bf6b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s', marginLeft: 8 }}>
+          Aplicar filtros
+        </button>
       </div>
 
       {/* KPIs y gráficas adicionales */}
@@ -210,9 +229,9 @@ export default function TendenciasPanel() {
         {/* Gráfica de barras de hashtags */}
         <div style={{ flex: 2, minWidth: 350, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}># Hashtags más usados</h3>
-          {Array.isArray(hashtags) && hashtags.length > 0 && hashtags[0].text !== undefined ? (
+          {Array.isArray(hashtagsFiltrados) && hashtagsFiltrados.length > 0 && hashtagsFiltrados[0].text !== undefined ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hashtags} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
+              <BarChart data={hashtagsFiltrados} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="text" type="category" width={120} />
@@ -230,7 +249,7 @@ export default function TendenciasPanel() {
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24 }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Publicaciones de ofertas (últimos días)</h3>
           <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={publicacionesPorDia} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
+            <LineChart data={publicacionesPorDiaFiltradas} margin={{ left: 0, right: 0, top: 10, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="fecha" fontSize={12} />
               <YAxis allowDecimals={false} fontSize={12} />
@@ -244,7 +263,7 @@ export default function TendenciasPanel() {
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Distribución por sector</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
-              data={[...sectoresPie].sort((a, b) => b.value - a.value)}
+              data={sectoresPieFiltrados}
               layout="vertical"
               margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
             >
@@ -266,7 +285,7 @@ export default function TendenciasPanel() {
                 }}
               />
               <Bar dataKey="value" barSize={22} isAnimationActive animationDuration={1200}>
-                {[...sectoresPie].sort((a, b) => b.value - a.value).map((entry, i) => (
+                {sectoresPieFiltrados.map((entry, i) => (
                   <Cell key={`cell-bar-${i}`} fill={pieColors[i % pieColors.length]} />
                 ))}
                 {/* Etiquetas de valor al final de cada barra */}
