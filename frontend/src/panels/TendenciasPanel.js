@@ -137,41 +137,7 @@ export default function TendenciasPanel() {
   // Datos
   const [mostrarTopHashtags, setMostrarTopHashtags] = useState(true);
 
-  // Hashtags dinámicos según las ofertas filtradas
-  const hashtags = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.descripcion) {
-        // Extraer hashtags del texto (palabras que empiezan por #)
-        const matches = of.descripcion.match(/#[\wáéíóúÁÉÍÓÚñÑ]+/g);
-        if (matches) {
-          matches.forEach(tag => {
-            counts[tag] = (counts[tag] || 0) + 1;
-          });
-        }
-      }
-    });
-    // Devolver array ordenado por valor descendente
-    return Object.entries(counts)
-      .map(([text, value]) => ({ text, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [ofertasFiltradas]);
   const [ofertas, setOfertas] = useState([]);
-  // Publicaciones por día dinámicas según las ofertas filtradas
-  const publicacionesPorDia = useMemo(() => {
-    const counts = {};
-    ofertasFiltradas.forEach(of => {
-      if (of.fecha) {
-        counts[of.fecha] = (counts[of.fecha] || 0) + 1;
-      }
-    });
-    // Devolver array ordenado por fecha ascendente
-    return Object.entries(counts)
-      .map(([fecha, ofertas]) => ({ fecha, ofertas }))
-      .sort((a, b) => a.fecha.localeCompare(b.fecha));
-  }, [ofertasFiltradas]);
-  // (sectoresPie eliminado, la gráfica de sectores es dinámica)
-
   // KPIs filtrados según ciudad/sector/fecha/keyword
   // Un solo filtro global para KPIs y paginación
   const ofertasFiltradas = useMemo(() => {
@@ -191,6 +157,41 @@ export default function TendenciasPanel() {
     }
     return filtered;
   }, [ofertas, ciudad, sector, fecha, keyword]);
+
+  // Hashtags dinámicos según las ofertas filtradas
+  const hashtags = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      if (of.descripcion) {
+        // Extraer hashtags del texto (palabras que empiezan por #)
+        const matches = of.descripcion.match(/#[\wáéíóúÁÉÍÓÚñÑ]+/g);
+        if (matches) {
+          matches.forEach(tag => {
+            counts[tag] = (counts[tag] || 0) + 1;
+          });
+        }
+      }
+    });
+    // Devolver array ordenado por valor descendente
+    return Object.entries(counts)
+      .map(([text, value]) => ({ text, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [ofertasFiltradas]);
+
+  // Publicaciones por día dinámicas según las ofertas filtradas
+  const publicacionesPorDia = useMemo(() => {
+    const counts = {};
+    ofertasFiltradas.forEach(of => {
+      if (of.fecha) {
+        counts[of.fecha] = (counts[of.fecha] || 0) + 1;
+      }
+    });
+    // Devolver array ordenado por fecha ascendente
+    return Object.entries(counts)
+      .map(([fecha, ofertas]) => ({ fecha, ofertas }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }, [ofertasFiltradas]);
+  // (sectoresPie eliminado, la gráfica de sectores es dinámica)
 
   // KPIs para mostrar (filtrados)
   const totalOfertas = ofertasFiltradas.length;
