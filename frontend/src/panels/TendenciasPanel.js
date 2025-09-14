@@ -34,6 +34,13 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  // Sincronizar filtros temporales con los reales al montar y cuando cambian los reales
+  useEffect(() => {
+    setCiudadTmp(ciudad);
+    setSectorTmp(sector);
+    setFechaTmp({ ...fecha });
+    setKeywordTmp(keyword);
+  }, [ciudad, sector, fecha, keyword]);
   // Generador de ofertas mock
   function generarOfertasMock(cantidad = 100) {
     const titulos = [
@@ -102,16 +109,27 @@ export default function TendenciasPanel() {
     return ofertas;
   }
 
-  // Botón de aplicar filtros (dummy para evitar error)
-  const handleAplicarFiltros = () => {};
+  // Botón de aplicar filtros: copia los filtros temporales a los reales
+  const handleAplicarFiltros = () => {
+    setCiudad(ciudadTmp);
+    setSector(sectorTmp);
+    setFecha({ ...fechaTmp });
+    setKeyword(keywordTmp);
+    setOfertasPage(1); // Reiniciar paginación al aplicar filtros
+  };
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
-  // Filtros
+  // Filtros reales (aplicados)
   const [ciudad, setCiudad] = useState('Todas');
   const [sector, setSector] = useState('Todos');
   const [fecha, setFecha] = useState({ desde: '', hasta: '' });
+  const [keyword, setKeyword] = useState('');
+  // Filtros temporales (UI)
+  const [ciudadTmp, setCiudadTmp] = useState('Todas');
+  const [sectorTmp, setSectorTmp] = useState('Todos');
+  const [fechaTmp, setFechaTmp] = useState({ desde: '', hasta: '' });
+  const [keywordTmp, setKeywordTmp] = useState('');
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
   const [ofertas, setOfertas] = useState([]);
@@ -266,27 +284,27 @@ export default function TendenciasPanel() {
       <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Ciudad:</label>
-          <select value={ciudad} onChange={e => setCiudad(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={ciudadTmp} onChange={e => setCiudadTmp(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {ciudades.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Sector:</label>
-          <select value={sector} onChange={e => setSector(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
+          <select value={sectorTmp} onChange={e => setSectorTmp(e.target.value)} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }}>
             {sectores.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Desde:</label>
-          <input type="date" value={fecha.desde} onChange={e => setFecha(f => ({ ...f, desde: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={fechaTmp.desde} onChange={e => setFechaTmp(f => ({ ...f, desde: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Hasta:</label>
-          <input type="date" value={fecha.hasta} onChange={e => setFecha(f => ({ ...f, hasta: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
+          <input type="date" value={fechaTmp.hasta} onChange={e => setFechaTmp(f => ({ ...f, hasta: e.target.value }))} style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2' }} />
         </div>
         <div>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Palabra clave:</label>
-          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
+          <input type="text" value={keywordTmp} onChange={e => setKeywordTmp(e.target.value)} placeholder="Buscar..." style={{ padding: 6, borderRadius: 6, border: '1px solid #d0d7e2', minWidth: 120 }} />
         </div>
         <button onClick={handleAplicarFiltros} style={{ background: '#20bf6b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s', marginLeft: 8 }}>
           Aplicar filtros
