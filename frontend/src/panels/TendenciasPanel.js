@@ -397,128 +397,131 @@ export default function TendenciasPanel() {
             </div>
           )}
         </div>
-        {/* Card cuadrada: Top empresas */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 20, marginBottom: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-          <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 14 }}>Empresas con más vacantes</h3>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', width: '100%' }}>
-            {(() => {
-              // Calcular top empresas
-              const empresaCounts = {};
-              ofertas.forEach(of => {
-                if (!empresaCounts[of.empresa]) empresaCounts[of.empresa] = 0;
-                empresaCounts[of.empresa]++;
-              });
-              const topEmpresas = Object.entries(empresaCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 6);
-              return topEmpresas.map(([empresa, count], i) => (
-                <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 12, padding: '14px 18px', minWidth: 90, minHeight: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
-                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-                    {empresa[0]}
+        {/* Columna: Top empresas arriba, mapa abajo */}
+        <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Card: Top empresas */}
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', minHeight: 120, maxHeight: 170 }}>
+            <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Empresas con más vacantes</h3>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', width: '100%' }}>
+              {(() => {
+                // Calcular top empresas
+                const empresaCounts = {};
+                ofertas.forEach(of => {
+                  if (!empresaCounts[of.empresa]) empresaCounts[of.empresa] = 0;
+                  empresaCounts[of.empresa]++;
+                });
+                const topEmpresas = Object.entries(empresaCounts)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 6);
+                return topEmpresas.map(([empresa, count], i) => (
+                  <div key={empresa} style={{ background: '#f7fafd', border: '1px solid #e0e7ef', borderRadius: 10, padding: '10px 12px', minWidth: 80, minHeight: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+                      {empresa[0]}
+                    </div>
+                    <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 13, textAlign: 'center', marginBottom: 1 }}>{empresa}</div>
+                    <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 14 }}>{count}</div>
+                    <div style={{ color: '#888', fontSize: 11 }}>vacantes</div>
                   </div>
-                  <div style={{ fontWeight: 700, color: '#232a3b', fontSize: 15, textAlign: 'center', marginBottom: 2 }}>{empresa}</div>
-                  <div style={{ color: '#188fd9', fontWeight: 700, fontSize: 16 }}>{count}</div>
-                  <div style={{ color: '#888', fontSize: 12 }}>vacantes</div>
+                ));
+              })()}
+            </div>
+          </div>
+          {/* Card: Mapa de calor */}
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 260, maxHeight: 320, position: 'relative' }}>
+            <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 10, fontSize: 18 }}>Mapa de calor por ciudad</h3>
+            <MapaCalorColombia
+              ciudades={(() => {
+                // Coordenadas de ciudades principales
+                const coordsMap = {
+                  'Bogotá': [4.711, -74.0721],
+                  'Medellín': [6.2442, -75.5812],
+                  'Cali': [3.4516, -76.532],
+                  'Barranquilla': [10.9685, -74.7813],
+                  'Cartagena': [10.391, -75.4794],
+                  'Bucaramanga': [7.1193, -73.1227],
+                  'Pereira': [4.8143, -75.6946],
+                  'Manizales': [5.0703, -75.5138],
+                  'Santa Marta': [11.2408, -74.199],
+                };
+                // Filtrar ofertas según los filtros activos
+                let filtered = ofertas;
+                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+                // Agrupar por ciudad y contar vacantes y ofertas
+                const counts = {};
+                filtered.forEach(of => {
+                  if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
+                  counts[of.ciudad].vacantes++;
+                  counts[of.ciudad].ofertas.push(of);
+                });
+                // Convertir a array de objetos para el mapa
+                return Object.entries(counts).map(([nombre, data]) => ({
+                  nombre,
+                  coords: coordsMap[nombre] || [4.5, -74.1],
+                  vacantes: data.vacantes,
+                  ofertas: data.ofertas
+                }));
+              })()}
+              onCiudadClick={nombre => setCiudadSeleccionada(nombre)}
+            />
+            {/* Resumen/lista de vacantes al hacer click en ciudad */}
+            {ciudadSeleccionada && (() => {
+              const ciudadesData = (() => {
+                // Repetimos la lógica de agrupación para obtener las ofertas de la ciudad seleccionada
+                const coordsMap = {
+                  'Bogotá': [4.711, -74.0721],
+                  'Medellín': [6.2442, -75.5812],
+                  'Cali': [3.4516, -76.532],
+                  'Barranquilla': [10.9685, -74.7813],
+                  'Cartagena': [10.391, -75.4794],
+                  'Bucaramanga': [7.1193, -73.1227],
+                  'Pereira': [4.8143, -75.6946],
+                  'Manizales': [5.0703, -75.5138],
+                  'Santa Marta': [11.2408, -74.199],
+                };
+                let filtered = ofertas;
+                if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
+                if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
+                if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
+                if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
+                const counts = {};
+                filtered.forEach(of => {
+                  if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
+                  counts[of.ciudad].vacantes++;
+                  counts[of.ciudad].ofertas.push(of);
+                });
+                return Object.entries(counts).map(([nombre, data]) => ({
+                  nombre,
+                  coords: coordsMap[nombre] || [4.5, -74.1],
+                  vacantes: data.vacantes,
+                  ofertas: data.ofertas
+                }));
+              })();
+              const ciudadData = ciudadesData.find(c => c.nombre === ciudadSeleccionada);
+              return ciudadData ? (
+                <div style={{ position: 'absolute', right: 24, top: 80, zIndex: 1200, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #0002', padding: 16, minWidth: 260 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <b style={{ fontSize: 16 }}>{ciudadSeleccionada}</b>
+                    <button onClick={() => setCiudadSeleccionada(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#eb3b5a' }}>×</button>
+                  </div>
+                  <div style={{ maxHeight: 180, overflowY: 'auto' }}>
+                    {ciudadData.ofertas.slice(0, 10).map((of, i) => (
+                      <div key={i} style={{ borderBottom: '1px solid #eee', padding: '6px 0' }}>
+                        <div style={{ fontWeight: 500 }}>{of.titulo || of.puesto || 'Vacante'}</div>
+                        <div style={{ fontSize: 12, color: '#888' }}>{of.empresa || ''}</div>
+                        <div style={{ fontSize: 12, color: '#188fd9' }}>{of.sector || ''}</div>
+                      </div>
+                    ))}
+                    {ciudadData.ofertas.length > 10 && (
+                      <div style={{ textAlign: 'center', color: '#888', fontSize: 13, marginTop: 6 }}>...más vacantes</div>
+                    )}
+                  </div>
                 </div>
-              ));
+              ) : null;
             })()}
           </div>
-        </div>
-        {/* Mapa de calor real con react-leaflet */}
-        <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
-          <MapaCalorColombia
-            ciudades={(() => {
-              // Coordenadas de ciudades principales
-              const coordsMap = {
-                'Bogotá': [4.711, -74.0721],
-                'Medellín': [6.2442, -75.5812],
-                'Cali': [3.4516, -76.532],
-                'Barranquilla': [10.9685, -74.7813],
-                'Cartagena': [10.391, -75.4794],
-                'Bucaramanga': [7.1193, -73.1227],
-                'Pereira': [4.8143, -75.6946],
-                'Manizales': [5.0703, -75.5138],
-                'Santa Marta': [11.2408, -74.199],
-              };
-              // Filtrar ofertas según los filtros activos
-              let filtered = ofertas;
-              if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-              if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-              if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-              if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
-              // Agrupar por ciudad y contar vacantes y ofertas
-              const counts = {};
-              filtered.forEach(of => {
-                if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
-                counts[of.ciudad].vacantes++;
-                counts[of.ciudad].ofertas.push(of);
-              });
-              // Convertir a array de objetos para el mapa
-              return Object.entries(counts).map(([nombre, data]) => ({
-                nombre,
-                coords: coordsMap[nombre] || [4.5, -74.1],
-                vacantes: data.vacantes,
-                ofertas: data.ofertas
-              }));
-            })()}
-            onCiudadClick={nombre => setCiudadSeleccionada(nombre)}
-          />
-          {/* Resumen/lista de vacantes al hacer click en ciudad */}
-          {ciudadSeleccionada && (() => {
-            const ciudadesData = (() => {
-              // Repetimos la lógica de agrupación para obtener las ofertas de la ciudad seleccionada
-              const coordsMap = {
-                'Bogotá': [4.711, -74.0721],
-                'Medellín': [6.2442, -75.5812],
-                'Cali': [3.4516, -76.532],
-                'Barranquilla': [10.9685, -74.7813],
-                'Cartagena': [10.391, -75.4794],
-                'Bucaramanga': [7.1193, -73.1227],
-                'Pereira': [4.8143, -75.6946],
-                'Manizales': [5.0703, -75.5138],
-                'Santa Marta': [11.2408, -74.199],
-              };
-              let filtered = ofertas;
-              if (ciudad && ciudad !== 'Todas') filtered = filtered.filter(of => of.ciudad === ciudad);
-              if (sector && sector !== 'Todos') filtered = filtered.filter(of => of.sector === sector);
-              if (fecha.desde) filtered = filtered.filter(of => of.fecha >= fecha.desde);
-              if (fecha.hasta) filtered = filtered.filter(of => of.fecha <= fecha.hasta);
-              const counts = {};
-              filtered.forEach(of => {
-                if (!counts[of.ciudad]) counts[of.ciudad] = { vacantes: 0, ofertas: [] };
-                counts[of.ciudad].vacantes++;
-                counts[of.ciudad].ofertas.push(of);
-              });
-              return Object.entries(counts).map(([nombre, data]) => ({
-                nombre,
-                coords: coordsMap[nombre] || [4.5, -74.1],
-                vacantes: data.vacantes,
-                ofertas: data.ofertas
-              }));
-            })();
-            const ciudadData = ciudadesData.find(c => c.nombre === ciudadSeleccionada);
-            return ciudadData ? (
-              <div style={{ position: 'absolute', right: 24, top: 80, zIndex: 1200, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #0002', padding: 16, minWidth: 260 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <b style={{ fontSize: 16 }}>{ciudadSeleccionada}</b>
-                  <button onClick={() => setCiudadSeleccionada(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#eb3b5a' }}>×</button>
-                </div>
-                <div style={{ maxHeight: 180, overflowY: 'auto' }}>
-                  {ciudadData.ofertas.slice(0, 10).map((of, i) => (
-                    <div key={i} style={{ borderBottom: '1px solid #eee', padding: '6px 0' }}>
-                      <div style={{ fontWeight: 500 }}>{of.titulo || of.puesto || 'Vacante'}</div>
-                      <div style={{ fontSize: 12, color: '#888' }}>{of.empresa || ''}</div>
-                      <div style={{ fontSize: 12, color: '#188fd9' }}>{of.sector || ''}</div>
-                    </div>
-                  ))}
-                  {ciudadData.ofertas.length > 10 && (
-                    <div style={{ textAlign: 'center', color: '#888', fontSize: 13, marginTop: 6 }}>...más vacantes</div>
-                  )}
-                </div>
-              </div>
-            ) : null;
-          })()}
         </div>
       </div>
 
