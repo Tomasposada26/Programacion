@@ -1,3 +1,5 @@
+  // Estado para mostrar top 5 hashtags
+  const [showTop5, setShowTop5] = useState(false);
 import MapaCalorColombia from '../components/MapaCalorColombia';
 
 import React, { useState, useEffect, useMemo } from 'react';
