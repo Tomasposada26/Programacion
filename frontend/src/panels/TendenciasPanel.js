@@ -34,6 +34,25 @@ const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
 
 export default function TendenciasPanel() {
+  // --- STATE HOOKS FIRST ---
+  // Filtros
+  const [ciudad, setCiudad] = useState('Todas');
+  const [sector, setSector] = useState('Todos');
+  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
+  // Datos
+  // Scroll infinito
+   const [filtrosAplicados, setFiltrosAplicados] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
+
+  // Otros
+
+  // Opciones simuladas
+
+
+  // --- MEMO HOOKS ---
+  // Datos filtrados para todos los gráficos
+
+
+  // --- FUNCTION DECLARATIONS ---
   // Generador de ofertas mock masivo y variado
   function generarOfertasMock(cantidad = 200) {
     const titulos = [
@@ -103,7 +122,7 @@ export default function TendenciasPanel() {
   }
 
   // Estado para filtros aplicados
-  const [filtrosAplicados, setFiltrosAplicados] = useState({ ciudad: 'Todas', sector: 'Todos', fecha: { desde: '', hasta: '' }, keyword: '' });
+
 
   // Handler para aplicar filtros
   const handleAplicarFiltros = () => {
@@ -175,13 +194,11 @@ export default function TendenciasPanel() {
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value-a.value);
   }, [ofertasFiltradas]);
-  const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null);
+
   // Filtros
-  const [ciudad, setCiudad] = useState('Todas');
-  const [sector, setSector] = useState('Todos');
-  const [fecha, setFecha] = useState({ desde: '', hasta: '' });
-  const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [loading, setLoading] = useState(false);
+
+
+
   const [keyword, setKeyword] = useState('');
   // Datos
   const [hashtags, setHashtags] = useState([]);
