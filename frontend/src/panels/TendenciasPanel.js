@@ -535,6 +535,19 @@ const handleUpdate = () => {
                   'Pereira': [4.8143, -75.6946],
                   'Manizales': [5.0703, -75.5138],
                   'Santa Marta': [11.2408, -74.199],
+                  'Cúcuta': [7.8939, -72.5078],
+                  'Ibagué': [4.4389, -75.2322],
+                  'Villavicencio': [4.142, -73.6266],
+                  'Neiva': [2.9359, -75.2809],
+                  'Armenia': [4.5339, -75.6811],
+                  'Popayán': [2.4448, -76.6147],
+                  'Montería': [8.74798, -75.8814],
+                  'Sincelejo': [9.30472, -75.3978],
+                  'Valledupar': [10.4631, -73.2532],
+                  'Pasto': [1.2136, -77.2811],
+                  'Tunja': [5.5353, -73.3678],
+                  'Riohacha': [11.5444, -72.9072],
+                  'Quibdó': [5.6947, -76.6611],
                 };
                 // Filtrar ofertas según los filtros activos
                 let filtered = ofertas;
