@@ -1,6 +1,6 @@
 import MapaCalorColombia from '../components/MapaCalorColombia';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend, LabelList } from 'recharts';
 // Tooltip personalizado para hashtags
 function CustomHashtagTooltip({ active, payload, label }) {
