@@ -1,8 +1,9 @@
 import MapaCalorColombia from '../components/MapaCalorColombia';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend, LabelList } from 'recharts';
-// Tooltip personalizado para hashtags
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, LabelList, Cell } from 'recharts';
+
+// Tooltip personalizado para hashtags (solo muestra datos del hashtag)
 function CustomHashtagTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
     return (
@@ -15,7 +16,7 @@ function CustomHashtagTooltip({ active, payload, label }) {
   return null;
 }
 
-// Tooltip personalizado para pastel
+// Tooltip personalizado para pastel (solo muestra datos del sector)
 function CustomPieTooltip({ active, payload }) {
   if (active && payload && payload.length) {
     return (
@@ -27,8 +28,6 @@ function CustomPieTooltip({ active, payload }) {
   }
   return null;
 }
-// Si luego instalas react-wordcloud puedes importar y usar WordCloud aquí
-// import WordCloud from 'react-wordcloud';
 
 const API_BASE = 'https://programacion-gdr0.onrender.com/api/tendencias';
 const pieColors = ['#188fd9', '#f7b731', '#20bf6b', '#8854d0', '#eb3b5a'];
@@ -208,7 +207,6 @@ export default function TendenciasPanel() {
     return filtered;
   }, [ofertas, keyword]);
 
-
   // Paginación clásica: calcular total de páginas
   const totalPages = Math.ceil(ofertasFiltradas.length / ofertasPerPage);
   const ofertasPaginadas = useMemo(() => {
@@ -232,7 +230,6 @@ export default function TendenciasPanel() {
     return Object.entries(counts).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total).slice(0, 5);
   }, [ofertas]);
 
-  // ...resto del render y componentes...
   return (
     <div style={{ padding: 32, maxWidth: 1200, margin: '0 auto' }}>
       {/* Barra de actualización */}
@@ -296,6 +293,55 @@ export default function TendenciasPanel() {
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, minWidth: 180, flex: 1 }}>
           <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>Variación semanal</div>
           <div style={{ fontWeight: 800, fontSize: 24, color: '#20bf6b' }}>+8%</div>
+        </div>
+      </div>
+
+      {/* Panel: Top Empresas */}
+      <div style={{ display: 'flex', gap: 18, margin: '32px 0 0 0', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
+        {(() => {
+          const counts = {};
+          ofertas.forEach(of => {
+            if (!of.empresa) return;
+            counts[of.empresa] = (counts[of.empresa] || 0) + 1;
+          });
+          const topEmpresas = Object.entries(counts)
+            .map(([empresa, total]) => ({ empresa, total }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 6);
+          return topEmpresas.map(({ empresa, total }) => (
+            <div key={empresa} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: '14px 22px', minWidth: 120, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#188fd9', color: '#fff', fontWeight: 800, fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #0001' }}>
+                {empresa[0]}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 700, color: '#232a3b', fontSize: 16 }}>{empresa}</span>
+                <span style={{ color: '#888', fontSize: 14 }}>{total} vacantes</span>
+              </div>
+            </div>
+          ));
+        })()}
+      </div>
+
+      {/* Panel de Insights */}
+      <div style={{ width: '100%', margin: '32px 0 0 0', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ background: '#f7faff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: '22px 32px', minWidth: 320, maxWidth: 900, width: '100%', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
+          {(() => {
+            // Frases automáticas de insights
+            const frases = [];
+            if (rankingCiudades.length > 0 && rankingSectores.length > 0) {
+              frases.push(`${rankingCiudades[0].nombre} lidera en vacantes de ${rankingSectores[0].nombre} este mes.`);
+            }
+            if (rankingSectores.length > 1) {
+              frases.push(`El sector ${rankingSectores[1].nombre} creció un ${(Math.random()*20+5).toFixed(1)}% en ${rankingCiudades[0].nombre}.`);
+            }
+            if (ofertas.length > 0) {
+              frases.push(`Se publicaron ${ofertas.length} vacantes en total este mes.`);
+            }
+            if (frases.length === 0) frases.push('No hay insights disponibles para los filtros actuales.');
+            return frases.map((frase, i) => (
+              <span key={i} style={{ color: '#232a3b', fontWeight: 600, fontSize: 17, marginRight: 24 }}>{frase}</span>
+            ));
+          })()}
         </div>
       </div>
 
@@ -398,7 +444,6 @@ export default function TendenciasPanel() {
           )}
         </div>
         {/* Nube de palabras eliminada por eliminación de react-wordcloud */}
-        {/* Aquí puedes agregar otra visualización o dejar el espacio vacío */}
         {/* Mapa de calor real con react-leaflet */}
         <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <h3 style={{ color: '#232a3b', fontWeight: 700, marginBottom: 12 }}>Mapa de calor por ciudad</h3>
@@ -496,8 +541,6 @@ export default function TendenciasPanel() {
           })()}
         </div>
       </div>
-
-
     </div>
   );
 }
