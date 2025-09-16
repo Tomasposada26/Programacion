@@ -307,7 +307,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
             }
             setLinking(false);
           }}
-          loading={linking || loading}
+          loading={linking}
         />
       </div>
       <InstagramAccountsTable
