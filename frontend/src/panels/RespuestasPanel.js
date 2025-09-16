@@ -21,10 +21,13 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/reglas`)
+    if (!user || !user.token) return;
+    fetch(`${process.env.REACT_APP_API_URL}/api/reglas`, {
+      headers: { Authorization: `Bearer ${user.token}` }
+    })
       .then(res => res.json())
       .then(data => setReglas(Array.isArray(data) ? data : []));
-  }, []);
+  }, [user]);
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -56,7 +59,10 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user?.token}`
+        },
         body: JSON.stringify(nueva)
       });
       if (res.ok) {
