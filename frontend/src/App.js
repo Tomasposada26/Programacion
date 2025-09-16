@@ -197,7 +197,13 @@ function App() {
       }))
     };
     const url = `${BACKEND_URL}/api/instagram-token/bulk-save`;
-    // Siempre usar fetchWithAuth para asegurar el token
+    if (navigator.sendBeacon) {
+      try {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      } catch {}
+    }
     fetchWithAuth(
       url,
       {

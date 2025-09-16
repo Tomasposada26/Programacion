@@ -244,10 +244,7 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     <div style={{ width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: '0 auto', padding: 24, overflow: 'visible', marginLeft: '-20ch' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <InstagramLinkCard
-          isLinked={accounts.length > 0}
           onLink={handleLink}
-          onUnlink={() => setConfirm({ open: true, id: user?._id })}
-          instagramUser={accounts[0]}
           loading={linking || loading}
         />
       </div>
@@ -266,7 +263,11 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
       <ConfirmModal
         open={confirm.open}
         onClose={() => setConfirm({ open: false, id: null })}
-        onConfirm={() => { handleUnlink(confirm.id); setConfirm({ open: false, id: null }); }}
+        onConfirm={() => {
+          // Eliminar inmediatamente del frontend
+          setAccounts(accs => accs.filter(a => a._id !== confirm.id));
+          handleUnlink(confirm.id);
+        }}
         message="¿Estás seguro que deseas desvincular esta cuenta?"
       />
     </div>
