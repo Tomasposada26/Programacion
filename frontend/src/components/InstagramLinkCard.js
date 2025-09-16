@@ -21,7 +21,49 @@ const InstagramLinkCard = ({ isLinked, onLink, onUnlink, instagramUser, loading 
       Conecta tu cuenta para acceder a funciones exclusivas.
     </div>
     {/* Mostrar botón solo si no hay cuenta vinculada */}
-    {/* Botón de vincular removido completamente */}
+    <button
+      onClick={onLink}
+      disabled={loading}
+      style={{
+        background: '#2196f3',
+        color: '#fff',
+        border: 'none',
+        borderRadius: 8,
+        padding: '10px 22px',
+        fontWeight: 600,
+        cursor: loading ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8
+      }}
+    >
+      {loading && (
+        <span className="spinner" style={{ width: 18, height: 18, display: 'inline-block' }}>
+          <svg viewBox="0 0 50 50" style={{ width: 18, height: 18 }}>
+            <circle
+              cx="25"
+              cy="25"
+              r="20"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="5"
+              strokeDasharray="31.4 31.4"
+              strokeLinecap="round"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 25 25"
+                to="360 25 25"
+                dur="0.8s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
+        </span>
+      )}
+      {loading ? 'Vinculando...' : 'Vincular cuenta de Instagram'}
+    </button>
   </div>
 );
 

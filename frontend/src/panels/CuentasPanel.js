@@ -244,7 +244,69 @@ const CuentasPanel = ({ accounts, setAccounts, user, setGlobalNotifications, glo
     <div style={{ width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: '0 auto', padding: 24, overflow: 'visible', marginLeft: '-20ch' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
         <InstagramLinkCard
-          onLink={handleLink}
+          onLink={async () => {
+            if (linking) return;
+            setLinking(true);
+            const now = new Date();
+            const realNames = [
+              'sofia.gomez', 'juanpablo_23', 'cata.martinez', 'luisfer.photo', 'valen_fit',
+              'andres.music', 'camila.makeup', 'dani_travels', 'maria.foodie', 'joseblog',
+              'laura.art', 'mateo.tech', 'isa_runner', 'nico.gamer', 'caro.style',
+              'pablo_chef', 'martina.books', 'santi.surf', 'alejandra.yoga', 'felipe.coffee'
+            ];
+            const username = `@${realNames[Math.floor(Math.random() * realNames.length)]}`;
+            const expiresAt = Date.now() + 60 * 60 * 1000;
+            const fakeAccount = {
+              _id: Math.random().toString(36).slice(2),
+              username,
+              profile_picture_url: 'https://ui-avatars.com/api/?name=IG',
+              isExpiringSoon: false,
+              active: true,
+              linkedAt: now.toLocaleString(),
+              autoRefresh: true,
+              refreshing: false,
+              expiresAt
+            };
+            try {
+              const res = await fetch(`${BACKEND_URL}/api/instagram-token/simulate-link`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${user?.token}`
+                },
+                body: JSON.stringify({
+                  username,
+                  linkedAt: now.toISOString(),
+                  active: true,
+                  expiresAt
+                })
+              });
+              if (res.ok) {
+                const saved = await res.json();
+                setAccounts(accs => [
+                  {
+                    ...fakeAccount,
+                    _id: saved._id || fakeAccount._id
+                  },
+                  ...accs
+                ]);
+                if (setGlobalNotifications) {
+                  const notif = {
+                    id: Date.now() + Math.random(),
+                    text: `Cuenta ${username} vinculada exitosamente`,
+                    date: new Date().toISOString(),
+                    type: 'vinculada',
+                    accountId: saved._id || fakeAccount._id || '',
+                    _tipo: 'cuenta'
+                  };
+                  setGlobalNotifications(prev => [notif, ...(prev || [])]);
+                }
+              }
+            } catch (e) {
+              // opcional: mostrar error
+            }
+            setLinking(false);
+          }}
           loading={linking || loading}
         />
       </div>
