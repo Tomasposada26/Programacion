@@ -21,13 +21,7 @@ const InstagramLinkCard = ({ isLinked, onLink, onUnlink, instagramUser, loading 
       Conecta tu cuenta para acceder a funciones exclusivas.
     </div>
     {/* Mostrar botón solo si no hay cuenta vinculada */}
-    <button
-      onClick={onLink}
-      disabled={loading}
-      style={{ background: '#2196f3', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 22px', fontWeight: 600, cursor: 'pointer' }}
-    >
-      {loading ? 'Vinculando...' : 'Vincular cuenta de Instagram'}
-    </button>
+    {/* Botón de vincular removido completamente */}
   </div>
 );
 
