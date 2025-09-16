@@ -4,7 +4,7 @@ const Regla = require('../models/Regla');
 const reglaController = {
   async create(req, res) {
     try {
-      const nueva = new Regla(req.body);
+      const nueva = new Regla({ ...req.body, userId: req.user.id });
       await nueva.save();
       res.status(201).json(nueva);
     } catch (err) {
@@ -13,13 +13,13 @@ const reglaController = {
   },
   async duplicate(req, res) {
     try {
-      const original = await Regla.findById(req.params.id);
+      const original = await Regla.findOne({ _id: req.params.id, userId: req.user.id });
       if (!original) return res.status(404).json({ error: 'Regla no encontrada' });
       const copia = original.toObject();
       delete copia._id;
       delete copia.createdAt;
       delete copia.updatedAt;
-      const nueva = new Regla(copia);
+      const nueva = new Regla({ ...copia, userId: req.user.id });
       await nueva.save();
       res.status(201).json(nueva);
     } catch (err) {
@@ -28,7 +28,7 @@ const reglaController = {
   },
   async getAll(req, res) {
     try {
-      const reglas = await Regla.find();
+      const reglas = await Regla.find({ userId: req.user.id });
       res.json(reglas);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -36,7 +36,7 @@ const reglaController = {
   },
   async getById(req, res) {
     try {
-      const regla = await Regla.findById(req.params.id);
+      const regla = await Regla.findOne({ _id: req.params.id, userId: req.user.id });
       if (!regla) return res.status(404).json({ error: 'Regla no encontrada' });
       res.json(regla);
     } catch (err) {
@@ -50,8 +50,8 @@ const reglaController = {
         update.respuestaAutomatica = req.body.respuestaAutomatica;
       }
       Object.assign(update, req.body);
-      const reglaActualizada = await Regla.findByIdAndUpdate(
-        req.params.id,
+      const reglaActualizada = await Regla.findOneAndUpdate(
+        { _id: req.params.id, userId: req.user.id },
         update,
         { new: true, runValidators: true }
       );
@@ -63,7 +63,7 @@ const reglaController = {
   },
   async delete(req, res) {
     try {
-      const reglaEliminada = await Regla.findByIdAndDelete(req.params.id);
+      const reglaEliminada = await Regla.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
       if (!reglaEliminada) return res.status(404).json({ error: 'Regla no encontrada' });
       res.json({ mensaje: 'Regla eliminada' });
     } catch (err) {
@@ -76,8 +76,8 @@ const reglaController = {
       return res.status(400).json({ error: 'Estado inválido' });
     }
     try {
-      const regla = await Regla.findByIdAndUpdate(
-        req.params.id,
+      const regla = await Regla.findOneAndUpdate(
+        { _id: req.params.id, userId: req.user.id },
         { estado },
         { new: true, runValidators: true }
       );
