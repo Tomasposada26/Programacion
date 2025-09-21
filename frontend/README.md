@@ -1,63 +1,78 @@
-# Getting Started with Create React App
+# Frontend — Aura (Instagram CMS)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este frontend es la interfaz de usuario de Aura, el CMS de Instagram para Magneto. Permite a los usuarios gestionar cuentas, reglas, notificaciones y visualizar estadísticas de interacciones.
 
-## Available Scripts
+## Funcionalidad principal
+- Login y autenticación de usuarios
+- Vinculación y gestión de múltiples cuentas de Instagram
+- Visualización y gestión de reglas automáticas
+- Panel de notificaciones y respuestas automáticas
+- Dashboard de tendencias y estadísticas
+- Chatbot integrado para responder a interacciones
+- UI moderna y responsiva (React)
 
-In the project directory, you can run:
+## Estructura de carpetas
+```
+frontend/
+├── public/            # Archivos estáticos y HTML base
+├── src/
+│   ├── assets/        # Imágenes, íconos y recursos gráficos
+│   ├── components/    # Componentes reutilizables (tablas, modales, etc.)
+│   ├── hooks/         # Custom hooks de React
+│   ├── legal/         # Páginas legales (privacidad, términos)
+│   ├── modals/        # Modales de autenticación, perfil, ayuda
+│   ├── panels/        # Paneles principales (Cuentas, Dashboard, Respuestas, etc.)
+│   ├── services/      # Servicios de API y helpers
+│   ├── styles/        # Estilos globales y específicos
+│   ├── tests/         # Pruebas unitarias y de integración
+│   └── utils/         # Utilidades varias
+├── package.json
+├── .env.example
+└── README.md
+```
 
-### `npm start`
+## Scripts principales
+- `npm start` — Inicia la app en modo desarrollo
+- `npm run build` — Compila la app para producción
+- `npm test` — Ejecuta los tests
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Configuración
+1. Crea un archivo `.env` y define la URL del backend:
+	- `REACT_APP_API_URL` —
+	  - Para desarrollo local: `http://localhost:4000`
+	  - Para producción (Render): `https://programacion-gdr0.onrender.com`
 
-### `npm test`
+2. Instala dependencias:
+	```bash
+	npm install
+	```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Ejecuta el frontend:
+	```bash
+	npm start
+	```
 
-### `npm run build`
+- El frontend consume la API protegida por JWT, por lo que requiere login.
+- Permite gestionar cuentas, reglas y ver notificaciones en tiempo real.
+- El diseño es adaptable y pensado para equipos de Magneto.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Despliegue
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Este frontend está desplegado en [Vercel](https://vercel.com/):
+- **En local:** escucha en `http://localhost:3000`
+- **En producción:** [https://programacion-tau.vercel.app/](https://programacion-tau.vercel.app/)
+Configura la variable de entorno `REACT_APP_API_URL` con la URL pública del backend desplegado en Render.
 
-### `npm run eject`
+---
+Desarrollado para Magneto | Proyecto Aura
+- El frontend consume la API protegida por JWT, por lo que requiere login.
+- Permite gestionar cuentas, reglas y ver notificaciones en tiempo real.
+- El diseño es adaptable y pensado para equipos de Magneto.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
+---
+Desarrollado para Magneto | Proyecto Aura
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
