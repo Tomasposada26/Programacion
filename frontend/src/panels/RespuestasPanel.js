@@ -239,7 +239,10 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                         const nuevoEstado = regla.estado === 'activa' ? 'inactiva' : 'activa';
                         const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${regla._id}/estado`, {
                           method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${user?.token}`
+                          },
                           body: JSON.stringify({ estado: nuevoEstado })
                         });
                         if (res.ok) {
@@ -266,7 +269,12 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                     <button
                       style={{background: darkMode ? '#232a3b' : '#e0e7ef',color: darkMode ? '#fff' : '#232a3b',fontWeight:600,padding:'6px 12px',border:'none',borderRadius:6,cursor:'pointer',marginRight:6}}
                       onClick={async () => {
-                        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${regla._id}/duplicar`, { method: 'POST' });
+                        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${regla._id}/duplicar`, {
+                          method: 'POST',
+                          headers: {
+                            Authorization: `Bearer ${user?.token}`
+                          }
+                        });
                         if (res.ok) {
                           const nueva = await res.json();
                           setReglas(rs => [nueva, ...rs]);
@@ -309,7 +317,12 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
               <button
                 style={{background:'#e53e3e',color:'#fff',fontWeight:700,padding:'10px 24px',border:'none',borderRadius:8,fontSize:16,cursor:'pointer'}}
                 onClick={async () => {
-                  const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${deleteId}`, { method: 'DELETE' });
+                  const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${deleteId}`, {
+                    method: 'DELETE',
+                    headers: {
+                      Authorization: `Bearer ${user?.token}`
+                    }
+                  });
                   if (res.ok) {
                     setReglas(rs => rs.filter(r => r._id !== deleteId));
                     if (typeof setGlobalNotifications === 'function' && typeof setNotificationCount === 'function') {
@@ -363,7 +376,10 @@ const RespuestasPanel = ({ setGlobalNotifications, setNotificationCount, user })
                     onClick={async () => {
                       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reglas/${editId}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${user?.token}`
+                        },
                         body: JSON.stringify({ respuestaAutomatica: editValue })
                       });
                       if (res.ok) {
